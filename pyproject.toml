@@ -23,7 +23,7 @@ classifiers = [
 packages = [{include = "src"}]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = ">=3.9,<3.9.7 || >3.9.7,<4.0"
 # Core Spark and Data Processing
 pyspark = "^3.4.1"
 delta-spark = "^2.4.0"
