@@ -48,6 +48,11 @@ click = "^8.1.3"
 pyyaml = "^6.0.1"
 python-dateutil = "^2.8.2"
 pytz = "^2023.3"
+# Test data generation
+faker = "^19.3.0"
+requests = "^2.31.0"
+# System monitoring
+psutil = "^5.9.0"
 
 [tool.poetry.group.dev.dependencies]
 # Testing

@@ -82,7 +82,7 @@ run-spark: ## Run a Spark job example
 	@echo "$(BLUE)Running Spark job example...$(NC)"
 	poetry run python -m src.analytics.example_job
 
-# Docker
+# Docker and Development Environment
 docker-build: ## Build Docker images
 	@echo "$(BLUE)Building Docker images...$(NC)"
 	docker-compose build
@@ -99,6 +99,24 @@ docker-logs: ## View logs from all services
 	@echo "$(BLUE)Viewing logs...$(NC)"
 	docker-compose logs -f
 
+# Development Environment Management
+dev-start: ## Start development environment with initialization
+	@echo "$(BLUE)Starting development environment...$(NC)"
+	./scripts/start-dev-env.sh
+
+dev-stop: ## Stop development environment
+	@echo "$(BLUE)Stopping development environment...$(NC)"
+	./scripts/stop-dev-env.sh
+
+dev-clean: ## Clean and restart development environment
+	@echo "$(BLUE)Cleaning and restarting development environment...$(NC)"
+	./scripts/stop-dev-env.sh --volumes
+	./scripts/start-dev-env.sh --clean
+
+dev-status: ## Check development environment status
+	@echo "$(BLUE)Checking development environment status...$(NC)"
+	docker-compose ps
+
 # Database
 db-migrate: ## Run database migrations
 	@echo "$(BLUE)Running database migrations...$(NC)"
@@ -109,10 +127,26 @@ db-reset: ## Reset database
 	poetry run alembic downgrade base
 	poetry run alembic upgrade head
 
-# Data
+# Data Management
 generate-data: ## Generate sample data
 	@echo "$(BLUE)Generating sample data...$(NC)"
-	poetry run python -m src.data.generator
+	./scripts/generate-test-data.py
+
+generate-data-quick: ## Generate small dataset for testing
+	@echo "$(BLUE)Generating quick test data...$(NC)"
+	./scripts/generate-test-data.py --quick
+
+reset-data: ## Reset all data
+	@echo "$(BLUE)Resetting all data...$(NC)"
+	./scripts/reset-data.sh --all --confirm
+
+reset-data-postgres: ## Reset PostgreSQL data only
+	@echo "$(BLUE)Resetting PostgreSQL data...$(NC)"
+	./scripts/reset-data.sh --postgres --confirm
+
+reset-data-kafka: ## Reset Kafka data only
+	@echo "$(BLUE)Resetting Kafka data...$(NC)"
+	./scripts/reset-data.sh --kafka --confirm
 
 # Spark
 spark-submit: ## Submit a Spark job
@@ -170,10 +204,20 @@ security-scan: ## Run security scan
 	poetry run bandit -r src/
 	poetry run safety check
 
-# Health check
-health: ## Check system health
-	@echo "$(BLUE)Checking system health...$(NC)"
-	poetry run python -m src.utils.health_check
+# Health Checks
+health-check: ## Comprehensive health check
+	@echo "$(BLUE)Running comprehensive health check...$(NC)"
+	./scripts/check-health.py
+
+test-services: ## Test core services
+	@echo "$(BLUE)Testing core services...$(NC)"
+	./scripts/test-services.py
+
+test-monitoring: ## Test monitoring services
+	@echo "$(BLUE)Testing monitoring services...$(NC)"
+	./scripts/test-monitoring.py
+
+health: health-check ## Alias for health-check
 
 # Environment setup
 setup-dev: install-dev ## Set up development environment
