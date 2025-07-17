@@ -36,6 +36,31 @@
 - **Future Enhancement**: Add CI/CD status checks once all workflows are stable
 - **Rationale**: Prioritize development velocity over strict protection during initial phases
 
+## 🔧 Technical Debt & Known Issues
+
+### CI/CD Pipeline Issues (To be addressed in future tasks)
+- **❌ Test Pipeline Failures**: Tests fail because no test files exist yet
+  - **Impact**: Testing jobs fail in CI/CD pipeline
+  - **Resolution**: Create basic test files when implementing features
+  - **Priority**: Medium - Will be resolved during Task 6.1.1 (Unit Testing)
+  
+- **❌ Deprecated actions/upload-artifact@v3**: GitHub Actions using deprecated version
+  - **Impact**: Deprecation warnings in CI/CD runs
+  - **Resolution**: Update to actions/upload-artifact@v4 in all workflows
+  - **Priority**: Low - Functional but needs updating
+  - **Files**: `.github/workflows/ci.yml` (security scanning job)
+  
+- **⚠️ Simplified Dependencies**: Removed heavy dependencies for CI performance
+  - **Impact**: Some features may need dependency additions
+  - **Resolution**: Add dependencies incrementally per task requirements
+  - **Priority**: Low - Intentional optimization
+  - **Context**: Moved PySpark, Kafka, Streamlit to future task phases
+
+### Performance Optimizations Applied
+- **✅ CI Performance**: Reduced from 5+ minutes to 1m21s
+- **✅ Dependency Resolution**: Simplified to core dependencies only
+- **✅ Workflow Resilience**: Added fallback handling for all CI checks
+
 ## Phase 1: Foundation & Infrastructure (Weeks 1-2)
 
 ### 1.1 Project Setup & Repository Management
