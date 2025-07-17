@@ -1,0 +1,85 @@
+# Local development configuration
+# Copy this file to local.yaml and modify as needed
+
+# Application settings
+app:
+  name: "E-Commerce Analytics Platform"
+  version: "0.1.0"
+  debug: true
+  log_level: "DEBUG"
+
+# Database configuration
+database:
+  host: "localhost"
+  port: 5432
+  name: "ecommerce_analytics"
+  user: "analytics_user"
+  password: "dev_password"
+  pool_size: 5
+  max_overflow: 10
+
+# Kafka configuration
+kafka:
+  bootstrap_servers: "localhost:9092"
+  topics:
+    transactions: "transactions"
+    user_events: "user-events"
+    product_updates: "product-updates"
+  consumer_group: "analytics-consumer-group"
+
+# Spark configuration
+spark:
+  app_name: "ECommerceAnalytics"
+  master: "local[*]"
+  driver_memory: "2g"
+  executor_memory: "2g"
+  executor_cores: 2
+  sql_adaptive_enabled: true
+  sql_adaptive_coalesce_partitions_enabled: true
+
+# Redis configuration
+redis:
+  host: "localhost"
+  port: 6379
+  db: 0
+  password: null
+  decode_responses: true
+
+# MinIO/S3 configuration
+storage:
+  endpoint: "localhost:9000"
+  access_key: "minioadmin"
+  secret_key: "minioadmin"
+  bucket: "ecommerce-data"
+  secure: false
+
+# API configuration
+api:
+  host: "0.0.0.0"
+  port: 8000
+  workers: 1
+  reload: true
+  access_log: true
+
+# Dashboard configuration
+dashboard:
+  host: "0.0.0.0"
+  port: 8501
+  debug: true
+
+# Monitoring configuration
+monitoring:
+  prometheus:
+    enabled: true
+    port: 9090
+  grafana:
+    enabled: true
+    port: 3000
+    
+# Logging configuration
+logging:
+  level: "DEBUG"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "logs/app.log"
+  max_size: "10MB"
+  backup_count: 5

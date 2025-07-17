@@ -1,0 +1,86 @@
+# Development environment configuration
+
+# Application settings
+app:
+  name: "E-Commerce Analytics Platform"
+  version: "0.1.0"
+  debug: false
+  log_level: "INFO"
+
+# Database configuration
+database:
+  host: "localhost"
+  port: 5432
+  name: "ecommerce_analytics_dev"
+  user: "analytics_user"
+  password: "${DB_PASSWORD}"
+  pool_size: 10
+  max_overflow: 20
+
+# Kafka configuration
+kafka:
+  bootstrap_servers: "localhost:9092"
+  topics:
+    transactions: "transactions"
+    user_events: "user-events"
+    product_updates: "product-updates"
+  consumer_group: "analytics-consumer-group"
+  auto_offset_reset: "earliest"
+
+# Spark configuration
+spark:
+  app_name: "ECommerceAnalytics-Dev"
+  master: "local[*]"
+  driver_memory: "4g"
+  executor_memory: "4g"
+  executor_cores: 4
+  sql_adaptive_enabled: true
+  sql_adaptive_coalesce_partitions_enabled: true
+  serializer: "org.apache.spark.serializer.KryoSerializer"
+
+# Redis configuration
+redis:
+  host: "localhost"
+  port: 6379
+  db: 0
+  password: "${REDIS_PASSWORD}"
+  decode_responses: true
+
+# MinIO/S3 configuration
+storage:
+  endpoint: "localhost:9000"
+  access_key: "${MINIO_ACCESS_KEY}"
+  secret_key: "${MINIO_SECRET_KEY}"
+  bucket: "ecommerce-data-dev"
+  secure: false
+
+# API configuration
+api:
+  host: "0.0.0.0"
+  port: 8000
+  workers: 2
+  reload: false
+  access_log: false
+
+# Dashboard configuration
+dashboard:
+  host: "0.0.0.0"
+  port: 8501
+  debug: false
+
+# Monitoring configuration
+monitoring:
+  prometheus:
+    enabled: true
+    port: 9090
+  grafana:
+    enabled: true
+    port: 3000
+
+# Logging configuration
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "logs/app.log"
+  max_size: "50MB"
+  backup_count: 10
