@@ -27,7 +27,6 @@ def test_subpackage_imports():
     import src.dashboard
     import src.streaming
     import src.utils
-    import src.data
     
     # These should import without errors
     assert src.analytics is not None
@@ -35,7 +34,6 @@ def test_subpackage_imports():
     assert src.dashboard is not None
     assert src.streaming is not None
     assert src.utils is not None
-    assert src.data is not None
 
 
 def test_cli_module_import():

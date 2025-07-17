@@ -76,6 +76,9 @@ sphinx = "^7.0.1"
 sphinx-rtd-theme = "^1.2.2"
 # Performance and Load Testing
 locust = "^2.15.1"
+# Security Scanning
+safety = "^2.3.0"
+bandit = "^1.7.5"
 
 [build-system]
 requires = ["poetry-core"]
