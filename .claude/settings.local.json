@@ -1,29 +1,7 @@
 {
   "permissions": {
     "allow": [
-      "Bash(ls:*)",
-      "Bash(git add:*)",
-      "Bash(git commit:*)",
-      "Bash(gh auth:*)",
-      "Bash(gh repo create:*)",
-      "Bash(git push:*)",
-      "Bash(git checkout:*)",
-      "Bash(gh api:*)",
-      "Bash(rm:*)",
-      "Bash(mkdir:*)",
-      "Bash(tree:*)",
-      "Bash(python:*)",
-      "Bash(git remote:*)",
-      "Bash(gh run list:*)",
-      "Bash(gh run view:*)",
-      "Bash(gh run cancel:*)",
-      "Bash(poetry lock:*)",
-<<<<<<< Updated upstream
-      "Bash(chmod:*)",
-      "Bash(docker-compose:*)"
-=======
-      "Bash(git pull:*)"
->>>>>>> Stashed changes
+      "Bash(poetry run pytest:*)"
     ],
     "deny": []
   }
