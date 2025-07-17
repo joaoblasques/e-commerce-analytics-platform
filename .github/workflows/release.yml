@@ -1,0 +1,219 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'  # Trigger on version tags like v1.0.0
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., 1.0.0)'
+        required: true
+        type: string
+
+env:
+  PYTHON_VERSION: '3.9'
+  POETRY_VERSION: '1.4.2'
+
+jobs:
+  validate-release:
+    name: Validate Release
+    runs-on: ubuntu-latest
+    
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Extract version
+      id: version
+      run: |
+        if [[ "${{ github.event_name }}" == "push" ]]; then
+          VERSION=${GITHUB_REF#refs/tags/v}
+        else
+          VERSION=${{ github.event.inputs.version }}
+        fi
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "Releasing version: $VERSION"
+        
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        
+    - name: Install Poetry
+      uses: snok/install-poetry@v1
+      with:
+        version: ${{ env.POETRY_VERSION }}
+        
+    - name: Validate version
+      run: |
+        poetry version ${{ steps.version.outputs.version }}
+        poetry check
+        
+    - name: Run full test suite
+      run: |
+        poetry install --no-interaction
+        poetry run pytest -v --tb=short
+        
+    - name: Build package
+      run: poetry build
+      
+    - name: Validate package
+      run: |
+        pip install dist/*.whl
+        python -c "import src; print(f'Package version: {src.__version__}')"
+
+  create-release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: validate-release
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        
+    - name: Install Poetry
+      uses: snok/install-poetry@v1
+      with:
+        version: ${{ env.POETRY_VERSION }}
+        
+    - name: Build package
+      run: |
+        poetry version ${{ needs.validate-release.outputs.version }}
+        poetry build
+        
+    - name: Generate changelog
+      id: changelog
+      run: |
+        # Extract changes from CHANGELOG.md if it exists
+        if [[ -f CHANGELOG.md ]]; then
+          sed -n "/## \[${VERSION}\]/,/## \[/p" CHANGELOG.md | head -n -1 > release_notes.txt
+        else
+          echo "Release v${{ needs.validate-release.outputs.version }}" > release_notes.txt
+          echo "" >> release_notes.txt
+          echo "## What's New" >> release_notes.txt
+          echo "- Bug fixes and improvements" >> release_notes.txt
+        fi
+        
+    - name: Create GitHub Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ needs.validate-release.outputs.version }}
+        release_name: Release v${{ needs.validate-release.outputs.version }}
+        body_path: release_notes.txt
+        draft: false
+        prerelease: false
+        
+    - name: Upload wheel to release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: dist/*.whl
+        asset_name: ecommerce_analytics_platform-${{ needs.validate-release.outputs.version }}-py3-none-any.whl
+        asset_content_type: application/zip
+        
+    - name: Upload source distribution to release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: dist/*.tar.gz
+        asset_name: ecommerce_analytics_platform-${{ needs.validate-release.outputs.version }}.tar.gz
+        asset_content_type: application/gzip
+
+  publish-package:
+    name: Publish to PyPI
+    runs-on: ubuntu-latest
+    needs: [validate-release, create-release]
+    environment: release  # Use environment protection
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        
+    - name: Install Poetry
+      uses: snok/install-poetry@v1
+      with:
+        version: ${{ env.POETRY_VERSION }}
+        
+    - name: Build package
+      run: |
+        poetry version ${{ needs.validate-release.outputs.version }}
+        poetry build
+        
+    - name: Publish to PyPI
+      env:
+        POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_TOKEN }}
+      run: |
+        poetry publish
+        
+    - name: Verify publication
+      run: |
+        sleep 30  # Wait for PyPI to update
+        pip install ecommerce-analytics-platform==${{ needs.validate-release.outputs.version }}
+        python -c "import src; print('Successfully installed from PyPI')"
+
+  update-documentation:
+    name: Update Documentation
+    runs-on: ubuntu-latest
+    needs: [validate-release, create-release]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        
+    - name: Install Poetry
+      uses: snok/install-poetry@v1
+      with:
+        version: ${{ env.POETRY_VERSION }}
+        
+    - name: Install dependencies
+      run: |
+        poetry install --no-interaction
+        
+    - name: Build documentation
+      run: |
+        poetry run sphinx-build -b html docs/ docs/_build/html
+        
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./docs/_build/html
+        
+    - name: Create documentation archive
+      run: |
+        tar -czf docs-v${{ needs.validate-release.outputs.version }}.tar.gz -C docs/_build/html .
+        
+    - name: Upload documentation to release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: docs-v${{ needs.validate-release.outputs.version }}.tar.gz
+        asset_name: documentation-v${{ needs.validate-release.outputs.version }}.tar.gz
+        asset_content_type: application/gzip
