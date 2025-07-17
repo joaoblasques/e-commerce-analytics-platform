@@ -130,13 +130,24 @@
     - Included development tools (Adminer, Kafka UI, Redis Commander)
     - Comprehensive documentation in docs/docker-setup.md
 
-- [ ] **Task 1.2.2**: Implement monitoring and observability stack
-  - [ ] Configure Prometheus for metrics collection
-  - [ ] Set up Grafana with pre-built dashboards
-  - [ ] Add Kafka monitoring (JMX metrics)
-  - [ ] Configure Spark History Server
-  - **Acceptance Criteria**: All services monitored, dashboards accessible
-  - **Estimated Time**: 6 hours
+- [x] **Task 1.2.2**: Implement monitoring and observability stack ✅
+  - [x] Configure Prometheus for metrics collection
+  - [x] Set up Grafana with pre-built dashboards
+  - [x] Add Kafka monitoring (JMX metrics)
+  - [x] Configure Spark History Server
+  - **Acceptance Criteria**: All services monitored, dashboards accessible ✅
+  - **Estimated Time**: 6 hours ✅
+  - **Completed**: 2024-01-17
+  - **Repository**: https://github.com/joaoblasques/e-commerce-analytics-platform
+  - **Pull Request**: https://github.com/joaoblasques/e-commerce-analytics-platform/pull/10 (Merged)
+  - **Implementation Details**:
+    - Created comprehensive monitoring stack with Prometheus, Grafana, Alertmanager
+    - Added specialized exporters: Node Exporter, Postgres Exporter, Redis Exporter, Kafka JMX Exporter
+    - Pre-built Grafana dashboards for system overview, Kafka monitoring, and Spark monitoring
+    - Configured alerting rules for critical and warning scenarios
+    - Health checks and service dependencies properly configured
+    - Test script created for monitoring stack validation
+    - Comprehensive documentation in docs/monitoring-setup.md
 
 - [ ] **Task 1.2.3**: Create development scripts and utilities
   - [ ] Write startup/shutdown scripts
