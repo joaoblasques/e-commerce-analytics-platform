@@ -12,7 +12,8 @@
       "Bash(rm:*)",
       "Bash(mkdir:*)",
       "Bash(tree:*)",
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "Bash(git remote:*)"
     ],
     "deny": []
   }
