@@ -28,8 +28,30 @@
      -F required_pull_request_reviews=null \
      -F restrictions=null
    ```
-7. **Update Task List**: Mark task as completed with PR link
+7. **Update Task List**: Mark task as completed with PR link and actual time spent
 8. **Document Progress**: Add completion notes and next steps
+
+### Time Tracking System
+
+**Purpose**: Track actual development time vs. estimates to improve future planning and identify bottlenecks.
+
+**Implementation**: 
+- **Timer Start**: When beginning a task, start internal timer
+- **Timer Stop**: When task is completed and PR merged, stop timer
+- **Actual Time Recording**: Add "**Actual Time**: X hours Y minutes" line after "**Estimated Time**"
+- **Variance Analysis**: Compare actual vs. estimated time to identify patterns
+
+**Format Example**:
+```
+- **Estimated Time**: 4 hours
+- **Actual Time**: 3 hours 45 minutes (within estimate ✅)
+```
+
+**Benefits**:
+- Improves estimation accuracy over time
+- Identifies complex vs. simple tasks
+- Helps with sprint planning and resource allocation
+- Provides data for retrospectives and process improvement
 
 ### Branch Protection Strategy
 - **Current Setup**: Minimal protection (enforce_admins=true, no force pushes/deletions)
@@ -156,6 +178,7 @@
   - [ ] Document local setup process
   - **Acceptance Criteria**: Developers can start environment in < 5 minutes
   - **Estimated Time**: 4 hours
+  - **Actual Time**: (To be recorded when task is completed)
 
 ### 1.3 Data Infrastructure Foundation
 - [ ] **Task 1.3.1**: Design and implement database schemas
@@ -165,6 +188,7 @@
   - [ ] Add database connection pooling
   - **Acceptance Criteria**: Database schemas created, seed data loaded
   - **Estimated Time**: 6 hours
+  - **Actual Time**: (To be recorded when task is completed)
 
 - [ ] **Task 1.3.2**: Configure Kafka topics and partitioning strategy
   - [ ] Create topics: transactions, user-events, product-updates
@@ -173,6 +197,7 @@
   - [ ] Add Kafka administration scripts
   - **Acceptance Criteria**: Topics created with optimal partitioning
   - **Estimated Time**: 4 hours
+  - **Actual Time**: (To be recorded when task is completed)
 
 - [ ] **Task 1.3.3**: Implement data generation framework
   - [ ] Create realistic e-commerce data generator
@@ -181,6 +206,7 @@
   - [ ] Include anomaly injection for fraud detection testing
   - **Acceptance Criteria**: Generator produces realistic data at scale
   - **Estimated Time**: 12 hours
+  - **Actual Time**: (To be recorded when task is completed)
 
 ### 1.4 Spark Environment Setup
 - [ ] **Task 1.4.1**: Configure Spark cluster and optimize settings
