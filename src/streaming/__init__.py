@@ -1,0 +1,1 @@
+"""Kafka streaming and real-time data processing module."""

@@ -1,0 +1,94 @@
+# Production environment configuration
+
+# Application settings
+app:
+  name: "E-Commerce Analytics Platform"
+  version: "0.1.0"
+  debug: false
+  log_level: "WARNING"
+
+# Database configuration
+database:
+  host: "${DB_HOST}"
+  port: 5432
+  name: "${DB_NAME}"
+  user: "${DB_USER}"
+  password: "${DB_PASSWORD}"
+  pool_size: 20
+  max_overflow: 50
+  ssl_mode: "require"
+
+# Kafka configuration
+kafka:
+  bootstrap_servers: "${KAFKA_BOOTSTRAP_SERVERS}"
+  topics:
+    transactions: "transactions"
+    user_events: "user-events"
+    product_updates: "product-updates"
+  consumer_group: "analytics-consumer-group"
+  auto_offset_reset: "latest"
+  security_protocol: "SSL"
+  ssl_ca_location: "${KAFKA_SSL_CA_LOCATION}"
+  ssl_certificate_location: "${KAFKA_SSL_CERT_LOCATION}"
+  ssl_key_location: "${KAFKA_SSL_KEY_LOCATION}"
+
+# Spark configuration
+spark:
+  app_name: "ECommerceAnalytics-Prod"
+  master: "spark://spark-master:7077"
+  driver_memory: "8g"
+  executor_memory: "8g"
+  executor_cores: 8
+  sql_adaptive_enabled: true
+  sql_adaptive_coalesce_partitions_enabled: true
+  serializer: "org.apache.spark.serializer.KryoSerializer"
+  dynamic_allocation_enabled: true
+
+# Redis configuration
+redis:
+  host: "${REDIS_HOST}"
+  port: 6379
+  db: 0
+  password: "${REDIS_PASSWORD}"
+  decode_responses: true
+  ssl: true
+
+# S3 configuration
+storage:
+  endpoint: "${S3_ENDPOINT}"
+  access_key: "${S3_ACCESS_KEY}"
+  secret_key: "${S3_SECRET_KEY}"
+  bucket: "${S3_BUCKET}"
+  secure: true
+  region: "${AWS_REGION}"
+
+# API configuration
+api:
+  host: "0.0.0.0"
+  port: 8000
+  workers: 4
+  reload: false
+  access_log: false
+
+# Dashboard configuration
+dashboard:
+  host: "0.0.0.0"
+  port: 8501
+  debug: false
+
+# Monitoring configuration
+monitoring:
+  prometheus:
+    enabled: true
+    port: 9090
+  grafana:
+    enabled: true
+    port: 3000
+
+# Logging configuration
+logging:
+  level: "WARNING"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "logs/app.log"
+  max_size: "100MB"
+  backup_count: 30
