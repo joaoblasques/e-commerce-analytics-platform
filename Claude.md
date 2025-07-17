@@ -80,9 +80,11 @@ git commit -m "feat: implement task X.X.X - [brief description]"
 git push origin feature/task-X.X.X
 # Create PR via GitHub CLI or web interface
 # Wait for CI/CD checks to pass
-# Merge to main branch
+# Automatically merge PR when tests pass (using gh pr merge)
 # Delete feature branch
 ```
+
+**Automatic PR Merge Rule**: When all CI/CD checks pass, automatically merge the PR using `gh pr merge --squash --delete-branch`. This streamlines the development workflow and ensures rapid iteration.
 
 #### 5. Task Completion
 - Update `ECAP_tasklist.md` by checking off completed task: `- [x]`
