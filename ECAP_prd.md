@@ -5,7 +5,7 @@
 
 **Project Name**: E-Commerce Real-Time Analytics Platform  
 **Duration**: 8-12 weeks  
-**Tech Stack**: Apache Spark, PySpark, Kafka, PostgreSQL, Docker  
+**Tech Stack**: Apache Spark, PySpark, Kafka, PostgreSQL, Docker, Terraform  
 **Difficulty**: Intermediate to Advanced
 
 ### 2. Business Problem
@@ -204,11 +204,12 @@ customer_rfm = transactions_df \
 - Performance optimization
 
 #### Phase 4: Production Setup (Weeks 8-12)
-**Learning Focus**: Deployment and monitoring
+**Learning Focus**: Infrastructure as Code and deployment
+- Terraform infrastructure provisioning
 - Cluster configuration and tuning
 - Monitoring and alerting
 - Data quality checks
-- CI/CD pipeline
+- CI/CD pipeline with infrastructure automation
 
 ### 8. Sample PySpark Code Snippets
 
@@ -308,10 +309,12 @@ services:
 ```
 
 #### 9.2 Production Considerations
+- **Infrastructure as Code**: Terraform for all cloud resources
 - **Cluster Size**: 3-5 worker nodes (4 cores, 16GB RAM each)
 - **Storage**: HDFS or S3 for data lake
 - **Monitoring**: Spark History Server, Ganglia, or custom dashboards
 - **Scheduling**: Airflow or similar workflow orchestration
+- **Cost Optimization**: Spot instances, auto-scaling groups, lifecycle policies
 
 ### 10. Success Metrics
 

@@ -57,17 +57,20 @@ For each task in `ECAP_tasklist.md`, follow this strict workflow:
 - Review acceptance criteria and time estimates
 - Identify dependencies and prerequisites
 - Plan the implementation approach
+- Consider infrastructure requirements (Terraform modules needed)
 - Ask clarifying questions if needed
 
 #### 2. Implementation (Main work)
 - Create feature branch: `git checkout -b feature/task-X.X.X`
 - Implement the solution following best practices
+- Create/update Terraform modules as needed for infrastructure components
 - Write tests alongside code
 - Update documentation as you go
 - Follow coding standards and conventions
 
 #### 3. Quality Assurance (15-20% of implementation time)
 - Run all tests and ensure they pass
+- Validate Terraform plans and infrastructure changes
 - Perform code review checklist
 - Check for security vulnerabilities
 - Validate performance requirements
@@ -80,14 +83,17 @@ git commit -m "feat: implement task X.X.X - [brief description]"
 git push origin feature/task-X.X.X
 # Create PR via GitHub CLI or web interface
 # Wait for CI/CD checks to pass
-# Merge to main branch
+# Automatically merge PR when tests pass (using gh pr merge)
 # Delete feature branch
 ```
+
+**Automatic PR Merge Rule**: When all CI/CD checks pass, automatically merge the PR using `gh pr merge --squash --delete-branch`. This streamlines the development workflow and ensures rapid iteration.
 
 #### 5. Task Completion
 - Update `ECAP_tasklist.md` by checking off completed task: `- [x]`
 - Document any deviations from original plan
 - Note lessons learned or improvements for future tasks
+- Update infrastructure documentation if Terraform changes were made
 - Commit the updated task list
 
 #### 6. Progress Report
@@ -95,6 +101,7 @@ After each task, provide a brief report including:
 - What was accomplished
 - Any challenges encountered and how they were solved
 - Deviations from the original plan
+- Infrastructure changes made (if any)
 - Next steps and dependencies
 - Time taken vs. estimated time
 
@@ -102,6 +109,7 @@ After each task, provide a brief report including:
 
 #### Local Development Stack
 - **Docker & Docker Compose**: For consistent development environment
+- **Terraform**: Infrastructure as Code for local and cloud deployments
 - **Apache Kafka**: Message streaming (use Confluent Docker images)
 - **Apache Spark**: Data processing (use Bitnami Docker images)
 - **PostgreSQL**: Operational database
@@ -121,6 +129,7 @@ After each task, provide a brief report including:
 When moving to cloud deployment, prioritize these free tier options:
 - **AWS Free Tier**: EC2, RDS, S3, Lambda (12 months free)
 - **Google Cloud Platform**: $300 credit (90 days)
+- **Terraform Cloud**: Free tier for small teams
 - **GitHub Actions**: 2000 minutes/month free
 - **Docker Hub**: Free public repositories
 - **Grafana Cloud**: Free tier available
@@ -157,6 +166,7 @@ To optimize development efficiency, you may need these MCP servers configured:
 - **Spark Errors**: Check memory settings, serialization, driver configuration
 - **Database Issues**: Verify connections, schemas, permissions
 - **Network Problems**: Check port exposure, service discovery, DNS resolution
+- **Terraform Issues**: Validate configuration syntax, check state file conflicts, verify provider versions
 
 ### Security Guidelines
 
@@ -261,7 +271,8 @@ Track these metrics throughout development:
   4. **Merge PR** if all tests pass and quality gates are satisfied
   5. **Update task list**: Mark task as completed `- [x]` in ECAP_tasklist.md
   6. **Document progress**: Provide brief summary of what was accomplished
-  7. **Stop and report**: Wait for confirmation before proceeding to next task
+  7. **Update execution summary**: Add task completion summary to ECAP_execution_summary.md
+  8. **Stop and report**: Wait for confirmation before proceeding to next task
 - **One task, one cycle**: Never work on multiple tasks simultaneously
 - **Celebrate progress**: Acknowledge each completed milestone
 
