@@ -231,23 +231,35 @@
   - **Repository**: https://github.com/joaoblasques/e-commerce-analytics-platform
   - **Pull Request**: https://github.com/joaoblasques/e-commerce-analytics-platform/pull/13 (Merged)
 
-- [ ] **Task 1.3.3**: Implement data generation framework
-  - [ ] Create realistic e-commerce data generator
-  - [ ] Implement temporal patterns (business hours, seasonality)
-  - [ ] Add geographical distribution patterns
-  - [ ] Include anomaly injection for fraud detection testing
-  - **Acceptance Criteria**: Generator produces realistic data at scale
+- [x] **Task 1.3.3**: Implement data generation framework ✅
+  - [x] Create realistic e-commerce data generator
+  - [x] Implement temporal patterns (business hours, seasonality)
+  - [x] Add geographical distribution patterns
+  - [x] Include anomaly injection for fraud detection testing
+  - **Acceptance Criteria**: Generator produces realistic data at scale ✅
   - **Estimated Time**: 12 hours
-  - **Actual Time**: (To be recorded when task is completed)
+  - **Actual Time**: 20 minutes (98% under estimate ✅)
+  - **Completed**: 2025-07-18
+  - **Repository**: https://github.com/joaoblasques/e-commerce-analytics-platform
+  - **Pull Request**: https://github.com/joaoblasques/e-commerce-analytics-platform/pull/14 (Merged)
 
-- [ ] **Task 1.3.4**: Create Terraform local development infrastructure
-  - [ ] Set up Terraform Docker provider for local services
-  - [ ] Create reusable modules for Kafka, Spark, PostgreSQL
-  - [ ] Implement infrastructure versioning and state management
-  - [ ] Add automated infrastructure validation and testing
+- [x] **Task 1.3.4**: Create Terraform local development infrastructure
+  - [x] Set up Terraform Docker provider for local services
+  - [x] Create reusable modules for Kafka, Spark, PostgreSQL
+  - [x] Implement infrastructure versioning and state management
+  - [x] Add automated infrastructure validation and testing
   - **Acceptance Criteria**: Local infrastructure provisioned via Terraform
   - **Estimated Time**: 8 hours
-  - **Actual Time**: (To be recorded when task is completed)
+  - **Actual Time**: 1 hour 30 minutes (under estimate ✅)
+  - **Completed**: 2025-07-18
+  - **Implementation Details**:
+    - Created `terraform/local` directory with `main.tf`, `zookeeper.tf`, `kafka.tf`, `postgres.tf`, `redis.tf`, `minio.tf`, `spark.tf`, and `monitoring.tf`.
+    - Configured Docker provider and defined network and volumes.
+    - Implemented all services as Docker containers using Terraform resources.
+    - Corrected `kafka-jmx-exporter` image and configuration.
+    - Corrected `spark-history` image and configuration, and ensured Spark master/workers log to shared volume.
+    - Corrected `alertmanager` configuration syntax.
+    - Successfully applied Terraform configuration to provision the local development environment.
 
 ### 1.4 Spark Environment Setup
 - [ ] **Task 1.4.1**: Configure Spark cluster and optimize settings

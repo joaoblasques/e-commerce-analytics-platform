@@ -35,8 +35,9 @@ receivers:
   - name: 'critical-alerts'
     email_configs:
       - to: 'admin@ecap.local'
-        subject: 'CRITICAL: {{ .GroupLabels.alertname }}'
-        body: |
+        headers:
+          Subject: 'CRITICAL: {{ .GroupLabels.alertname }}'
+        text: |
           {{ range .Alerts }}
           Alert: {{ .Annotations.summary }}
           Description: {{ .Annotations.description }}
@@ -51,8 +52,9 @@ receivers:
   - name: 'warning-alerts'
     email_configs:
       - to: 'team@ecap.local'
-        subject: 'WARNING: {{ .GroupLabels.alertname }}'
-        body: |
+        headers:
+          Subject: 'WARNING: {{ .GroupLabels.alertname }}'
+        text: |
           {{ range .Alerts }}
           Alert: {{ .Annotations.summary }}
           Description: {{ .Annotations.description }}
@@ -62,8 +64,9 @@ receivers:
   - name: 'service-down-alerts'
     email_configs:
       - to: 'ops@ecap.local'
-        subject: 'SERVICE DOWN: {{ .GroupLabels.alertname }}'
-        body: |
+        headers:
+          Subject: 'SERVICE DOWN: {{ .GroupLabels.alertname }}'
+        text: |
           {{ range .Alerts }}
           Service: {{ .Labels.job }}
           Instance: {{ .Labels.instance }}
