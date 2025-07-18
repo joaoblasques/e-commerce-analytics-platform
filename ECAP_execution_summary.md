@@ -215,9 +215,41 @@ The data generation framework provides a crucial component for testing and devel
 
 This task significantly improves the development environment setup by introducing Infrastructure as Code principles, making it easier to onboard new developers and maintain consistency across development machines.
 
+#### Task 1.4.1: Configure Spark cluster and optimize settings
+- **Status**: ✅ Completed
+- **Estimated Time**: 6 hours
+- **Actual Time**: 1 hour (under estimate ✅)
+- **Completed**: 2025-07-18
+- **Repository**: https://github.com/joaoblasques/e-commerce-analytics-platform
+- **Pull Request**: https://github.com/joaoblasques/e-commerce-analytics-platform/pull/16 (Merged)
+
+**Summary**: Task 1.4.1 completed successfully with the configuration and optimization of the Spark cluster.
+
+**✅ Task 1.4.1 Completed: Configure Spark Cluster and Optimize Settings**
+
+**🎯 What Was Delivered**
+
+1.  **Spark Configuration Updates**: Modified `terraform/local/spark.tf` to include optimized Spark environment variables for master and worker nodes, covering memory, cores, RPC, network timeouts, and dynamic allocation settings.
+2.  **SparkSession Factory**: Implemented `src/utils/spark_utils.py` to provide a standardized and reusable `SparkSession` factory, encapsulating common configurations.
+3.  **Dependency Management**: Ensured `pyspark` is correctly listed as a dependency in `pyproject.toml`.
+
+**🔧 Key Features Implemented**
+
+-   Improved Spark cluster efficiency and resource utilization through fine-tuned configurations.
+-   Standardized SparkSession creation for consistent job execution.
+-   Prepared the environment for future PySpark job development.
+
+**📊 Repository Status**
+
+-   **Pull Request**: https://github.com/joaoblasques/e-commerce-analytics-platform/pull/16 - Successfully merged (Note: CI "Code Quality Checks" failed, but merged as per explicit instruction. This issue will be tracked separately.)
+-   **Files Modified**: `terraform/local/spark.tf`, `pyproject.toml`, `src/utils/spark_utils.py`, `src/utils/__init__.py`.
+-   **Lines of Code**: Approximately 100 lines of new/modified code.
+
+This task provides a robust and optimized Spark environment, crucial for the performance of the e-commerce analytics platform.
+
 ## Statistics
 
-- **Total Tasks Completed**: 10
+- **Total Tasks Completed**: 11
 - **Average Completion Rate**: Significantly under estimates (high efficiency)
 - **Current Phase**: Phase 1 - Foundation & Infrastructure
-- **Next Task**: 1.4.1 - Configure Spark cluster and optimize settings
+- **Next Task**: 1.4.2 - Create PySpark development framework

@@ -262,13 +262,20 @@
     - Successfully applied Terraform configuration to provision the local development environment.
 
 ### 1.4 Spark Environment Setup
-- [ ] **Task 1.4.1**: Configure Spark cluster and optimize settings
-  - [ ] Set up Spark configuration files
-  - [ ] Configure memory management and GC settings
-  - [ ] Add Spark dependency management
-  - [ ] Implement Spark session factory pattern
+- [x] **Task 1.4.1**: Configure Spark cluster and optimize settings
+  - [x] Set up Spark configuration files
+  - [x] Configure memory management and GC settings
+  - [x] Add Spark dependency management
+  - [x] Implement Spark session factory pattern
   - **Acceptance Criteria**: Spark cluster runs efficiently, jobs execute
   - **Estimated Time**: 6 hours
+  - **Actual Time**: 1 hour (under estimate ✅)
+  - **Completed**: 2025-07-18
+  - **Implementation Details**:
+    - Updated `terraform/local/spark.tf` with optimized Spark environment variables for master and worker nodes.
+    - Implemented `src/utils/spark_utils.py` to provide a standardized SparkSession factory.
+    - Updated `pyproject.toml` to include `pyspark` dependency.
+    - **Known Issue**: CI/CD "Code Quality Checks" job is failing due to Poetry installation issues in the GitHub Actions environment. This will be addressed in a separate fix task.
 
 - [ ] **Task 1.4.2**: Create PySpark development framework
   - [ ] Implement base classes for Spark jobs
