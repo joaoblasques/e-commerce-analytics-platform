@@ -24,6 +24,7 @@ packages = [{include = "src"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
+pyspark = "^3.4.1"
 # Core dependencies (will be expanded in future phases)
 fastapi = "^0.104.0"
 uvicorn = {extras = ["standard"], version = "^0.24.0"}
