@@ -19,20 +19,25 @@ def validate_spark_imports(file_path: Path) -> List[str]:
         
         # Check for common Spark import patterns
         spark_imports = set()
+        imported_names = set()
+        
         for node in ast.walk(tree):
             if isinstance(node, ast.Import):
                 for alias in node.names:
                     if 'pyspark' in alias.name:
                         spark_imports.add(alias.name)
+                        imported_names.add(alias.name)
             elif isinstance(node, ast.ImportFrom):
                 if node.module and 'pyspark' in node.module:
                     spark_imports.add(node.module)
+                    for alias in node.names:
+                        imported_names.add(alias.name)
         
         # Validate common patterns
         if spark_imports:
             # Check for proper SparkSession usage
             if 'pyspark.sql' in spark_imports:
-                if not any('SparkSession' in imp for imp in spark_imports):
+                if not any('SparkSession' in name for name in imported_names):
                     errors.append(f"{file_path}: Consider importing SparkSession explicitly")
             
             # Check for deprecated RDD usage

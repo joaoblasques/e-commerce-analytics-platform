@@ -1,6 +1,7 @@
 {
   "permissions": {
     "allow": [
+      "Bash(poetry run pytest:*)",
       "Bash(git checkout:*)",
       "Bash(pip install:*)",
       "Bash(alembic init:*)",
