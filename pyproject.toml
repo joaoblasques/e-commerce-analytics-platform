@@ -167,6 +167,7 @@ ignore_missing_imports = true
 [[tool.mypy.overrides]]
 module = [
     "src.utils.spark_utils",
+    "src.utils.spark_validator",
     "src.utils.performance_utils",
     "src.analytics.jobs.base_job",
     "src.analytics.jobs.sample_batch_job",
@@ -181,8 +182,7 @@ module = [
     "src.database.config",
     "src.database.utils",
     "examples.*",
-    "tests.test_transaction_producer",
-    "tests.test_user_behavior_producer",
+    "tests.*",
 ]
 ignore_errors = true
 
