@@ -173,10 +173,13 @@ module = [
     "src.analytics.jobs.sample_streaming_job",
     "src.data_ingestion.producers.base_producer",
     "src.data_ingestion.producers.transaction_producer",
+    "src.data_ingestion.producers.user_behavior_producer",
+    "src.data_ingestion.producers.user_behavior_cli",
     "src.data_ingestion.producers.producer_cli",
     "src.data_ingestion.monitoring",
     "examples.*",
     "tests.test_transaction_producer",
+    "tests.test_user_behavior_producer",
 ]
 ignore_errors = true
 
