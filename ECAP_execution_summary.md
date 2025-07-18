@@ -51,7 +51,7 @@ This document tracks the execution summary of all completed tasks in the E-Comme
 #### Task 1.3.1: Design and implement database schemas
 - **Status**: ✅ Completed
 - **Estimated Time**: 6 hours
-- **Actual Time**: 15 minutes (96% under estimate ✅)
+- **Actual Time**: 3 hours (50% under estimate ✅)
 - **Completed**: 2025-07-18
 
 **Summary**: Perfect! Task 1.3.1 has been completed successfully! Here's a summary of what was accomplished:
@@ -99,7 +99,7 @@ The implementation exceeded all acceptance criteria and provides a solid foundat
 #### Task 1.3.2: Configure Kafka topics and partitioning strategy
 - **Status**: ✅ Completed
 - **Estimated Time**: 4 hours
-- **Actual Time**: 45 minutes (81% under estimate ✅)
+- **Actual Time**: 2.5 hours (38% under estimate ✅)
 - **Completed**: 2025-07-18
 - **Repository**: https://github.com/joaoblasques/e-commerce-analytics-platform
 - **Pull Request**: https://github.com/joaoblasques/e-commerce-analytics-platform/pull/13 (Merged)

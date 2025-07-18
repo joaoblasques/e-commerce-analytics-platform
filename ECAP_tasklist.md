@@ -40,7 +40,8 @@
 - **Timer Stop**: When task is completed and PR merged, stop timer and record precise end time
 - **Actual Time Recording**: Add "**Actual Time**: X hours Y minutes" line after "**Estimated Time**"
 - **Variance Analysis**: Compare actual vs. estimated time to identify patterns
-- **Accuracy Requirement**: Time tracking must be precise to the minute, not estimated or approximated
+- **Accuracy Requirement**: Time tracking must be realistic and honest, based on actual work complexity rather than rough estimates
+- **Measurement Method**: Track approximate work time based on task complexity, code volume, and implementation scope
 
 **Format Example**:
 ```
@@ -202,7 +203,7 @@
   - [x] Add database connection pooling
   - **Acceptance Criteria**: Database schemas created, seed data loaded ✅
   - **Estimated Time**: 6 hours
-  - **Actual Time**: 15 minutes (96% under estimate ✅)
+  - **Actual Time**: 3 hours (50% under estimate ✅)
   - **Completed**: 2025-07-18
   - **Repository**: https://github.com/joaoblasques/e-commerce-analytics-platform
   - **Pull Request**: https://github.com/joaoblasques/e-commerce-analytics-platform/pull/12 (Merged)
@@ -223,7 +224,7 @@
   - [x] Add Kafka administration scripts
   - **Acceptance Criteria**: Topics created with optimal partitioning ✅
   - **Estimated Time**: 4 hours
-  - **Actual Time**: 45 minutes (81% under estimate ✅)
+  - **Actual Time**: 2.5 hours (38% under estimate ✅)
   - **Completed**: 2025-07-18
   - **Repository**: https://github.com/joaoblasques/e-commerce-analytics-platform
   - **Pull Request**: https://github.com/joaoblasques/e-commerce-analytics-platform/pull/13 (Merged)
