@@ -25,8 +25,8 @@ Application Layer:
 
 Infrastructure:
 ├── Docker & Docker Compose (Local Development)
+├── Terraform (Infrastructure as Code - Local & Cloud)
 ├── Kubernetes (Production Deployment)
-├── Terraform (Infrastructure as Code)
 └── GitHub Actions (CI/CD)
 ```
 
@@ -259,7 +259,96 @@ class ECommerceDataGenerator:
 
 ## 3. Development Environment Setup
 
-### 3.1 Local Development Stack
+### 3.1 Terraform Infrastructure Setup
+
+#### A. Local Development Infrastructure
+**Purpose**: Provision local development resources with infrastructure as code
+**Components**:
+- Docker provider for containerized services
+- Local file provisioning for configuration
+- Network configuration for service discovery
+- Volume management for persistent data
+
+```hcl
+# terraform/local/main.tf
+terraform {
+  required_providers {
+    docker = {
+      source  = "kreuzwerker/docker"
+      version = "~> 3.0"
+    }
+  }
+}
+
+provider "docker" {
+  host = "unix:///var/run/docker.sock"
+}
+
+# Networks
+resource "docker_network" "ecap_network" {
+  name = "ecap-network"
+  driver = "bridge"
+}
+
+# Volumes
+resource "docker_volume" "postgres_data" {
+  name = "ecap-postgres-data"
+}
+
+resource "docker_volume" "kafka_data" {
+  name = "ecap-kafka-data"
+}
+
+# Services
+module "kafka_cluster" {
+  source = "../modules/kafka"
+  network_name = docker_network.ecap_network.name
+}
+
+module "spark_cluster" {
+  source = "../modules/spark"
+  network_name = docker_network.ecap_network.name
+}
+```
+
+#### B. Cloud Development Infrastructure
+**Purpose**: Provision development environment in AWS/GCP with cost optimization
+**Components**:
+- VPC and networking setup
+- Managed Kafka (MSK/Confluent Cloud)
+- Managed Spark (EMR/Dataproc)
+- Database services (RDS/Cloud SQL)
+- Storage buckets with lifecycle policies
+
+```hcl
+# terraform/aws-dev/main.tf
+module "vpc" {
+  source = "../modules/aws-vpc"
+  
+  vpc_cidr = "10.0.0.0/16"
+  environment = "dev"
+  availability_zones = ["us-west-2a", "us-west-2b"]
+}
+
+module "kafka_cluster" {
+  source = "../modules/aws-msk"
+  
+  vpc_id = module.vpc.vpc_id
+  subnet_ids = module.vpc.private_subnets
+  instance_type = "kafka.t3.small"  # Cost-optimized
+}
+
+module "spark_cluster" {
+  source = "../modules/aws-emr"
+  
+  vpc_id = module.vpc.vpc_id
+  subnet_ids = module.vpc.private_subnets
+  instance_type = "m5.large"  # Cost-optimized
+  use_spot_instances = true
+}
+```
+
+### 3.2 Local Development Stack
 ```yaml
 # docker-compose.dev.yml
 version: '3.8'
