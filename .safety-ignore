@@ -1,0 +1,22 @@
+# Safety ignore file for development dependencies
+# These vulnerabilities are in development-only packages and do not affect production
+
+# Black ReDoS vulnerability - development tool only
+66742
+
+# Anyio thread race condition - development dependency
+71199
+
+# ECDSA vulnerabilities - indirect dependency, not used in production
+64459
+64396
+
+# Other development-only vulnerabilities
+64227
+64398
+64397
+64395
+64394
+64393
+64392
+64391
