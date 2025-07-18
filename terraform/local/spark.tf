@@ -19,11 +19,7 @@ resource "docker_container" "spark-master" {
     "SPARK_RPC_ENCRYPTION_ENABLED=no",
     "SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no",
     "SPARK_SSL_ENABLED=no",
-    "SPARK_MASTER_OPTS=-Dspark.deploy.defaultCores=2 -Dspark.eventLog.enabled=true -Dspark.eventLog.dir=file:///opt/spark-events",
-    "SPARK_DAEMON_MEMORY=1g",
-    "SPARK_DRIVER_MEMORY=1g",
-    "SPARK_RPC_MESSAGE_MAX_SIZE=256",
-    "SPARK_NETWORK_TIMEOUT=300s"
+    "SPARK_MASTER_OPTS=-Dspark.deploy.defaultCores=2 -Dspark.eventLog.enabled=true -Dspark.eventLog.dir=file:///opt/spark-events"
   ]
   volumes {
     volume_name = docker_volume.spark_logs.name
@@ -56,16 +52,12 @@ resource "docker_container" "spark-worker-1" {
   env = [
     "SPARK_MODE=worker",
     "SPARK_MASTER_URL=spark://spark-master:7077",
-    "SPARK_WORKER_MEMORY=1g",
-    "SPARK_WORKER_CORES=1",
+    "SPARK_WORKER_MEMORY=2g",
+    "SPARK_WORKER_CORES=2",
     "SPARK_RPC_AUTHENTICATION_ENABLED=no",
     "SPARK_RPC_ENCRYPTION_ENABLED=no",
     "SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no",
-    "SPARK_SSL_ENABLED=no",
-    "SPARK_SHUFFLE_SERVICE_ENABLED=true",
-    "SPARK_DYNAMIC_ALLOCATION_ENABLED=true",
-    "SPARK_DYNAMIC_ALLOCATION_MIN_EXECUTORS=1",
-    "SPARK_DYNAMIC_ALLOCATION_MAX_EXECUTORS=5"
+    "SPARK_SSL_ENABLED=no"
   ]
   volumes {
     volume_name = docker_volume.spark_logs.name
@@ -98,16 +90,12 @@ resource "docker_container" "spark-worker-2" {
   env = [
     "SPARK_MODE=worker",
     "SPARK_MASTER_URL=spark://spark-master:7077",
-    "SPARK_WORKER_MEMORY=1g",
-    "SPARK_WORKER_CORES=1",
+    "SPARK_WORKER_MEMORY=2g",
+    "SPARK_WORKER_CORES=2",
     "SPARK_RPC_AUTHENTICATION_ENABLED=no",
     "SPARK_RPC_ENCRYPTION_ENABLED=no",
     "SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no",
-    "SPARK_SSL_ENABLED=no",
-    "SPARK_SHUFFLE_SERVICE_ENABLED=true",
-    "SPARK_DYNAMIC_ALLOCATION_ENABLED=true",
-    "SPARK_DYNAMIC_ALLOCATION_MIN_EXECUTORS=1",
-    "SPARK_DYNAMIC_ALLOCATION_MAX_EXECUTORS=5"
+    "SPARK_SSL_ENABLED=no"
   ]
   volumes {
     volume_name = docker_volume.spark_logs.name

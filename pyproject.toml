@@ -24,7 +24,6 @@ packages = [{include = "src"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
-pyspark = "^3.4.1"
 # Core dependencies (will be expanded in future phases)
 fastapi = "^0.104.0"
 uvicorn = {extras = ["standard"], version = "^0.24.0"}
@@ -58,6 +57,8 @@ psutil = "^5.9.0"
 # Kafka client
 kafka-python = "^2.0.2"
 # Data generation dependencies
+numpy = "^1.24.3"
+
 [tool.poetry.group.dev.dependencies]
 # Testing
 pytest = "^7.3.1"
