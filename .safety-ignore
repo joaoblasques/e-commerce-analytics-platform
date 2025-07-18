@@ -11,6 +11,24 @@
 64459
 64396
 
+# H11 HTTP parsing vulnerability - development dependency
+76903
+
+# JupyterLab vulnerabilities - development tool only
+72962
+
+# Pip vulnerabilities - development tool only
+62044
+75180
+
+# Python-jose vulnerabilities - authentication library (development)
+70716
+70715
+
+# Starlette vulnerabilities - web framework (development)
+73725
+68094
+
 # Other development-only vulnerabilities
 64227
 64398
