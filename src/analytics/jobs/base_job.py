@@ -1,9 +1,11 @@
+from abc import ABC, abstractmethod
+
 from pyspark.sql import SparkSession
 
 from src.utils.spark_utils import get_spark_session
 
 
-class SparkJob:
+class SparkJob(ABC):
     """
     Base class for Spark jobs, providing a standardized way to create and manage SparkSessions.
     """
@@ -34,6 +36,7 @@ class SparkJob:
             duration = end_time - start_time
             self.logger.info(f"Finished {self.app_name} job in {duration:.2f} seconds.")
 
+    @abstractmethod
     def _run_job_logic(self):
         """
         Actual job logic to be implemented by subclasses.

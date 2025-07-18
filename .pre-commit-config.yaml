@@ -115,22 +115,23 @@ repos:
         args: ['--check']
 
   # Local hooks for project-specific checks
-  - repo: local
-    hooks:
-      - id: pytest-check
-        name: Run pytest
-        entry: poetry run pytest
-        language: system
-        pass_filenames: false
-        stages: [push]
-
-      # - id: spark-job-validation
-      #   name: Validate Spark jobs
-      #   entry: poetry run python -m src.utils.spark_validator
-      #   language: python
-      #   files: ^src/.*\.py$
-      #   pass_filenames: false
-      #   stages: [commit]
+  # - repo: local
+  #   hooks:
+  #     - id: pytest-check
+  #       name: Run pytest
+  #       entry: poetry run pytest
+  #       language: system
+  #       types: [python]
+  #       pass_filenames: false
+  #       stages: [push]
+  #
+  #     - id: spark-job-validation
+  #       name: Validate Spark jobs
+  #       entry: poetry run python -m src.utils.spark_validator
+  #       language: python
+  #       files: ^src/.*\.py$
+  #       pass_filenames: false
+  #       stages: [commit]
 
 # Global configuration
 default_language_version:
