@@ -40,8 +40,10 @@
 - **Timer Stop**: When task is completed and PR merged, stop timer and record precise end time
 - **Actual Time Recording**: Add "**Actual Time**: X hours Y minutes" line after "**Estimated Time**"
 - **Variance Analysis**: Compare actual vs. estimated time to identify patterns
-- **Accuracy Requirement**: Time tracking must be realistic and honest, based on actual work complexity rather than rough estimates
-- **Measurement Method**: Track approximate work time based on task complexity, code volume, and implementation scope
+- **Accuracy Requirement**: Time tracking must be precise, measuring actual elapsed time from task start to completion
+- **Measurement Method**: Track elapsed time from when task begins until PR is merged and summary is completed
+- **Start Time**: When user requests to begin the task
+- **End Time**: When PR is merged and task summary is provided
 
 **Format Example**:
 ```
@@ -224,7 +226,7 @@
   - [x] Add Kafka administration scripts
   - **Acceptance Criteria**: Topics created with optimal partitioning ✅
   - **Estimated Time**: 4 hours
-  - **Actual Time**: 2.5 hours (38% under estimate ✅)
+  - **Actual Time**: 20 minutes (92% under estimate ✅)
   - **Completed**: 2025-07-18
   - **Repository**: https://github.com/joaoblasques/e-commerce-analytics-platform
   - **Pull Request**: https://github.com/joaoblasques/e-commerce-analytics-platform/pull/13 (Merged)
