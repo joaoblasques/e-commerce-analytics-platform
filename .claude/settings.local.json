@@ -11,7 +11,9 @@
       "Bash(docker-compose:*)",
       "Bash(pip3 install:*)",
       "Bash(git commit:*)",
-      "Bash(poetry lock:*)"
+      "Bash(poetry lock:*)",
+      "WebFetch(domain:github.com)",
+      "Bash(git log:*)"
     ],
     "deny": []
   }
