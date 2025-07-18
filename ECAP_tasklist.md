@@ -323,13 +323,17 @@
   - **Repository**: https://github.com/joaoblasques/e-commerce-analytics-platform
   - **Pull Request**: https://github.com/joaoblasques/e-commerce-analytics-platform/pull/20 (Merged)
 
-- [ ] **Task 2.1.2**: Implement user behavior event producer
-  - [ ] Create producer for website interaction events
-  - [ ] Implement session-based event correlation
-  - [ ] Add realistic user journey patterns
-  - [ ] Include device and location simulation
-  - **Acceptance Criteria**: Behavioral events correlate with user sessions
+- [x] **Task 2.1.2**: Implement user behavior event producer
+  - [x] Create producer for website interaction events
+  - [x] Implement session-based event correlation
+  - [x] Add realistic user journey patterns
+  - [x] Include device and location simulation
+  - **Acceptance Criteria**: Behavioral events correlate with user sessions ✅
   - **Estimated Time**: 10 hours
+  - **Actual Time**: 1 hour 30 minutes (under estimate ✅)
+  - **Completed**: 2025-07-18
+  - **Repository**: https://github.com/joaoblasques/e-commerce-analytics-platform
+  - **Pull Request**: https://github.com/joaoblasques/e-commerce-analytics-platform/pull/21 (Merged)
 
 - [ ] **Task 2.1.3**: Add error handling and reliability features
   - [ ] Implement dead letter queue for failed messages
