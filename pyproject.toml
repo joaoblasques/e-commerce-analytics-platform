@@ -58,6 +58,8 @@ psutil = "^5.9.0"
 # Kafka client
 kafka-python = "^2.0.2"
 # Data generation dependencies
+numpy = "^1.24.3"
+
 [tool.poetry.group.dev.dependencies]
 # Testing
 pytest = "^7.3.1"
