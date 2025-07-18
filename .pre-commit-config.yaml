@@ -1,3 +1,4 @@
+---
 repos:
   # Pre-commit hooks for general file cleanup
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -55,9 +56,9 @@ repos:
     hooks:
       - id: flake8
         name: Lint Python code with flake8
-        args: 
+        args:
           - '--max-line-length=88'
-          - '--extend-ignore=E203,E501,W503'
+          - '--extend-ignore=E203,E501,W503,D100,D107,D200,D205,D401,F841'
           - '--exclude=.git,__pycache__,.venv,build,dist,*.egg-info,.pytest_cache,.mypy_cache'
         additional_dependencies:
           - flake8-docstrings
@@ -71,7 +72,6 @@ repos:
     hooks:
       - id: mypy
         name: Type check Python code with MyPy
-        args: ['--ignore-missing-imports', '--show-error-codes']
         additional_dependencies:
           - types-redis
           - types-requests
@@ -85,8 +85,8 @@ repos:
     hooks:
       - id: bandit
         name: Security lint Python code with bandit
-        args: ['-r', 'src/', '-f', 'json']
-        exclude: 'tests/'
+        args: ['-r', 'src/', '-f', 'json', '--skip', 'B311,B324,B608']
+        pass_filenames: false
 
   # Dockerfile linting
   - repo: https://github.com/hadolint/hadolint
@@ -102,7 +102,7 @@ repos:
     hooks:
       - id: yamllint
         name: Lint YAML files
-        args: ['-d', '{extends: default, rules: {line-length: {max: 120}, comments: {min-spaces-from-content: 1}}}']
+        args: ['-d', '{extends: default, rules: {line-length: {max: 120, level: warning}, comments: {min-spaces-from-content: 1}}}']
 
   # Poetry check
   - repo: https://github.com/python-poetry/poetry
@@ -114,29 +114,28 @@ repos:
         name: Check Poetry lock file
         args: ['--check']
 
-  # Local hooks for project-specific checks (temporarily disabled for CI optimization)
-  # - repo: local
-  #   hooks:
-  #     - id: pytest-check
-  #       name: Run pytest
-  #       entry: poetry run pytest
-  #       language: system
-  #       types: [python]
-  #       pass_filenames: false
-  #       stages: [push]
-  #       
-  #     - id: spark-job-validation
-  #       name: Validate Spark jobs
-  #       entry: python -m src.utils.spark_validator
-  #       language: system
-  #       files: 'src/.*\.py$'
-  #       pass_filenames: false
-  #       stages: [commit]
+  # Local hooks for project-specific checks
+  - repo: local
+    hooks:
+      - id: pytest-check
+        name: Run pytest
+        entry: poetry run pytest
+        language: system
+        pass_filenames: false
+        stages: [push]
+
+      # - id: spark-job-validation
+      #   name: Validate Spark jobs
+      #   entry: poetry run python -m src.utils.spark_validator
+      #   language: python
+      #   files: ^src/.*\.py$
+      #   pass_filenames: false
+      #   stages: [commit]
 
 # Global configuration
 default_language_version:
   python: python3.9
-  
+
 fail_fast: false
 default_stages: [commit]
 

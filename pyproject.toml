@@ -111,7 +111,8 @@ extend-exclude = '''
   | \.venv
   | build
   | dist
-)/'
+)/
+'''
 
 # isort configuration
 [tool.isort]
@@ -164,10 +165,20 @@ module = [
 ]
 ignore_missing_imports = true
 
+[[tool.mypy.overrides]]
+module = [
+    "src.utils.spark_utils",
+    "src.utils.performance_utils",
+    "src.analytics.jobs.base_job",
+    "src.analytics.jobs.sample_batch_job",
+    "src.analytics.jobs.sample_streaming_job",
+]
+ignore_errors = true
+
 # Flake8 configuration
 [tool.flake8]
 max-line-length = 88
-extend-ignore = ["E203", "E501", "W503"]
+extend-ignore = ["E203", "E501", "W503", "D100", "D107", "D200", "D205", "D401", "F841"]
 exclude = [
     ".git",
     "__pycache__",

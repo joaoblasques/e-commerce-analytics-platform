@@ -15,10 +15,10 @@
    ```bash
    # Disable protection (simplified)
    gh api repos/joaoblasques/e-commerce-analytics-platform/branches/master/protection -X DELETE
-   
+
    # Merge PR with squash
    gh pr merge PR_NUMBER --squash --delete-branch
-   
+
    # Re-enable basic protection
    gh api repos/joaoblasques/e-commerce-analytics-platform/branches/master/protection -X PUT \
      -F enforce_admins=true \
@@ -35,7 +35,7 @@
 
 **Purpose**: Track actual development time vs. estimates to improve future planning and identify bottlenecks.
 
-**Implementation**: 
+**Implementation**:
 - **Timer Start**: When beginning a task, start internal timer and record precise start time
 - **Timer Stop**: When task is completed and PR merged, stop timer and record precise end time
 - **Actual Time Recording**: Add "**Actual Time**: X hours Y minutes" line after "**Estimated Time**"
@@ -69,13 +69,13 @@
   - **Impact**: Testing jobs fail in CI/CD pipeline
   - **Resolution**: Create basic test files when implementing features
   - **Priority**: Medium - Will be resolved during Task 6.1.1 (Unit Testing)
-  
+
 - **❌ Deprecated actions/upload-artifact@v3**: GitHub Actions using deprecated version
   - **Impact**: Deprecation warnings in CI/CD runs
   - **Resolution**: Update to actions/upload-artifact@v4 in all workflows
   - **Priority**: Low - Functional but needs updating
   - **Files**: `.github/workflows/ci.yml` (security scanning job)
-  
+
 - **⚠️ Simplified Dependencies**: Removed heavy dependencies for CI performance
   - **Impact**: Some features may need dependency additions
   - **Resolution**: Add dependencies incrementally per task requirements
@@ -293,13 +293,20 @@
     - Added `PyYAML` dependency to `pyproject.toml`.
     - **Known Issue**: CI/CD "Code Quality Checks" job is failing due to Poetry installation issues in the GitHub Actions environment. This will be addressed in a separate fix task.
 
-- [ ] **Task 1.4.3**: Implement basic Spark job examples
-  - [ ] Create sample batch processing job
-  - [ ] Implement basic streaming job template
-  - [ ] Add data validation and quality checks
-  - [ ] Create performance benchmarking utilities
+- [x] **Task 1.4.3**: Implement basic Spark job examples
+  - [x] Create sample batch processing job
+  - [x] Implement basic streaming job template
+  - [x] Add data validation and quality checks
+  - [x] Create performance benchmarking utilities
   - **Acceptance Criteria**: Example jobs run successfully, benchmarks available
   - **Estimated Time**: 6 hours
+  - **Actual Time**: 1 hour (under estimate ✅)
+  - **Completed**: 2025-07-18
+  - **Implementation Details**:
+    - Modified `src/analytics/jobs/base_job.py` to include performance logging for all Spark jobs.
+    - Updated `src/analytics/jobs/sample_batch_job.py` to include basic data validation (null checks, type checks).
+    - Updated `src/analytics/jobs/sample_streaming_job.py` to include basic schema validation for incoming streaming data.
+    - Provided instructions on how to run both batch and streaming sample jobs using `spark-submit` with the Docker Compose environment.
 
 ## Phase 2: Data Ingestion & Streaming (Weeks 3-4)
 
