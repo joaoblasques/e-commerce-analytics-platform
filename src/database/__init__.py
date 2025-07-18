@@ -1,0 +1,1 @@
+"""Database module for e-commerce analytics platform."""
