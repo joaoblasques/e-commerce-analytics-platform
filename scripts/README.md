@@ -167,6 +167,79 @@ This directory contains utility scripts for managing the E-Commerce Analytics Pl
 ./generate-test-data.py --customers 5000 --products 2000 --orders 10000
 ```
 
+#### `manage_kafka.py`
+**Purpose**: Comprehensive Kafka management with CLI interface  
+**Usage**: `python manage_kafka.py [COMMAND] [OPTIONS]`
+
+**Commands**:
+- `create-topics`: Create all configured Kafka topics
+- `list-topics`: List all topics in the cluster
+- `describe-topic <topic>`: Get detailed topic information
+- `delete-topic <topic>`: Delete a specific topic
+- `health-check`: Perform cluster health check
+- `list-consumer-groups`: List all consumer groups
+- `test-produce <topic> [msg]`: Send test message to topic
+
+**Features**:
+- Creates 5 optimized topics for e-commerce analytics
+- Configures appropriate partitioning and retention policies
+- Comprehensive health monitoring and validation
+- Safe topic management with confirmations
+- Integration with Docker Compose environment
+
+**Topic Configuration**:
+- **transactions**: 6 partitions, 7-day retention, LZ4 compression
+- **user-events**: 12 partitions, 3-day retention, LZ4 compression  
+- **product-updates**: 3 partitions, 30-day retention, GZIP compression
+- **fraud-alerts**: 2 partitions, 90-day retention, GZIP compression
+- **analytics-results**: 4 partitions, 14-day retention, GZIP compression
+
+**Example**:
+```bash
+# Create all topics
+python manage_kafka.py create-topics
+
+# Check cluster health
+python manage_kafka.py health-check
+
+# Describe specific topic
+python manage_kafka.py describe-topic transactions
+```
+
+#### `kafka-topics.sh`
+**Purpose**: Shell wrapper for convenient Kafka operations  
+**Usage**: `./kafka-topics.sh [COMMAND] [OPTIONS]`
+
+**Commands**:
+- `create-topics`: Create all configured topics
+- `list-topics`: List all topics
+- `describe-topic <topic>`: Describe specific topic
+- `delete-topic <topic>`: Delete topic (with confirmation)
+- `health-check`: Perform health check
+- `consumer-groups`: List consumer groups
+- `test-produce <topic> [msg]`: Send test message
+- `reset-topics`: Delete and recreate all topics (DANGEROUS)
+- `kafka-cli <command>`: Execute Kafka CLI commands
+
+**Features**:
+- Automatic Docker and dependency checking
+- Colored output for better readability
+- Safe operations with confirmation prompts
+- Integration with development environment
+- Comprehensive error handling
+
+**Example**:
+```bash
+# Create all topics
+./kafka-topics.sh create-topics
+
+# Test message production
+./kafka-topics.sh test-produce transactions '{"user_id": "test", "amount": 100}'
+
+# Monitor topic in real-time
+./kafka-topics.sh kafka-cli kafka-console-consumer --topic transactions --from-beginning
+```
+
 ## Script Dependencies
 
 All scripts require:

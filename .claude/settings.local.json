@@ -6,7 +6,9 @@
       "Bash(alembic init:*)",
       "Bash(python:*)",
       "Bash(chmod:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(docker-compose:*)",
+      "Bash(pip3 install:*)"
     ],
     "deny": []
   }

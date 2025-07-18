@@ -153,10 +153,22 @@ spark-submit: ## Submit a Spark job
 	@echo "$(BLUE)Submitting Spark job...$(NC)"
 	poetry run spark-submit --master local[*] src/analytics/spark_job.py
 
-# Kafka
+# Kafka Management
 kafka-topics: ## Create Kafka topics
 	@echo "$(BLUE)Creating Kafka topics...$(NC)"
-	poetry run python -m src.streaming.setup_topics
+	./scripts/kafka-topics.sh create-topics
+
+kafka-list: ## List all Kafka topics
+	@echo "$(BLUE)Listing Kafka topics...$(NC)"
+	./scripts/kafka-topics.sh list-topics
+
+kafka-health: ## Check Kafka cluster health
+	@echo "$(BLUE)Checking Kafka cluster health...$(NC)"
+	./scripts/kafka-topics.sh health-check
+
+kafka-reset: ## Reset all Kafka topics (DANGEROUS)
+	@echo "$(BLUE)Resetting Kafka topics...$(NC)"
+	./scripts/kafka-topics.sh reset-topics
 
 # Monitoring
 monitor: ## Open monitoring dashboard

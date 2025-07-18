@@ -54,6 +54,8 @@ faker = "^19.3.0"
 requests = "^2.31.0"
 # System monitoring
 psutil = "^5.9.0"
+# Kafka client
+kafka-python = "^2.0.2"
 
 [tool.poetry.group.dev.dependencies]
 # Testing
