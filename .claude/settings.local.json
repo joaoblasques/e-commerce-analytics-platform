@@ -23,7 +23,9 @@
       "Bash(git push:*)",
       "Bash(gh run download:*)",
       "Bash(gh issue create:*)",
-      "Bash(gh issue list:*)"
+      "Bash(gh issue list:*)",
+      "Bash(rm:*)",
+      "Bash(gh pr create:*)"
     ],
     "deny": []
   }

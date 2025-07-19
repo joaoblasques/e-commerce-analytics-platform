@@ -26,14 +26,33 @@ from .patterns import (
     TemporalPatterns,
 )
 from .producers import DataGenerationOrchestrator, KafkaDataProducer
+from .reliability import (
+    DeadLetterQueue,
+    HealthMonitor,
+    Message,
+    MessageDeduplicator,
+    MessageStatus,
+    RetryConfig,
+    RetryManager,
+)
+from .reliable_producer import ReliableKafkaProducer, default_alert_handler
 
 __all__ = [
     "ECommerceDataGenerator",
     "KafkaDataProducer",
     "DataGenerationOrchestrator",
+    "ReliableKafkaProducer",
+    "default_alert_handler",
     "TemporalPatterns",
     "GeographicPatterns",
     "FraudPatterns",
     "SeasonalPatterns",
     "DataGenerationConfig",
+    "Message",
+    "MessageStatus",
+    "RetryConfig",
+    "DeadLetterQueue",
+    "MessageDeduplicator",
+    "RetryManager",
+    "HealthMonitor",
 ]
