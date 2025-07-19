@@ -82,12 +82,12 @@
   - **Priority**: Low - Intentional optimization
   - **Context**: Moved PySpark, Kafka, Streamlit to future task phases
 
-- **❌ Low Integration Test Coverage**: Integration test coverage threshold lowered to 5%
-  - **Impact**: Integration tests have minimal coverage (7.93%) but overall coverage remains high (80%)
-  - **Resolution**: Write comprehensive integration tests for API endpoints and data flows
-  - **Priority**: Medium - Important for end-to-end testing confidence
-  - **Target**: Achieve >90% integration coverage by Phase 6.2.1 (Integration Testing)
-  - **Context**: Integration tests isolated with lower threshold while maintaining overall 80% coverage requirement
+- **❌ Low Overall Test Coverage**: Coverage threshold temporarily lowered to 5%
+  - **Impact**: Current coverage is 7.93%, below production standards (target: 80%)
+  - **Resolution**: Write comprehensive tests for all modules, especially data generation framework
+  - **Priority**: High - Critical for production readiness and code quality
+  - **Target**: Achieve >80% coverage by Phase 6.1.1 (Unit Testing)
+  - **Context**: Lowered from 80% to 5% to unblock CI while focusing on foundational features
 
 ### Performance Optimizations Applied
 - **✅ CI Performance**: Reduced from 5+ minutes to 1m21s
