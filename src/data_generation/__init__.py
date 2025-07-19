@@ -1,5 +1,5 @@
 """
-Data Generation Framework for E-Commerce Analytics Platform
+Data Generation Framework for E-Commerce Analytics Platform.
 
 This module provides comprehensive data generation capabilities for realistic
 e-commerce analytics scenarios including:
@@ -11,28 +11,29 @@ e-commerce analytics scenarios including:
 
 Usage:
     from src.data_generation import ECommerceDataGenerator
-    
+
     generator = ECommerceDataGenerator()
     transactions = generator.generate_transactions(1000)
     events = generator.generate_user_events(5000)
 """
 
-from .generator import ECommerceDataGenerator
-from .producers import KafkaDataProducer
-from .patterns import (
-    TemporalPatterns,
-    GeographicPatterns,
-    FraudPatterns,
-    SeasonalPatterns
-)
 from .config import DataGenerationConfig
+from .generator import ECommerceDataGenerator
+from .patterns import (
+    FraudPatterns,
+    GeographicPatterns,
+    SeasonalPatterns,
+    TemporalPatterns,
+)
+from .producers import DataGenerationOrchestrator, KafkaDataProducer
 
 __all__ = [
-    'ECommerceDataGenerator',
-    'KafkaDataProducer',
-    'TemporalPatterns',
-    'GeographicPatterns',
-    'FraudPatterns',
-    'SeasonalPatterns',
-    'DataGenerationConfig'
+    "ECommerceDataGenerator",
+    "KafkaDataProducer",
+    "DataGenerationOrchestrator",
+    "TemporalPatterns",
+    "GeographicPatterns",
+    "FraudPatterns",
+    "SeasonalPatterns",
+    "DataGenerationConfig",
 ]

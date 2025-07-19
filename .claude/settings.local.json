@@ -13,7 +13,13 @@
       "Bash(git commit:*)",
       "Bash(poetry lock:*)",
       "WebFetch(domain:github.com)",
-      "Bash(git log:*)"
+      "Bash(git log:*)",
+      "Bash(gh run list:*)",
+      "Bash(gh run view:*)",
+      "Bash(poetry run safety:*)",
+      "Bash(find:*)",
+      "Bash(coverage run:*)",
+      "Bash(coverage report)"
     ],
     "deny": []
   }
