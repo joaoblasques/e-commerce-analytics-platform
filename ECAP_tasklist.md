@@ -65,24 +65,24 @@
 ## 🔧 Technical Debt & Known Issues
 
 ### CI/CD Pipeline Issues (To be addressed in future tasks)
-- **❌ Test Pipeline Failures**: Tests fail because no test files exist yet
+- **❌ Test Pipeline Failures**: Tests fail because no test files exist yet ([Issue #24](https://github.com/joaoblasques/e-commerce-analytics-platform/issues/24))
   - **Impact**: Testing jobs fail in CI/CD pipeline
   - **Resolution**: Create basic test files when implementing features
   - **Priority**: Medium - Will be resolved during Task 6.1.1 (Unit Testing)
 
-- **❌ Deprecated actions/upload-artifact@v3**: GitHub Actions using deprecated version
+- **❌ Deprecated actions/upload-artifact@v3**: GitHub Actions using deprecated version ([Issue #25](https://github.com/joaoblasques/e-commerce-analytics-platform/issues/25))
   - **Impact**: Deprecation warnings in CI/CD runs
   - **Resolution**: Update to actions/upload-artifact@v4 in all workflows
   - **Priority**: Low - Functional but needs updating
   - **Files**: `.github/workflows/ci.yml` (security scanning job)
 
-- **⚠️ Simplified Dependencies**: Removed heavy dependencies for CI performance
+- **⚠️ Simplified Dependencies**: Removed heavy dependencies for CI performance ([Issue #26](https://github.com/joaoblasques/e-commerce-analytics-platform/issues/26))
   - **Impact**: Some features may need dependency additions
   - **Resolution**: Add dependencies incrementally per task requirements
   - **Priority**: Low - Intentional optimization
   - **Context**: Moved PySpark, Kafka, Streamlit to future task phases
 
-- **❌ Low Overall Test Coverage**: Coverage threshold temporarily lowered to 5%
+- **❌ Low Overall Test Coverage**: Coverage threshold temporarily lowered to 5% ([Issue #23](https://github.com/joaoblasques/e-commerce-analytics-platform/issues/23))
   - **Impact**: Current coverage is 7.93%, below production standards (target: 80%)
   - **Resolution**: Write comprehensive tests for all modules, especially data generation framework
   - **Priority**: High - Critical for production readiness and code quality
