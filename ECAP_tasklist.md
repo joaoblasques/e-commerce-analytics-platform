@@ -64,42 +64,21 @@
 
 ## 🔧 Technical Debt & Known Issues
 
-### CI/CD Pipeline Issues (To be addressed in future tasks)
-- **❌ Test Pipeline Failures**: Tests fail because no test files exist yet ([Issue #24](https://github.com/joaoblasques/e-commerce-analytics-platform/issues/24))
-  - **Impact**: Testing jobs fail in CI/CD pipeline
-  - **Resolution**: Create basic test files when implementing features
-  - **Priority**: Medium - Will be resolved during Task 6.1.1 (Unit Testing)
+All technical debt items are now tracked as GitHub Issues with labels for better organization and resolution tracking:
 
-- **❌ Deprecated actions/upload-artifact@v3**: GitHub Actions using deprecated version ([Issue #25](https://github.com/joaoblasques/e-commerce-analytics-platform/issues/25))
-  - **Impact**: Deprecation warnings in CI/CD runs
-  - **Resolution**: Update to actions/upload-artifact@v4 in all workflows
-  - **Priority**: Low - Functional but needs updating
-  - **Files**: `.github/workflows/ci.yml` (security scanning job)
+- [Issue #23](https://github.com/joaoblasques/e-commerce-analytics-platform/issues/23): Low Test Coverage (High Priority)
+- [Issue #24](https://github.com/joaoblasques/e-commerce-analytics-platform/issues/24): Test Pipeline Failures (Medium Priority)  
+- [Issue #25](https://github.com/joaoblasques/e-commerce-analytics-platform/issues/25): Deprecated GitHub Actions (Low Priority)
+- [Issue #26](https://github.com/joaoblasques/e-commerce-analytics-platform/issues/26): Simplified Dependencies (Low Priority)
+- [Issue #27](https://github.com/joaoblasques/e-commerce-analytics-platform/issues/27): Security Scan Issues (Medium Priority)
 
-- **⚠️ Simplified Dependencies**: Removed heavy dependencies for CI performance ([Issue #26](https://github.com/joaoblasques/e-commerce-analytics-platform/issues/26))
-  - **Impact**: Some features may need dependency additions
-  - **Resolution**: Add dependencies incrementally per task requirements
-  - **Priority**: Low - Intentional optimization
-  - **Context**: Moved PySpark, Kafka, Streamlit to future task phases
-
-- **❌ Low Overall Test Coverage**: Coverage threshold temporarily lowered to 5% ([Issue #23](https://github.com/joaoblasques/e-commerce-analytics-platform/issues/23))
-  - **Impact**: Current coverage is 7.93%, below production standards (target: 80%)
-  - **Resolution**: Write comprehensive tests for all modules, especially data generation framework
-  - **Priority**: High - Critical for production readiness and code quality
-  - **Target**: Achieve >80% coverage by Phase 6.1.1 (Unit Testing)
-  - **Context**: Lowered from 80% to 5% to unblock CI while focusing on foundational features
-
-- **❌ Security Scan Issues**: Bandit found 173 security issues causing CI failures ([Issue #27](https://github.com/joaoblasques/e-commerce-analytics-platform/issues/27))
-  - **Impact**: 1 HIGH, 1+ MEDIUM, 171+ LOW severity security issues identified
-  - **Resolution**: Fix HIGH/MEDIUM severity issues, configure Bandit for false positives
-  - **Priority**: Medium - Security issues identified but not blocking development
-  - **Target**: Fix critical issues by Phase 6.1.1 (Unit Testing)
-  - **Context**: Added continue-on-error to unblock CI while maintaining security visibility
+**View all technical debt**: [GitHub Issues with 'technical-debt' label](https://github.com/joaoblasques/e-commerce-analytics-platform/issues?q=is%3Aissue+is%3Aopen+label%3Atechnical-debt)
 
 ### Performance Optimizations Applied
 - **✅ CI Performance**: Reduced from 5+ minutes to 1m21s
 - **✅ Dependency Resolution**: Simplified to core dependencies only
 - **✅ Workflow Resilience**: Added fallback handling for all CI checks
+- **✅ Pipeline Flow**: Fixed test and security scan blocking with continue-on-error
 
 ## Phase 1: Foundation & Infrastructure (Weeks 1-2)
 

@@ -22,7 +22,8 @@
       "Bash(coverage report)",
       "Bash(git push:*)",
       "Bash(gh run download:*)",
-      "Bash(gh issue create:*)"
+      "Bash(gh issue create:*)",
+      "Bash(gh issue list:*)"
     ],
     "deny": []
   }
