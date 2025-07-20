@@ -1,5 +1,5 @@
 """
-Kafka Structured Streaming Consumers for E-Commerce Analytics Platform
+Kafka Structured Streaming Consumers for E-Commerce Analytics Platform.
 
 This module provides robust Kafka consumers using Spark Structured Streaming
 with comprehensive error handling, schema validation, checkpointing, and
@@ -7,26 +7,15 @@ backpressure management.
 """
 
 import logging
-import time
 from abc import ABC, abstractmethod
 from typing import Any, Callable, Dict, List, Optional
 
 from pyspark.sql import DataFrame, SparkSession
-from pyspark.sql.functions import (
-    col,
-    current_timestamp,
-    from_json,
-    isnan,
-    isnull,
-    regexp_extract,
-    split,
-)
+from pyspark.sql.functions import col, current_timestamp, from_json, lit
 from pyspark.sql.functions import sum as spark_sum
-from pyspark.sql.functions import to_timestamp, when
+from pyspark.sql.functions import when
 from pyspark.sql.streaming import StreamingQuery
 from pyspark.sql.types import (
-    ArrayType,
-    BooleanType,
     DoubleType,
     IntegerType,
     MapType,
@@ -36,6 +25,7 @@ from pyspark.sql.types import (
     TimestampType,
 )
 
+from src.streaming.data_quality import DataQualityEngine
 from src.utils.logger import get_logger
 
 
@@ -163,6 +153,10 @@ class BaseStreamingConsumer(ABC):
         self.schema_validator = SchemaValidator()
         self.quality_checker = DataQualityChecker(self.logger)
 
+        # Initialize comprehensive data quality engine
+        self.data_quality_engine = DataQualityEngine(self.spark)
+        self.enable_data_quality = True  # Flag to enable/disable quality checks
+
         # Configure Spark settings for streaming
         self._configure_spark_settings()
 
@@ -196,6 +190,72 @@ class BaseStreamingConsumer(ABC):
         spark_conf.set("spark.sql.streaming.ui.enabled", "true")
 
         self.logger.info("Configured Spark settings for streaming")
+
+    def apply_data_quality_checks(self, df: DataFrame, stream_type: str) -> DataFrame:
+        """
+        Apply comprehensive data quality checks to streaming data.
+
+        Args:
+            df: Input DataFrame to check
+            stream_type: Type of stream (transaction, user_behavior, etc.)
+
+        Returns:
+            DataFrame with quality flags and high-quality data filtering
+        """
+        if not self.enable_data_quality:
+            return df.withColumn("quality_passed", lit(True))
+
+        try:
+            # Apply comprehensive data quality assessment
+            quality_df, quality_report = self.data_quality_engine.assess_data_quality(
+                df,
+                stream_type=stream_type,
+                enable_profiling=False,  # Disable profiling for performance
+            )
+
+            # Log quality metrics
+            self.logger.info(f"Data Quality Assessment for {stream_type}:")
+            self.logger.info(f"  - Quality Level: {quality_report.quality_level.value}")
+            self.logger.info(
+                f"  - Valid Records: {quality_report.valid_records}/{quality_report.total_records}"
+            )
+            self.logger.info(
+                f"  - Completeness: {quality_report.completeness_score:.2%}"
+            )
+            self.logger.info(f"  - Anomalies: {quality_report.anomaly_count}")
+
+            # Log recommendations if any
+            if quality_report.recommendations:
+                self.logger.info("  - Recommendations:")
+                for rec in quality_report.recommendations[
+                    :3
+                ]:  # Log top 3 recommendations
+                    self.logger.info(f"    * {rec}")
+
+            # Add a single column to indicate overall quality
+            quality_df = quality_df.withColumn(
+                "quality_passed",
+                (
+                    col("validation_passed")
+                    & col("completeness_passed")
+                    & (~col("is_anomaly"))
+                ),
+            )
+
+            # Create quality monitoring stream (for alerts/dashboards)
+            quality_monitoring_df = (
+                self.data_quality_engine.create_quality_monitoring_stream(quality_df)
+            )
+
+            # In a real scenario, you would write this to a monitoring topic
+            # self.write_monitoring_stream(quality_monitoring_df)
+
+            return quality_df
+
+        except Exception as e:
+            self.logger.error(f"Error in data quality checks: {e}")
+            # Return original data if quality checks fail to avoid breaking the pipeline
+            return df.withColumn("quality_passed", lit(False))
 
     @abstractmethod
     def get_schema(self) -> StructType:
@@ -500,12 +560,15 @@ class TransactionStreamConsumer(BaseStreamingConsumer):
 
     def transform_stream(self, df: DataFrame) -> DataFrame:
         """Transform transaction stream data with comprehensive enrichment."""
-        from src.streaming.transformations import DataEnrichmentPipeline, StreamDeduplicator
-        
+        from src.streaming.transformations import (
+            DataEnrichmentPipeline,
+            StreamDeduplicator,
+        )
+
         # Initialize transformation components
         enrichment_pipeline = DataEnrichmentPipeline(self.spark)
         deduplicator = StreamDeduplicator(self.spark)
-        
+
         # Add computed columns (basic transformation)
         transformed_df = (
             df.withColumn(
@@ -528,17 +591,20 @@ class TransactionStreamConsumer(BaseStreamingConsumer):
         valid_df = transformed_df.filter(
             (col("price") > 0) & (col("quantity") > 0) & (col("total_amount") >= 0)
         )
-        
+
         # Apply deduplication
         deduplicated_df = deduplicator.deduplicate_transactions(
-            valid_df, 
-            watermark_delay="5 minutes",
-            similarity_threshold=0.95
+            valid_df, watermark_delay="5 minutes", similarity_threshold=0.95
         )
-        
+
+        # Apply data quality checks before enrichment
+        quality_checked_df = self.apply_data_quality_checks(
+            deduplicated_df, "transaction"
+        )
+
         # Apply comprehensive enrichment
-        enriched_df = enrichment_pipeline.enrich_transaction_stream(deduplicated_df)
-        
+        enriched_df = enrichment_pipeline.enrich_transaction_stream(quality_checked_df)
+
         return enriched_df
 
     def _get_critical_columns(self) -> List[str]:
@@ -609,12 +675,15 @@ class UserBehaviorStreamConsumer(BaseStreamingConsumer):
 
     def transform_stream(self, df: DataFrame) -> DataFrame:
         """Transform user behavior stream data with comprehensive enrichment."""
-        from src.streaming.transformations import DataEnrichmentPipeline, StreamDeduplicator
-        
+        from src.streaming.transformations import (
+            DataEnrichmentPipeline,
+            StreamDeduplicator,
+        )
+
         # Initialize transformation components
         enrichment_pipeline = DataEnrichmentPipeline(self.spark)
         deduplicator = StreamDeduplicator(self.spark)
-        
+
         # Add computed columns (basic transformation)
         transformed_df = (
             df.withColumn("processing_timestamp", current_timestamp())
@@ -641,18 +710,25 @@ class UserBehaviorStreamConsumer(BaseStreamingConsumer):
             & col("user_id").isNotNull()
             & col("session_id").isNotNull()
         )
-        
+
         # Apply deduplication for user behavior
         deduplicated_df = deduplicator.deduplicate_user_behavior(
             valid_df,
             session_dedup=True,
             event_dedup_window="30 seconds",
-            watermark_delay="2 minutes"
+            watermark_delay="2 minutes",
         )
-        
+
+        # Apply data quality checks before enrichment
+        quality_checked_df = self.apply_data_quality_checks(
+            deduplicated_df, "user_behavior"
+        )
+
         # Apply comprehensive enrichment
-        enriched_df = enrichment_pipeline.enrich_user_behavior_stream(deduplicated_df)
-        
+        enriched_df = enrichment_pipeline.enrich_user_behavior_stream(
+            quality_checked_df
+        )
+
         return enriched_df
 
     def _get_critical_columns(self) -> List[str]:
