@@ -1,30 +1,25 @@
-"""
-Real-time aggregations with windowing for streaming analytics.
+from typing import TYPE_CHECKING
 
-This module provides comprehensive windowed aggregation capabilities:
-- Time-based windowing (tumbling, sliding, session)
-- Real-time KPIs and metrics
-- Customer behavior aggregations
-- Product performance metrics
-"""
-
-import logging
-from typing import Dict, List, Optional, Any
-from datetime import datetime
-
-from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.functions import (
-    col, count, sum as spark_sum, avg, max as spark_max, min as spark_min,
-    stddev, first, last, collect_list, collect_set, 
-    window, current_timestamp, when, coalesce, lit,
-    desc, asc, row_number, rank, dense_rank,
-    lag, lead, countDistinct, approx_count_distinct
+    avg,
+    col,
+    count,
+    countDistinct,
+    current_timestamp,
+    first,
+    lit,
+    max as spark_max,
+    min as spark_min,
+    sum as spark_sum,
+    when,
+    window,
+    coalesce,
+    last,
 )
-from pyspark.sql.window import Window
-from pyspark.sql.types import (
-    StructType, StructField, StringType, IntegerType, 
-    DoubleType, TimestampType, BooleanType
-)
+
+if TYPE_CHECKING:
+    from pyspark.sql import DataFrame, SparkSession
+    from pyspark.sql.window import Window
 
 from src.utils.logger import get_logger
 
@@ -41,7 +36,7 @@ class StreamingAggregator:
     - Real-time alerting metrics
     """
     
-    def __init__(self, spark: SparkSession):
+    def __init__(self, spark: "SparkSession"):
         """
         Initialize streaming aggregator.
         
@@ -53,10 +48,10 @@ class StreamingAggregator:
         
     def create_real_time_kpis(
         self, 
-        transaction_df: DataFrame,
+        transaction_df: "DataFrame",
         window_duration: str = "5 minutes",
         slide_duration: str = "1 minute"
-    ) -> DataFrame:
+    ) -> "DataFrame":
         """
         Create real-time KPI aggregations from transaction stream.
         
@@ -128,10 +123,10 @@ class StreamingAggregator:
     
     def create_customer_behavior_aggregations(
         self,
-        behavior_df: DataFrame,
+        behavior_df: "DataFrame",
         window_duration: str = "10 minutes",
         slide_duration: str = "2 minutes"
-    ) -> DataFrame:
+    ) -> "DataFrame":
         """
         Create customer behavior aggregations from user behavior stream.
         
@@ -220,10 +215,10 @@ class StreamingAggregator:
     
     def create_product_performance_aggregations(
         self,
-        transaction_df: DataFrame,
+        transaction_df: "DataFrame",
         window_duration: str = "15 minutes",
         slide_duration: str = "5 minutes"
-    ) -> DataFrame:
+    ) -> "DataFrame":
         """
         Create product performance aggregations from transaction stream.
         
@@ -286,9 +281,9 @@ class StreamingAggregator:
                 .otherwise(lit(0.0))
             ).withColumn(
                 "performance_score",
-                (col("units_sold") * 0.3 + 
-                 col("revenue") * 0.5 + 
-                 col("unique_buyers") * 0.2).cast(IntegerType())
+                (col("units_sold") * 0.3 +
+                 col("revenue") * 0.5 +
+                 col("unique_buyers") * 0.2).cast("int")
             ).withColumn(
                 "velocity_category",
                 when(col("units_sold") >= 50, lit("Fast Moving"))
@@ -306,9 +301,9 @@ class StreamingAggregator:
     
     def create_session_aggregations(
         self,
-        behavior_df: DataFrame,
+        behavior_df: "DataFrame",
         session_timeout: str = "30 minutes"
-    ) -> DataFrame:
+    ) -> "DataFrame":
         """
         Create session-based aggregations using session windows.
         
@@ -338,7 +333,7 @@ class StreamingAggregator:
                     # Engagement in session
                     spark_sum("engagement_score").alias("session_engagement_score"),
                     avg("engagement_score").alias("avg_event_engagement"),
-                    spark_max("page_depth").alias("max_page_depth_reached"),
+                    spark_max("engagement_score").alias("max_engagement_score"),
                     
                     # Funnel progression
                     spark_max("purchase_intent_score").alias("max_purchase_intent"),
@@ -356,7 +351,7 @@ class StreamingAggregator:
             # Calculate session duration and metrics
             session_metrics_df = windowed_df.withColumn(
                 "session_duration_seconds",
-                (col("session_end_time").cast("long") - 
+                (col("session_end_time").cast("long") -
                  col("session_start_time").cast("long"))
             ).withColumn(
                 "session_duration_minutes",
@@ -379,7 +374,7 @@ class StreamingAggregator:
                 .otherwise(lit("Poor"))
             ).withColumn(
                 "funnel_progression",
-                when((col("entry_funnel_stage") == "Awareness") & 
+                when((col("entry_funnel_stage") == "Awareness") &
                      (col("exit_funnel_stage") == "Purchase"), lit("Full Conversion"))
                 .when(col("exit_funnel_stage") != col("entry_funnel_stage"), lit("Progressed"))
                 .otherwise(lit("No Progression"))
@@ -394,10 +389,10 @@ class StreamingAggregator:
     
     def create_alert_aggregations(
         self,
-        transaction_df: DataFrame,
-        behavior_df: DataFrame,
+        transaction_df: "DataFrame",
+        behavior_df: "DataFrame",
         alert_window: str = "5 minutes"
-    ) -> DataFrame:
+    ) -> "DataFrame":
         """
         Create aggregations for real-time alerting and monitoring.
         

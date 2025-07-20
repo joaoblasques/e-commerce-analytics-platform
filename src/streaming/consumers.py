@@ -1,5 +1,5 @@
 """
-Kafka Structured Streaming Consumers for E-Commerce Analytics Platform
+Kafka Structured Streaming Consumers for E-Commerce Analytics Platform.
 
 This module provides robust Kafka consumers using Spark Structured Streaming
 with comprehensive error handling, schema validation, checkpointing, and
@@ -7,26 +7,15 @@ backpressure management.
 """
 
 import logging
-import time
 from abc import ABC, abstractmethod
 from typing import Any, Callable, Dict, List, Optional
 
 from pyspark.sql import DataFrame, SparkSession
-from pyspark.sql.functions import (
-    col,
-    current_timestamp,
-    from_json,
-    isnan,
-    isnull,
-    regexp_extract,
-    split,
-)
+from pyspark.sql.functions import col, current_timestamp, from_json, lit
 from pyspark.sql.functions import sum as spark_sum
-from pyspark.sql.functions import to_timestamp, when
+from pyspark.sql.functions import when
 from pyspark.sql.streaming import StreamingQuery
 from pyspark.sql.types import (
-    ArrayType,
-    BooleanType,
     DoubleType,
     IntegerType,
     MapType,
@@ -214,7 +203,7 @@ class BaseStreamingConsumer(ABC):
             DataFrame with quality flags and high-quality data filtering
         """
         if not self.enable_data_quality:
-            return df
+            return df.withColumn("quality_passed", lit(True))
 
         try:
             # Apply comprehensive data quality assessment
@@ -243,21 +232,14 @@ class BaseStreamingConsumer(ABC):
                 ]:  # Log top 3 recommendations
                     self.logger.info(f"    * {rec}")
 
-            # Filter out poor quality data (configurable threshold)
-            quality_threshold = 50  # Minimum quality score to keep records
-            high_quality_df = quality_df.filter(
-                col("validation_passed")
-                & col("completeness_passed")
-                & (col("data_quality_score") >= quality_threshold)
-            )
-
-            # Log filtering results
-            original_count = df.count()
-            filtered_count = high_quality_df.count()
-            filtered_percentage = (filtered_count / max(original_count, 1)) * 100
-
-            self.logger.info(
-                f"Quality filtering: {filtered_count}/{original_count} records retained ({filtered_percentage:.1f}%)"
+            # Add a single column to indicate overall quality
+            quality_df = quality_df.withColumn(
+                "quality_passed",
+                (
+                    col("validation_passed")
+                    & col("completeness_passed")
+                    & (~col("is_anomaly"))
+                ),
             )
 
             # Create quality monitoring stream (for alerts/dashboards)
@@ -265,15 +247,15 @@ class BaseStreamingConsumer(ABC):
                 self.data_quality_engine.create_quality_monitoring_stream(quality_df)
             )
 
-            # TODO: In production, you might want to write quality_monitoring_df to a monitoring topic
-            # quality_monitoring_df.writeStream.format("kafka").option("topic", "data-quality-monitoring").start()
+            # In a real scenario, you would write this to a monitoring topic
+            # self.write_monitoring_stream(quality_monitoring_df)
 
-            return high_quality_df
+            return quality_df
 
         except Exception as e:
             self.logger.error(f"Error in data quality checks: {e}")
             # Return original data if quality checks fail to avoid breaking the pipeline
-            return df
+            return df.withColumn("quality_passed", lit(False))
 
     @abstractmethod
     def get_schema(self) -> StructType:

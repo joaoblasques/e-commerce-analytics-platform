@@ -1,15 +1,3 @@
-"""
-Stream-to-stream joins for real-time data correlation.
-
-This module provides comprehensive streaming join capabilities:
-- Stream-to-stream joins with time windows
-- Stream-to-static data joins
-- Complex multi-stream correlations
-- Late arrival and watermark handling
-"""
-
-import logging
-from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional, Tuple
 
 from pyspark.sql import DataFrame, SparkSession
@@ -18,33 +6,16 @@ from pyspark.sql.functions import (
     broadcast,
     coalesce,
     col,
-    collect_list,
-    collect_set,
     current_timestamp,
     datediff,
     expr,
-    first,
-    from_unixtime,
     greatest,
     lag,
-    last,
-    lead,
-    least,
     lit,
-    monotonically_increasing_id,
     row_number,
 )
 from pyspark.sql.functions import sum as spark_sum
-from pyspark.sql.functions import unix_timestamp, when, window
-from pyspark.sql.types import (
-    BooleanType,
-    DoubleType,
-    IntegerType,
-    StringType,
-    StructField,
-    StructType,
-    TimestampType,
-)
+from pyspark.sql.functions import when, window
 from pyspark.sql.window import Window
 
 from src.utils.logger import get_logger
@@ -58,7 +29,7 @@ class StreamJoinEngine:
     - Transaction and behavior correlation
     - User journey reconstruction
     - Cross-stream event correlation
-    - Late data handling with watermarks
+    - Late arrival and watermark handling
     """
 
     def __init__(self, spark: SparkSession):
@@ -159,7 +130,7 @@ class StreamJoinEngine:
                 .withColumn(
                     "intent_to_purchase_score",
                     when(
-                        col("product_match") == True, col("behavior_intent") + lit(20)
+                        col("product_match"), col("behavior_intent") + lit(20)
                     ).otherwise(  # Boost for product match
                         col("behavior_intent")
                     ),
@@ -287,7 +258,7 @@ class StreamJoinEngine:
                 .withColumn(
                     "journey_effectiveness",
                     when(
-                        col("led_to_purchase") == True,
+                        col("led_to_purchase"),
                         when(col("event_type") == "add_to_cart", lit(100))
                         .when(col("event_type") == "product_view", lit(80))
                         .when(col("event_type") == "search", lit(60))
@@ -431,7 +402,7 @@ class StreamJoinEngine:
                             - col("profile_update_timestamp").cast("long")
                         )
                         / 3600,
-                    ).otherwise(lit(null)),
+                    ).otherwise(lit(None)),
                 )
                 .withColumn("profile_join_timestamp", current_timestamp())
             )
@@ -634,7 +605,7 @@ class StreamJoinEngine:
                 .withColumn(
                     "session_conversion_score",
                     when(
-                        col("within_session_purchase") == True,
+                        col("within_session_purchase"),
                         col("behavior_engagement") + lit(50),
                     ).otherwise(col("behavior_engagement")),
                 )
@@ -672,3 +643,21 @@ class StreamJoinEngine:
         except Exception as e:
             self.logger.error(f"Error creating sessionized join: {e}")
             raise
+
+
+if __name__ == "__main__":
+    # Example usage (for testing and demonstration)
+    spark_session = (
+        SparkSession.builder.appName("StreamJoinEngineExample")
+        .config("spark.sql.shuffle.partitions", "4")
+        .getOrCreate()
+    )
+    join_engine = StreamJoinEngine(spark_session)
+
+    # Create sample DataFrames (replace with actual stream sources)
+    # ...
+
+    # Example: join_transaction_behavior_streams
+    # ...
+
+    spark_session.stop()
