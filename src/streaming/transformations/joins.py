@@ -33,10 +33,9 @@ from pyspark.sql.functions import (
     lit,
     monotonically_increasing_id,
     row_number,
-    unix_timestamp,
-    when,
-    window,
 )
+from pyspark.sql.functions import sum as spark_sum
+from pyspark.sql.functions import unix_timestamp, when, window
 from pyspark.sql.types import (
     BooleanType,
     DoubleType,
