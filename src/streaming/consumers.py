@@ -499,8 +499,14 @@ class TransactionStreamConsumer(BaseStreamingConsumer):
         )
 
     def transform_stream(self, df: DataFrame) -> DataFrame:
-        """Transform transaction stream data."""
-        # Add computed columns
+        """Transform transaction stream data with comprehensive enrichment."""
+        from src.streaming.transformations import DataEnrichmentPipeline, StreamDeduplicator
+        
+        # Initialize transformation components
+        enrichment_pipeline = DataEnrichmentPipeline(self.spark)
+        deduplicator = StreamDeduplicator(self.spark)
+        
+        # Add computed columns (basic transformation)
         transformed_df = (
             df.withColumn(
                 "total_amount", col("price") * col("quantity") - col("discount_applied")
@@ -522,8 +528,18 @@ class TransactionStreamConsumer(BaseStreamingConsumer):
         valid_df = transformed_df.filter(
             (col("price") > 0) & (col("quantity") > 0) & (col("total_amount") >= 0)
         )
-
-        return valid_df
+        
+        # Apply deduplication
+        deduplicated_df = deduplicator.deduplicate_transactions(
+            valid_df, 
+            watermark_delay="5 minutes",
+            similarity_threshold=0.95
+        )
+        
+        # Apply comprehensive enrichment
+        enriched_df = enrichment_pipeline.enrich_transaction_stream(deduplicated_df)
+        
+        return enriched_df
 
     def _get_critical_columns(self) -> List[str]:
         """Get critical columns for transaction data."""
@@ -592,8 +608,14 @@ class UserBehaviorStreamConsumer(BaseStreamingConsumer):
         )
 
     def transform_stream(self, df: DataFrame) -> DataFrame:
-        """Transform user behavior stream data."""
-        # Add computed columns
+        """Transform user behavior stream data with comprehensive enrichment."""
+        from src.streaming.transformations import DataEnrichmentPipeline, StreamDeduplicator
+        
+        # Initialize transformation components
+        enrichment_pipeline = DataEnrichmentPipeline(self.spark)
+        deduplicator = StreamDeduplicator(self.spark)
+        
+        # Add computed columns (basic transformation)
         transformed_df = (
             df.withColumn("processing_timestamp", current_timestamp())
             .withColumn(
@@ -619,8 +641,19 @@ class UserBehaviorStreamConsumer(BaseStreamingConsumer):
             & col("user_id").isNotNull()
             & col("session_id").isNotNull()
         )
-
-        return valid_df
+        
+        # Apply deduplication for user behavior
+        deduplicated_df = deduplicator.deduplicate_user_behavior(
+            valid_df,
+            session_dedup=True,
+            event_dedup_window="30 seconds",
+            watermark_delay="2 minutes"
+        )
+        
+        # Apply comprehensive enrichment
+        enriched_df = enrichment_pipeline.enrich_user_behavior_stream(deduplicated_df)
+        
+        return enriched_df
 
     def _get_critical_columns(self) -> List[str]:
         """Get critical columns for user behavior data."""
