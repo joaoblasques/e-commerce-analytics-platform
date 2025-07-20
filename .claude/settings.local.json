@@ -25,7 +25,11 @@
       "Bash(gh issue create:*)",
       "Bash(gh issue list:*)",
       "Bash(rm:*)",
-      "Bash(gh pr create:*)"
+      "Bash(gh pr create:*)",
+      "Bash(gh pr list:*)",
+      "Bash(gh pr view:*)",
+      "Bash(gh pr merge:*)",
+      "Bash(git stash:*)"
     ],
     "deny": []
   }
