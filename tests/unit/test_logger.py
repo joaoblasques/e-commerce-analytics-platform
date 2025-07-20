@@ -3,8 +3,6 @@ Unit tests for logger utilities.
 """
 import logging
 
-import pytest
-
 from src.utils.logger import get_logger, setup_logging
 
 
@@ -119,7 +117,6 @@ def test_get_logger_alias_consistency():
 def test_logger_logging_functionality():
     """Test that logger can actually log messages."""
     import io
-    import sys
 
     # Capture stdout
     captured_output = io.StringIO()

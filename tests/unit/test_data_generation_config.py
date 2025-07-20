@@ -2,9 +2,7 @@
 Comprehensive unit tests for data generation configuration.
 """
 import json
-from datetime import datetime, timedelta
-
-import pytest
+from datetime import datetime
 
 from src.data_generation.config import DataGenerationConfig
 
@@ -281,8 +279,8 @@ def test_age_ranges_and_distribution():
     config = DataGenerationConfig()
 
     # Check that all age groups in distribution have corresponding ranges
-    for age_group in config.age_distribution.keys():
-        assert age_group in config.age_ranges
+    for _age_group in config.age_distribution.keys():
+        assert _age_group in config.age_ranges
 
     # Check that all ranges are valid
     for age_group, (min_age, max_age) in config.age_ranges.items():
@@ -310,7 +308,7 @@ def test_event_types_structure():
     total_weight = sum(event["weight"] for event in config.event_types.values())
     assert abs(total_weight - 1.0) < 0.01  # Should sum to approximately 1.0
 
-    for event_type, event_data in config.event_types.items():
+    for _event_type, event_data in config.event_types.items():
         assert "weight" in event_data
         assert "duration_range" in event_data
         assert len(event_data["duration_range"]) == 2

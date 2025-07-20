@@ -80,6 +80,152 @@ All technical debt items are now tracked as GitHub Issues with labels for better
 - **✅ Workflow Resilience**: Added fallback handling for all CI checks
 - **✅ Pipeline Flow**: Fixed test and security scan blocking with continue-on-error
 
+## 📊 Test Coverage Strategy & Implementation Plan
+
+### Current Coverage Analysis (As of 2025-07-20)
+
+**Current State**: 12.29% test coverage (exceeds temporary 10% minimum)
+
+### Why 10% Coverage is Problematic
+
+**Industry Standards**:
+- **Good projects**: 70-80% coverage
+- **Excellent projects**: 85-95% coverage
+- **Critical systems**: 95%+ coverage
+- **10% coverage**: Essentially "no meaningful testing"
+
+### Context: Early Development Phase Justification
+
+**Current Situation**:
+- 17 completed tasks focused on infrastructure setup (Docker, Kafka, Spark, etc.)
+- Most code is configuration, setup, and framework code
+- Limited business logic implemented yet
+- Infrastructure-heavy components require external systems (Kafka, Spark, PostgreSQL)
+
+**Technical Debt Reality**:
+✅ **Acceptable temporarily** for infrastructure setup phase
+❌ **Unacceptable for business logic** and production code
+❌ **Creating technical debt** that must be addressed soon
+
+### Progressive Coverage Implementation Plan
+
+**Phase-Based Coverage Targets**:
+```
+Phase 1 (Infrastructure): 10% - 25% ✅ Current phase
+Phase 2 (Business Logic): 60% minimum 🎯 Next target
+Phase 3 (Production Ready): 85% minimum 🚀 Final target
+```
+
+### Immediate Implementation Plan
+
+#### **Next Task (2.2.2): Increase Coverage Threshold**
+```toml
+# pyproject.toml update:
+"--cov-fail-under=25",  # Immediate bump from 10%
+```
+
+#### **High-Value Testing Priorities** (Next 5 Tasks):
+1. **Business Logic Functions**
+   - Analytics calculations (RFM, CLV, churn prediction)
+   - Data validation and transformation logic
+   - Configuration parsing and validation
+
+2. **Data Processing Components**
+   - Stream processing transformations
+   - Data quality checking logic
+   - Error handling paths
+
+3. **API and Service Logic**
+   - REST endpoint business logic
+   - Authentication and authorization
+   - Input validation and sanitization
+
+#### **Testing Pyramid for ECAP**:
+```
+   🔺 E2E Tests (5%)
+     - Full pipeline integration tests
+     - Docker compose end-to-end validation
+
+  🔺🔺 Integration Tests (20%)
+     - Kafka + Spark integration
+     - Database + API integration
+     - Component interaction validation
+
+🔺🔺🔺 Unit Tests (75%)
+     - Business logic (analytics calculations)
+     - Data validation and transformation
+     - Configuration management
+     - Error handling and edge cases
+```
+
+### Progressive Coverage Milestones
+
+**Milestone 1 (Tasks 2.2.2-2.2.3)**: 25% coverage
+- Focus: Stream processing business logic
+- Target: Data transformation and validation functions
+
+**Milestone 2 (Tasks 2.3.1-2.3.3)**: 45% coverage
+- Focus: Data lake and Delta Lake operations
+- Target: Storage layer and data management logic
+
+**Milestone 3 (Phase 3 Start)**: 60% coverage
+- Focus: Analytics engine components
+- Target: Customer analytics and fraud detection logic
+
+**Milestone 4 (Phase 4 Start)**: 75% coverage
+- Focus: API and dashboard components
+- Target: Business logic and user-facing functionality
+
+**Milestone 5 (Production Ready)**: 85% coverage
+- Focus: Complete system validation
+- Target: All business-critical paths tested
+
+### Testing Infrastructure Requirements
+
+**Immediate Needs (Next 2-3 Tasks)**:
+- Test containers for Kafka and Spark integration tests
+- Database test fixtures and factories
+- Mock frameworks for external dependencies
+- Performance and load testing framework
+
+**Medium Term**:
+- Chaos engineering test suite
+- End-to-end pipeline validation
+- Security and compliance testing
+- Data quality monitoring tests
+
+### Risk Mitigation
+
+**Current Risks**:
+- ✗ No protection against regressions
+- ✗ Refactoring becomes dangerous
+- ✗ Business logic bugs go undetected
+- ✗ Integration issues discovered late
+- ✗ Deployment confidence is low
+
+**Risk Reduction Plan**:
+- **Immediate**: Increase coverage threshold to 25%
+- **Short-term**: Focus on business logic and data processing tests
+- **Medium-term**: Add comprehensive integration testing
+- **Long-term**: Achieve production-ready 85% coverage
+
+### Success Metrics
+
+**Technical Targets**:
+- **Phase 2 Completion**: 60% coverage minimum
+- **Phase 3 Completion**: 75% coverage minimum
+- **Production Deployment**: 85% coverage minimum
+- **Regression Rate**: <2% after achieving 75% coverage
+- **Deployment Confidence**: >95% after achieving 85% coverage
+
+**Quality Gates**:
+- All new business logic: 90%+ coverage required
+- All API endpoints: 85%+ coverage required
+- All data transformations: 95%+ coverage required
+- Critical path functions: 100% coverage required
+
+This progressive approach ensures we maintain development velocity while systematically eliminating technical debt and building production-ready quality standards.
+
 ## Phase 1: Foundation & Infrastructure (Weeks 1-2)
 
 ### 1.1 Project Setup & Repository Management

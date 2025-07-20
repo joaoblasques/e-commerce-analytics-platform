@@ -2,7 +2,6 @@
 Comprehensive unit tests for CLI module.
 """
 import click
-import pytest
 from click.testing import CliRunner
 
 from src import __version__
