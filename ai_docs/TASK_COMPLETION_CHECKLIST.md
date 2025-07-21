@@ -59,7 +59,13 @@ This checklist must be followed for **EVERY** task start and completion to ensur
        - [ ] **Reference GitHub issue** in task documentation
    - [ ] **Only proceed** when CI/CD is GREEN (passing) with technical debt properly documented
 
-5. **✅ DOCUMENTATION UPDATE (CRITICAL)**
+5. **✅ POST-MERGE CLEANUP (MANDATORY)**
+   - [ ] **Pull latest changes from master** after PR merge
+   - [ ] **Delete local feature branch**: `git branch -d feature/task-X.X.X`
+   - [ ] **Verify remote branch deletion**: Automatic with `--delete-branch` flag
+   - [ ] **Confirm branch cleanup**: Use `git branch -a` to verify no stale branches
+
+6. **✅ DOCUMENTATION UPDATE (CRITICAL)**
    - [ ] **ECAP_tasklist.md** updated with:
      - [ ] Task marked as `[x]` completed
      - [ ] Actual time recorded
@@ -73,8 +79,9 @@ This checklist must be followed for **EVERY** task start and completion to ensur
      - [ ] Statistics updated (total tasks count)
      - [ ] Next task updated
 
-6. **✅ Final Verification**
+7. **✅ Final Verification**
    - [ ] CI/CD pipeline is green (or technical debt documented)
+   - [ ] Feature branches cleaned up (local and remote)
    - [ ] Both documentation files committed
    - [ ] All files pushed to master
    - [ ] Task completion confirmed
@@ -87,10 +94,11 @@ This checklist must be followed for **EVERY** task start and completion to ensur
 The human will ask about missing documentation updates or failing CI/CD if you forget. To prevent this:
 
 1. **Always monitor CI/CD after PR merge** - failing CI/CD means task is NOT complete
-2. **Always update both files immediately after PR merge**
-3. **Use the TodoWrite tool to track documentation as a separate task**
-4. **Create GitHub issues for CI/CD technical debt** when immediate fixes aren't feasible
-5. **Double-check both documentation files AND CI/CD status before declaring task complete**
+2. **Always clean up feature branches after PR merge** - both local and remote
+3. **Always update both files immediately after PR merge**
+4. **Use the TodoWrite tool to track documentation as a separate task**
+5. **Create GitHub issues for CI/CD technical debt** when immediate fixes aren't feasible
+6. **Double-check both documentation files AND CI/CD status before declaring task complete**
 
 ### 📝 Template for Documentation Updates
 
@@ -106,9 +114,21 @@ The human will ask about missing documentation updates or failing CI/CD if you f
   - **Pull Request**: https://github.com/joaoblasques/e-commerce-analytics-platform/pull/XX (Merged)
 ```
 
-#### PR Merge Command (with branch deletion):
+#### PR Merge Command (with automatic branch deletion):
 ```bash
 gh pr merge PR_NUMBER --squash --delete-branch
+```
+
+#### Post-Merge Cleanup Commands:
+```bash
+# Pull latest changes from master
+git pull origin master
+
+# Delete local feature branch
+git branch -d feature/task-X.X.X
+
+# Verify branch cleanup
+git branch -a
 ```
 
 #### For ECAP_execution_summary.md:
