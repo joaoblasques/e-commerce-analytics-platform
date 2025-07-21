@@ -8,7 +8,10 @@ and optimization features for the data lake using Delta Lake.
 import logging
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .lifecycle_manager import DataLifecycleManager
 
 from delta import DeltaTable, configure_spark_with_delta_pip
 from pyspark.sql import DataFrame, SparkSession
@@ -458,6 +461,265 @@ class DeltaLakeManager:
 
         logger.info(f"Listed {len(tables)} Delta tables")
         return tables
+
+    def enable_lifecycle_tracking(self, lifecycle_manager: 'DataLifecycleManager') -> None:
+        """
+        Enable automatic lifecycle tracking for Delta Lake operations.
+        
+        Args:
+            lifecycle_manager: DataLifecycleManager instance for tracking
+        """
+        from .lifecycle_manager import LineageRecord
+        self.lifecycle_manager = lifecycle_manager
+        self.auto_track_lineage = True
+        logger.info("Lifecycle tracking enabled for Delta Lake operations")
+
+    def _track_operation_lineage(
+        self, 
+        operation: str, 
+        table_name: str, 
+        source_tables: List[str] = None, 
+        record_count: int = 0,
+        bytes_processed: int = 0
+    ) -> None:
+        """Track lineage for Delta Lake operations."""
+        if not hasattr(self, 'lifecycle_manager') or not self.auto_track_lineage:
+            return
+            
+        from .lifecycle_manager import LineageRecord
+        import uuid
+        import os
+        
+        lineage_record = LineageRecord(
+            table_name=table_name,
+            operation=operation,
+            timestamp=datetime.now(),
+            source_tables=source_tables or [],
+            target_table=table_name,
+            record_count=record_count,
+            bytes_processed=bytes_processed,
+            job_id=f"delta_job_{uuid.uuid4().hex[:8]}",
+            user=os.getenv('USER', 'system'),
+            metadata={
+                "spark_app_id": self.spark.sparkContext.applicationId,
+                "delta_version": "3.0.0",  # Could be dynamic
+                "base_path": self.base_path
+            }
+        )
+        
+        try:
+            self.lifecycle_manager.track_lineage(lineage_record)
+        except Exception as e:
+            logger.warning(f"Failed to track lineage for {operation} on {table_name}: {e}")
+
+    def create_delta_table_with_lifecycle(
+        self,
+        df: DataFrame,
+        table_name: str,
+        table_path: Optional[str] = None,
+        partition_columns: Optional[List[str]] = None,
+        mode: str = "error",
+        enable_retention: bool = True,
+        retention_config: Optional[Dict[str, Any]] = None
+    ) -> bool:
+        """
+        Create Delta table with automatic lifecycle management setup.
+        
+        Args:
+            df: DataFrame to write
+            table_name: Name of the table
+            table_path: Path to store the table
+            partition_columns: Columns to partition by
+            mode: Write mode (error, overwrite, ignore)
+            enable_retention: Enable automatic retention policies
+            retention_config: Custom retention configuration
+            
+        Returns:
+            True if successful
+        """
+        # Create the Delta table
+        result = self.create_delta_table(df, table_name, table_path, partition_columns, mode)
+        
+        if result and hasattr(self, 'lifecycle_manager') and enable_retention:
+            # Setup default retention policy if not exists
+            if table_name not in self.lifecycle_manager.retention_rules:
+                from .lifecycle_manager import RetentionRule
+                from .lifecycle_config import LifecycleConfigManager
+                
+                config_manager = LifecycleConfigManager()
+                retention_rule = config_manager.get_retention_rule(table_name)
+                retention_rule.enabled = True  # Enable by default for new tables
+                
+                if retention_config:
+                    # Apply custom retention configuration
+                    for key, value in retention_config.items():
+                        if hasattr(retention_rule, key):
+                            setattr(retention_rule, key, value)
+                
+                self.lifecycle_manager.add_retention_rule(retention_rule)
+                logger.info(f"Added default retention policy for table: {table_name}")
+        
+        # Track lineage
+        self._track_operation_lineage(
+            operation="CREATE", 
+            table_name=table_name,
+            record_count=df.count() if df else 0
+        )
+        
+        return result
+
+    def write_to_delta_with_lifecycle(
+        self,
+        df: DataFrame,
+        table_name: str,
+        mode: str = "append",
+        merge_condition: Optional[str] = None,
+        source_tables: Optional[List[str]] = None,
+        track_lineage: bool = True
+    ) -> bool:
+        """
+        Write to Delta table with automatic lineage tracking.
+        
+        Args:
+            df: DataFrame to write
+            table_name: Target table name
+            mode: Write mode
+            merge_condition: Condition for merge operations
+            source_tables: List of source tables for lineage
+            track_lineage: Whether to track lineage
+            
+        Returns:
+            True if successful
+        """
+        record_count = df.count() if df else 0
+        
+        # Perform the write operation
+        result = self.write_to_delta(df, table_name, mode, merge_condition)
+        
+        # Track lineage if enabled
+        if track_lineage:
+            operation = "MERGE" if merge_condition else mode.upper()
+            self._track_operation_lineage(
+                operation=operation,
+                table_name=table_name,
+                source_tables=source_tables,
+                record_count=record_count
+            )
+        
+        return result
+
+    def optimize_with_lifecycle(
+        self, 
+        table_name: str, 
+        z_order_columns: Optional[List[str]] = None,
+        track_lineage: bool = True
+    ) -> Dict[str, Any]:
+        """
+        Optimize Delta table and track the operation.
+        
+        Args:
+            table_name: Table to optimize
+            z_order_columns: Columns for Z-ordering
+            track_lineage: Whether to track lineage
+            
+        Returns:
+            Optimization results
+        """
+        # Get table info before optimization
+        table_path = self.tables.get(table_name)
+        if not table_path:
+            raise ValueError(f"Table {table_name} not found")
+        
+        # Perform optimization
+        result = self.optimize_table(table_name, z_order_columns)
+        
+        # Track lineage
+        if track_lineage:
+            self._track_operation_lineage(
+                operation="OPTIMIZE",
+                table_name=table_name,
+                record_count=0,  # Optimization doesn't change record count
+                bytes_processed=result.get("bytes_processed", 0)
+            )
+        
+        return result
+
+    def vacuum_with_lifecycle(
+        self, 
+        table_name: str, 
+        retention_hours: int = 168,
+        track_lineage: bool = True
+    ) -> Dict[str, Any]:
+        """
+        Vacuum Delta table and track the operation.
+        
+        Args:
+            table_name: Table to vacuum
+            retention_hours: Retention period in hours
+            track_lineage: Whether to track lineage
+            
+        Returns:
+            Vacuum results
+        """
+        # Perform vacuum
+        result = self.vacuum_table(table_name, retention_hours)
+        
+        # Track lineage
+        if track_lineage:
+            self._track_operation_lineage(
+                operation="VACUUM",
+                table_name=table_name,
+                record_count=0,
+                bytes_processed=result.get("bytes_removed", 0)
+            )
+        
+        return result
+
+    def apply_retention_policies(self, dry_run: bool = True) -> Dict[str, Any]:
+        """
+        Apply retention policies to all managed tables.
+        
+        Args:
+            dry_run: Whether to perform a dry run
+            
+        Returns:
+            Retention policy results
+        """
+        if not hasattr(self, 'lifecycle_manager'):
+            logger.warning("Lifecycle manager not enabled. Call enable_lifecycle_tracking() first.")
+            return {}
+        
+        return self.lifecycle_manager.apply_retention_policies(dry_run=dry_run)
+
+    def get_table_lineage(self, table_name: str, depth: int = 3) -> Dict[str, Any]:
+        """
+        Get lineage information for a table.
+        
+        Args:
+            table_name: Table to get lineage for
+            depth: Maximum lineage depth
+            
+        Returns:
+            Lineage graph
+        """
+        if not hasattr(self, 'lifecycle_manager'):
+            logger.warning("Lifecycle manager not enabled. Call enable_lifecycle_tracking() first.")
+            return {}
+        
+        return self.lifecycle_manager.get_lineage_graph(table_name, depth)
+
+    def generate_lifecycle_report(self) -> Dict[str, Any]:
+        """
+        Generate comprehensive lifecycle report for all managed tables.
+        
+        Returns:
+            Lifecycle report
+        """
+        if not hasattr(self, 'lifecycle_manager'):
+            logger.warning("Lifecycle manager not enabled. Call enable_lifecycle_tracking() first.")
+            return {}
+        
+        return self.lifecycle_manager.generate_lifecycle_report()
 
     def close(self) -> None:
         """Clean up resources."""
