@@ -19,11 +19,11 @@ from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.functions import col, current_timestamp, lit
 from pyspark.sql.streaming import StreamingQuery
 
-from ..utils.logger import setup_logger
+from ..utils.logger import setup_logging
 from ..utils.spark_utils import create_spark_session
 from .storage import DataLakeStorage
 
-logger = setup_logger(__name__)
+logger = setup_logging(__name__)
 
 
 class DataLakeIngester:

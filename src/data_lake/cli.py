@@ -9,13 +9,13 @@ import json
 
 import click
 
-from ..utils.logger import setup_logger
+from ..utils.logger import setup_logging
 from .compaction import DataCompactor
 from .ingestion import DataLakeIngester
 from .metadata import MetadataManager, TableStatus
 from .storage import DataLakeStorage
 
-logger = setup_logger(__name__)
+logger = setup_logging(__name__)
 
 
 @click.group()

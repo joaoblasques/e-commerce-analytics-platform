@@ -21,10 +21,10 @@ from pyspark.sql.functions import min as spark_min
 from pyspark.sql.functions import stddev
 from pyspark.sql.types import DataType, StructField, StructType
 
-from ..utils.logger import setup_logger
+from ..utils.logger import setup_logging
 from ..utils.spark_utils import create_spark_session
 
-logger = setup_logger(__name__)
+logger = setup_logging(__name__)
 
 
 class TableStatus(Enum):

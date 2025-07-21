@@ -20,11 +20,11 @@ from pyspark.sql.functions import min as spark_min
 from pyspark.sql.functions import sum as spark_sum
 from pyspark.sql.types import StructType
 
-from ..utils.logger import setup_logger
+from ..utils.logger import setup_logging
 from ..utils.spark_utils import create_spark_session
 from .storage import DataLakeStorage
 
-logger = setup_logger(__name__)
+logger = setup_logging(__name__)
 
 
 class DataCompactor:
