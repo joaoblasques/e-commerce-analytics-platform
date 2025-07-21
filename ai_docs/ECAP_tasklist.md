@@ -532,7 +532,9 @@ This progressive approach ensures we maintain development velocity while systema
   - **Actual Time**: ~12 hours (20% over estimate - complexity higher than expected)
   - **Completed**: 2025-07-21
   - **Commit**: 2fc1da9 - Complete data lake implementation with comprehensive functionality
-  - **Technical Debt**: GitHub Issue #37 - PySpark testing environment setup
+  - **Technical Debt**: 
+    - GitHub Issue #37 - PySpark testing environment setup
+    - GitHub Issue #38 - CI/CD pipeline failures and infrastructure issues
 
 - [ ] **Task 2.3.2**: Integrate Delta Lake for ACID transactions
   - [ ] Set up Delta Lake tables for streaming writes
