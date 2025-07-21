@@ -54,7 +54,8 @@
       "Bash(git fetch:*)",
       "Bash(gh issue comment:*)",
       "Bash(gh workflow run:*)",
-      "Bash(gh run cancel:*)"
+      "Bash(gh run cancel:*)",
+      "Bash(gh issue:*)"
     ],
     "deny": []
   }

@@ -1,8 +1,23 @@
 # Task Completion Checklist
 
-## 🚨 MANDATORY CHECKLIST - READ BEFORE EVERY TASK COMPLETION
+## 🚨 MANDATORY CHECKLIST - READ BEFORE EVERY TASK START AND COMPLETION
 
-This checklist must be followed for **EVERY** task completion to ensure proper documentation and tracking.
+This checklist must be followed for **EVERY** task start and completion to ensure proper documentation and tracking.
+
+### 📖 PRE-TASK REQUIREMENT (MANDATORY)
+
+**Before starting ANY task, you MUST:**
+
+- [ ] **Read ALL documentation in ai_docs/ folder**
+  - [ ] Read CLAUDE.md for project guidelines and principles
+  - [ ] Read ECAP_prd.md for project requirements
+  - [ ] Read ECAP_tasklist.md for current task details
+  - [ ] Read ECAP_execution_summary.md for project status
+  - [ ] Read ECAP_planning.md for architectural context
+  - [ ] Read this TASK_COMPLETION_CHECKLIST.md for process requirements
+  - [ ] Read CI_CD_STABILITY_PLAN.md for CI/CD best practices
+
+**This ensures you have complete context and understanding before beginning any work.**
 
 ### ✅ Task Completion Workflow
 
@@ -151,7 +166,7 @@ A task is only considered complete when:
 
 **This checklist exists because:**
 - Documentation updates were forgotten multiple times
-- Tasks were considered complete with failing CI/CD pipelines  
+- Tasks were considered complete with failing CI/CD pipelines
 - Feature branches were not deleted after PR merges, causing branch accumulation
 - PR workflow was occasionally bypassed, leading to process violations
 - Following it ensures consistent project tracking and prevents human frustration with missing updates, broken builds, or messy git history
