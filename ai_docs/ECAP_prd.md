@@ -3,9 +3,9 @@
 
 ### 1. Project Overview
 
-**Project Name**: E-Commerce Real-Time Analytics Platform  
-**Duration**: 8-12 weeks  
-**Tech Stack**: Apache Spark, PySpark, Kafka, PostgreSQL, Docker, Terraform  
+**Project Name**: E-Commerce Real-Time Analytics Platform
+**Duration**: 8-12 weeks
+**Tech Stack**: Apache Spark, PySpark, Kafka, PostgreSQL, Docker, Terraform
 **Difficulty**: Intermediate to Advanced
 
 ### 2. Business Problem
@@ -84,7 +84,7 @@ Data Sources → Kafka → Spark Streaming → [Batch Processing] → Data Lake/
 ```python
 transaction_schema = {
     "transaction_id": "string",
-    "user_id": "string", 
+    "user_id": "string",
     "product_id": "string",
     "category": "string",
     "amount": "decimal(10,2)",
@@ -188,13 +188,13 @@ customer_rfm = transactions_df \
         count("transaction_id").alias("frequency"),
         sum("amount").alias("monetary")
     ) \
-    .withColumn("recency", 
+    .withColumn("recency",
                 datediff(current_date(), "last_purchase")) \
-    .withColumn("r_score", 
+    .withColumn("r_score",
                 ntile(5).over(Window.orderBy(desc("recency")))) \
-    .withColumn("f_score", 
+    .withColumn("f_score",
                 ntile(5).over(Window.orderBy("frequency"))) \
-    .withColumn("m_score", 
+    .withColumn("m_score",
                 ntile(5).over(Window.orderBy("monetary")))
 ```
 
@@ -218,17 +218,17 @@ customer_rfm = transactions_df \
 def data_quality_check(df, required_columns):
     """Validate data quality"""
     results = {}
-    
+
     # Check for null values
     for col in required_columns:
         null_count = df.filter(col(col).isNull()).count()
         results[f"{col}_nulls"] = null_count
-    
+
     # Check for duplicates
     total_count = df.count()
     distinct_count = df.distinct().count()
     results["duplicate_rate"] = (total_count - distinct_count) / total_count
-    
+
     return results
 ```
 
@@ -254,15 +254,15 @@ def calculate_distance(lat1, lon1, lat2, lon2):
     """Calculate distance between two coordinates"""
     # Haversine formula implementation
     import math
-    
+
     R = 6371  # Earth's radius in km
     dlat = math.radians(lat2 - lat1)
     dlon = math.radians(lon2 - lon1)
-    
-    a = (math.sin(dlat/2) * math.sin(dlat/2) + 
-         math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * 
+
+    a = (math.sin(dlat/2) * math.sin(dlat/2) +
+         math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) *
          math.sin(dlon/2) * math.sin(dlon/2))
-    
+
     c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
     return R * c
 ```
@@ -281,7 +281,7 @@ services:
     ports:
       - "8080:8080"
       - "7077:7077"
-  
+
   spark-worker:
     image: bitnami/spark:3.4
     environment:
@@ -289,7 +289,7 @@ services:
       - SPARK_MASTER_URL=spark://spark-master:7077
     depends_on:
       - spark-master
-  
+
   kafka:
     image: confluentinc/cp-kafka:latest
     environment:
@@ -297,7 +297,7 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
     ports:
       - "9092:9092"
-  
+
   postgresql:
     image: postgres:13
     environment:
@@ -358,10 +358,10 @@ from datetime import datetime, timedelta
 
 def generate_sample_data(num_records=100000):
     """Generate sample e-commerce transaction data"""
-    
+
     categories = ["Electronics", "Clothing", "Books", "Home", "Sports"]
     payment_methods = ["credit_card", "debit_card", "paypal", "apple_pay"]
-    
+
     data = []
     for i in range(num_records):
         record = {
@@ -382,7 +382,7 @@ def generate_sample_data(num_records=100000):
             }
         }
         data.append(record)
-    
+
     return data
 ```
 

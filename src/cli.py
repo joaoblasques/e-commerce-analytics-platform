@@ -2,7 +2,10 @@
 Command line interface for the E-Commerce Analytics Platform.
 """
 import click
+
 from src import __version__
+
+from .data_lake.cli import data_lake as data_lake_cli
 
 
 @click.group()
@@ -20,7 +23,9 @@ def version():
 
 
 @main.command()
-@click.option('--config', '-c', default='config/local.yaml', help='Configuration file path')
+@click.option(
+    "--config", "-c", default="config/local.yaml", help="Configuration file path"
+)
 def start(config):
     """Start the analytics platform."""
     click.echo(f"Starting E-Commerce Analytics Platform with config: {config}")
@@ -34,5 +39,9 @@ def test():
     # Implementation will be added in later tasks
 
 
-if __name__ == '__main__':
+# Add data lake commands
+main.add_command(data_lake_cli, name="data-lake")
+
+
+if __name__ == "__main__":
     main()

@@ -232,19 +232,19 @@ class ECommerceDataGenerator:
         self.users = self._generate_user_base(10000)
         self.products = self._generate_product_catalog(1000)
         self.sessions = {}
-        
+
     def generate_transaction_stream(self, events_per_hour=10000):
         """Generate realistic transaction patterns"""
         pass
-        
+
     def generate_behavior_stream(self, events_per_hour=100000):
         """Generate user interaction events"""
         pass
-        
+
     def simulate_seasonal_patterns(self):
         """Apply seasonal multipliers (holidays, sales)"""
         pass
-        
+
     def inject_anomalies(self, anomaly_rate=0.001):
         """Inject fraud patterns for detection testing"""
         pass
@@ -324,7 +324,7 @@ module "spark_cluster" {
 # terraform/aws-dev/main.tf
 module "vpc" {
   source = "../modules/aws-vpc"
-  
+
   vpc_cidr = "10.0.0.0/16"
   environment = "dev"
   availability_zones = ["us-west-2a", "us-west-2b"]
@@ -332,7 +332,7 @@ module "vpc" {
 
 module "kafka_cluster" {
   source = "../modules/aws-msk"
-  
+
   vpc_id = module.vpc.vpc_id
   subnet_ids = module.vpc.private_subnets
   instance_type = "kafka.t3.small"  # Cost-optimized
@@ -340,7 +340,7 @@ module "kafka_cluster" {
 
 module "spark_cluster" {
   source = "../modules/aws-emr"
-  
+
   vpc_id = module.vpc.vpc_id
   subnet_ids = module.vpc.private_subnets
   instance_type = "m5.large"  # Cost-optimized
@@ -748,7 +748,7 @@ class TestCustomerSegmentation:
             .master("local[2]") \
             .config("spark.sql.shuffle.partitions", "2") \
             .getOrCreate()
-    
+
     def test_rfm_calculation(self, spark):
         # Test RFM analysis with known data
         test_data = [
@@ -757,10 +757,10 @@ class TestCustomerSegmentation:
             ("user2", "2024-01-10", 200.0)
         ]
         df = spark.createDataFrame(test_data, ["user_id", "date", "amount"])
-        
+
         segmentation = CustomerSegmentation(spark)
         result = segmentation.calculate_rfm(df)
-        
+
         assert result.count() == 2
         assert "r_score" in result.columns
         assert "f_score" in result.columns
@@ -774,11 +774,11 @@ class TestStreamingPipeline:
     def test_end_to_end_processing(self):
         # Test complete pipeline from Kafka to storage
         pass
-    
+
     def test_data_quality_validation(self):
         # Test data validation rules
         pass
-    
+
     def test_error_handling(self):
         # Test error scenarios and recovery
         pass
@@ -791,7 +791,7 @@ class TestSparkPerformance:
     def test_large_dataset_processing(self):
         # Test processing of large datasets
         pass
-    
+
     def test_streaming_throughput(self):
         # Test streaming performance under load
         pass
