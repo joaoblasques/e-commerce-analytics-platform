@@ -20,11 +20,12 @@ This checklist must be followed for **EVERY** task completion to ensure proper d
    - [ ] Branch pushed to remote
    - [ ] Pull request created
 
-3. **✅ Quality Assurance**
+3. **✅ Quality Assurance & PR Merge**
    - [ ] All tests passing
    - [ ] Pre-commit hooks passing
    - [ ] Code reviewed (if applicable)
    - [ ] PR merged successfully
+   - [ ] **Feature branch deleted** (automatic with `--delete-branch` flag)
 
 4. **✅ CI/CD MONITORING (MANDATORY)**
    - [ ] **Monitor GitHub Actions workflow** after PR merge
@@ -86,6 +87,11 @@ The human will ask about missing documentation updates or failing CI/CD if you f
   - **Pull Request**: https://github.com/joaoblasques/e-commerce-analytics-platform/pull/XX (Merged)
 ```
 
+#### PR Merge Command (with branch deletion):
+```bash
+gh pr merge PR_NUMBER --squash --delete-branch
+```
+
 #### For ECAP_execution_summary.md:
 ```markdown
 #### Task X.X.X: Task description
@@ -125,16 +131,20 @@ A task is only considered complete when:
 ### 💡 Pro Tips
 
 1. **Monitor CI/CD immediately** after PR merge - don't wait or assume it passes
-2. **Use TodoWrite** to track documentation updates as separate tasks
-3. **Always read this checklist** before starting any task
-4. **Double-check documentation AND CI/CD** before declaring completion
-5. **Keep templates handy** for consistent formatting
-6. **Update statistics** (total tasks count) in execution summary
-7. **Create GitHub issues proactively** for technical debt to maintain development velocity
+2. **Always use `--delete-branch`** when merging PRs to automatically clean up feature branches
+3. **Use TodoWrite** to track documentation updates as separate tasks
+4. **Always read this checklist** before starting any task
+5. **Double-check documentation AND CI/CD** before declaring completion
+6. **Keep templates handy** for consistent formatting
+7. **Update statistics** (total tasks count) in execution summary
+8. **Create GitHub issues proactively** for technical debt to maintain development velocity
+9. **Verify branch deletion** - feature branches should not accumulate on remote
 
 ---
 
 **This checklist exists because:**
 - Documentation updates were forgotten multiple times
-- Tasks were considered complete with failing CI/CD pipelines
-- Following it ensures consistent project tracking and prevents human frustration with missing updates or broken builds
+- Tasks were considered complete with failing CI/CD pipelines  
+- Feature branches were not deleted after PR merges, causing branch accumulation
+- PR workflow was occasionally bypassed, leading to process violations
+- Following it ensures consistent project tracking and prevents human frustration with missing updates, broken builds, or messy git history
