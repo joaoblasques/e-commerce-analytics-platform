@@ -37,8 +37,12 @@ This checklist must be followed for **EVERY** task completion to ensure proper d
        - Errors are non-critical and don't affect functionality
        - Fixing would require significant time/scope change
        - Errors are infrastructure/tooling related
-     - [ ] **Reference GitHub issue** in task documentation
-   - [ ] **Only proceed** when CI/CD is green OR technical debt is properly documented
+     - [ ] **CRITICAL: When postponing as technical debt**:
+       - [ ] **Fix CI/CD workflow** to handle the errors gracefully (continue-on-error, fallbacks)
+       - [ ] **Ensure pipeline shows GREEN** - failing CI/CD is never acceptable
+       - [ ] **Document workarounds** in the GitHub issue with specific implementation details
+       - [ ] **Reference GitHub issue** in task documentation
+   - [ ] **Only proceed** when CI/CD is GREEN (passing) with technical debt properly documented
 
 5. **✅ DOCUMENTATION UPDATE (CRITICAL)**
    - [ ] **ECAP_tasklist.md** updated with:
@@ -123,22 +127,25 @@ gh pr merge PR_NUMBER --squash --delete-branch
 A task is only considered complete when:
 - All code is implemented and tested
 - PR is merged successfully
-- **CI/CD pipeline passes completely (or technical debt is properly documented)**
+- **CI/CD pipeline shows GREEN status (passes completely or fails gracefully with documented technical debt)**
 - Both documentation files are updated
 - All changes are committed to master
 - Statistics are updated correctly
+
+**CRITICAL**: CI/CD must NEVER be left in a failing state. If errors are postponed as technical debt, the workflow must be fixed to handle them gracefully and show GREEN status.
 
 ### 💡 Pro Tips
 
 1. **Monitor CI/CD immediately** after PR merge - don't wait or assume it passes
 2. **Always use `--delete-branch`** when merging PRs to automatically clean up feature branches
-3. **Use TodoWrite** to track documentation updates as separate tasks
-4. **Always read this checklist** before starting any task
-5. **Double-check documentation AND CI/CD** before declaring completion
-6. **Keep templates handy** for consistent formatting
-7. **Update statistics** (total tasks count) in execution summary
-8. **Create GitHub issues proactively** for technical debt to maintain development velocity
-9. **Verify branch deletion** - feature branches should not accumulate on remote
+3. **GREEN CI/CD is mandatory** - fix workflows with continue-on-error/fallbacks when postponing issues as technical debt
+4. **Use TodoWrite** to track documentation updates as separate tasks
+5. **Always read this checklist** before starting any task
+6. **Double-check documentation AND CI/CD** before declaring completion
+7. **Keep templates handy** for consistent formatting
+8. **Update statistics** (total tasks count) in execution summary
+9. **Create GitHub issues proactively** for technical debt to maintain development velocity
+10. **Verify branch deletion** - feature branches should not accumulate on remote
 
 ---
 
