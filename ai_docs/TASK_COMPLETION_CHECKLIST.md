@@ -26,7 +26,20 @@ This checklist must be followed for **EVERY** task completion to ensure proper d
    - [ ] Code reviewed (if applicable)
    - [ ] PR merged successfully
 
-4. **✅ DOCUMENTATION UPDATE (CRITICAL)**
+4. **✅ CI/CD MONITORING (MANDATORY)**
+   - [ ] **Monitor GitHub Actions workflow** after PR merge
+   - [ ] **Verify all CI/CD checks pass** (tests, linting, security scans)
+   - [ ] **If any CI/CD errors occur:**
+     - [ ] **STOP** - Task is NOT complete with failing CI/CD
+     - [ ] **Option 1: Fix errors immediately** and re-run checks
+     - [ ] **Option 2: Create GitHub issue** for technical debt if:
+       - Errors are non-critical and don't affect functionality
+       - Fixing would require significant time/scope change
+       - Errors are infrastructure/tooling related
+     - [ ] **Reference GitHub issue** in task documentation
+   - [ ] **Only proceed** when CI/CD is green OR technical debt is properly documented
+
+5. **✅ DOCUMENTATION UPDATE (CRITICAL)**
    - [ ] **ECAP_tasklist.md** updated with:
      - [ ] Task marked as `[x]` completed
      - [ ] Actual time recorded
@@ -40,7 +53,8 @@ This checklist must be followed for **EVERY** task completion to ensure proper d
      - [ ] Statistics updated (total tasks count)
      - [ ] Next task updated
 
-5. **✅ Final Verification**
+6. **✅ Final Verification**
+   - [ ] CI/CD pipeline is green (or technical debt documented)
    - [ ] Both documentation files committed
    - [ ] All files pushed to master
    - [ ] Task completion confirmed
@@ -48,12 +62,15 @@ This checklist must be followed for **EVERY** task completion to ensure proper d
 ### 🔥 REMINDER SYSTEM
 
 **NEVER skip the documentation update step!**
+**NEVER consider a task complete with failing CI/CD!**
 
-The human will ask about missing documentation updates if you forget. To prevent this:
+The human will ask about missing documentation updates or failing CI/CD if you forget. To prevent this:
 
-1. **Always update both files immediately after PR merge**
-2. **Use the TodoWrite tool to track documentation as a separate task**
-3. **Double-check both files before declaring task complete**
+1. **Always monitor CI/CD after PR merge** - failing CI/CD means task is NOT complete
+2. **Always update both files immediately after PR merge**
+3. **Use the TodoWrite tool to track documentation as a separate task**
+4. **Create GitHub issues for CI/CD technical debt** when immediate fixes aren't feasible
+5. **Double-check both documentation files AND CI/CD status before declaring task complete**
 
 ### 📝 Template for Documentation Updates
 
@@ -100,18 +117,24 @@ The human will ask about missing documentation updates if you forget. To prevent
 A task is only considered complete when:
 - All code is implemented and tested
 - PR is merged successfully
+- **CI/CD pipeline passes completely (or technical debt is properly documented)**
 - Both documentation files are updated
 - All changes are committed to master
 - Statistics are updated correctly
 
 ### 💡 Pro Tips
 
-1. **Use TodoWrite** to track documentation updates as separate tasks
-2. **Always read this checklist** before starting any task
-3. **Double-check documentation** before declaring completion
-4. **Keep templates handy** for consistent formatting
-5. **Update statistics** (total tasks count) in execution summary
+1. **Monitor CI/CD immediately** after PR merge - don't wait or assume it passes
+2. **Use TodoWrite** to track documentation updates as separate tasks
+3. **Always read this checklist** before starting any task
+4. **Double-check documentation AND CI/CD** before declaring completion
+5. **Keep templates handy** for consistent formatting
+6. **Update statistics** (total tasks count) in execution summary
+7. **Create GitHub issues proactively** for technical debt to maintain development velocity
 
 ---
 
-**This checklist exists because documentation updates were forgotten multiple times. Following it ensures consistent project tracking and prevents human frustration with missing updates.**
+**This checklist exists because:**
+- Documentation updates were forgotten multiple times
+- Tasks were considered complete with failing CI/CD pipelines
+- Following it ensures consistent project tracking and prevents human frustration with missing updates or broken builds
