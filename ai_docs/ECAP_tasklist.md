@@ -531,7 +531,7 @@ This progressive approach ensures we maintain development velocity while systema
   - **Estimated Time**: 10 hours
   - **Actual Time**: ~12 hours (20% over estimate - complexity higher than expected)
   - **Completed**: 2025-07-21
-  - **Commit**: 2fc1da9 - Complete data lake implementation with comprehensive functionality
+  - **Pull Request**: https://github.com/joaoblasques/e-commerce-analytics-platform/pull/39 (Merged)
   - **Technical Debt**: 
     - GitHub Issue #37 - PySpark testing environment setup
     - GitHub Issue #38 - CI/CD pipeline failures and infrastructure issues
