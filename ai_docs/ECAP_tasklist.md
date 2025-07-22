@@ -75,10 +75,10 @@ All technical debt items are now tracked as GitHub Issues with labels for better
 **View all technical debt**: [GitHub Issues with 'technical-debt' label](https://github.com/joaoblasques/e-commerce-analytics-platform/issues?q=is%3Aissue+is%3Aopen+label%3Atechnical-debt)
 
 ### Performance Optimizations Applied
-- **✅ CI Performance**: Reduced from 5+ minutes to 1m21s
-- **✅ Dependency Resolution**: Simplified to core dependencies only
-- **✅ Workflow Resilience**: Added fallback handling for all CI checks
-- **✅ Pipeline Flow**: Fixed test and security scan blocking with continue-on-error
+- ✅ CI Performance: Reduced from 5+ minutes to 1m21s
+- ✅ Dependency Resolution: Simplified to core dependencies only
+- ✅ Workflow Resilience: Added fallback handling for all CI checks
+- ✅ Pipeline Flow: Fixed test and security scan blocking with continue-on-error
 
 ## 📊 Test Coverage Strategy & Implementation Plan
 
@@ -410,6 +410,8 @@ This progressive approach ensures we maintain development velocity while systema
   - **Estimated Time**: 6 hours
   - **Actual Time**: 1 hour (under estimate ✅)
   - **Completed**: 2025-07-18
+  - **Repository**: https://github.com/joaoblasques/e-commerce-analytics-platform
+  - **Pull Request**: https://github.com/joaoblasques/e-commerce-analytics-platform/pull/16 (Merged)
   - **Implementation Details**:
     - Updated `terraform/local/spark.tf` with optimized Spark environment variables for master and worker nodes.
     - Implemented `src/utils/spark_utils.py` to provide a standardized SparkSession factory.
@@ -424,6 +426,8 @@ This progressive approach ensures we maintain development velocity while systema
   - **Estimated Time**: 8 hours
   - **Actual Time**: 1 hour (under estimate ✅)
   - **Completed**: 2025-07-18
+  - **Repository**: https://github.com/joaoblasques/e-commerce-analytics-platform
+  - **Pull Request**: https://github.com/joaoblasques/e-commerce-analytics-platform/pull/17 (Merged)
   - **Implementation Details**:
     - Implemented `src/analytics/jobs/base_job.py` for Spark job base class.
     - Created `src/analytics/config.py` for configuration management using YAML.
@@ -441,6 +445,8 @@ This progressive approach ensures we maintain development velocity while systema
   - **Estimated Time**: 6 hours
   - **Actual Time**: 1 hour (under estimate ✅)
   - **Completed**: 2025-07-18
+  - **Repository**: https://github.com/joaoblasques/e-commerce-analytics-platform
+  - **Pull Request**: https://github.com/joaoblasques/e-commerce-analytics-platform/pull/19 (Merged)
   - **Implementation Details**:
     - Modified `src/analytics/jobs/base_job.py` to include performance logging for all Spark jobs.
     - Updated `src/analytics/jobs/sample_batch_job.py` to include basic data validation (null checks, type checks).
@@ -599,13 +605,17 @@ This progressive approach ensures we maintain development velocity while systema
   - **Repository**: https://github.com/joaoblasques/e-commerce-analytics-platform
   - **Pull Request**: https://github.com/joaoblasques/e-commerce-analytics-platform/pull/44 (Merged)
 
-- [ ] **Task 3.1.4**: Implement customer journey analytics
-  - [ ] Track customer touchpoints and interactions
-  - [ ] Create funnel analysis capabilities
-  - [ ] Add conversion rate calculations
-  - [ ] Implement attribution modeling
+- [x] **Task 3.1.4**: Implement customer journey analytics
+  - [x] Track customer touchpoints and interactions
+  - [x] Create funnel analysis capabilities
+  - [x] Add conversion rate calculations
+  - [x] Implement attribution modeling
   - **Acceptance Criteria**: Customer journeys tracked end-to-end
   - **Estimated Time**: 14 hours
+  - **Actual Time**: 1 hour (93% under estimate ✅)
+  - **Completed**: 2025-07-22
+  - **Repository**: https://github.com/joaoblasques/e-commerce-analytics-platform
+  - **Pull Request**: https://github.com/joaoblasques/e-commerce-analytics-platform/pull/45 (Merged)
 
 ### 3.2 Fraud Detection System
 - [ ] **Task 3.2.1**: Implement real-time anomaly detection
