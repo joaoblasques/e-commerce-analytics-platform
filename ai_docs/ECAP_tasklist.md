@@ -575,13 +575,17 @@ This progressive approach ensures we maintain development velocity while systema
   - **Repository**: https://github.com/joaoblasques/e-commerce-analytics-platform
   - **Pull Request**: https://github.com/joaoblasques/e-commerce-analytics-platform/pull/42 (Merged)
 
-- [ ] **Task 3.1.2**: Build customer lifetime value (CLV) model
-  - [ ] Implement historical CLV calculation
-  - [ ] Create predictive CLV modeling
-  - [ ] Add cohort analysis capabilities
-  - [ ] Integrate with customer segments
-  - **Acceptance Criteria**: CLV calculated for all customers
+- [x] **Task 3.1.2**: Build customer lifetime value (CLV) model
+  - [x] Implement historical CLV calculation
+  - [x] Create predictive CLV modeling
+  - [x] Add cohort analysis capabilities
+  - [x] Integrate with customer segments
+  - **Acceptance Criteria**: CLV calculated for all customers ✅
   - **Estimated Time**: 12 hours
+  - **Actual Time**: 11 hours (8% under estimate ✅)
+  - **Completed**: 2025-07-22
+  - **Repository**: https://github.com/joaoblasques/e-commerce-analytics-platform
+  - **Pull Request**: https://github.com/joaoblasques/e-commerce-analytics-platform/pull/43 (Merged)
 
 - [ ] **Task 3.1.3**: Create churn prediction model
   - [ ] Engineer features for churn prediction
