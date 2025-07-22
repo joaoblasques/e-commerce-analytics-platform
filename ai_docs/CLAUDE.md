@@ -215,6 +215,13 @@ To optimize development efficiency, you may need these MCP servers configured:
 - Document architectural decisions (ADRs)
 - Create troubleshooting guides
 
+#### Documentation File Naming Convention
+- **IMPORTANT**: All documentation files in `docs/` must be prefixed with their corresponding task number
+- Format: `"X.X.X - filename.md"` (e.g., "3.1.1 - rfm-customer-segmentation.md")
+- This convention helps maintain organization and traceability between tasks and their documentation
+- When creating new documentation, always check the task list to determine the appropriate task number prefix
+- Existing files have been renamed following this convention as of 2025-07-22
+
 ### Communication Protocol
 
 #### When to Ask for Human Input
