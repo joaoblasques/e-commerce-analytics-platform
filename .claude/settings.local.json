@@ -57,7 +57,8 @@
       "Bash(gh run cancel:*)",
       "Bash(gh issue:*)",
       "Bash(git branch:*)",
-      "Bash(git for-each-ref:*)"
+      "Bash(git for-each-ref:*)",
+      "Bash(git remote:*)"
     ],
     "deny": []
   }
