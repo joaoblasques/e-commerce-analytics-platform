@@ -5,8 +5,10 @@ This module provides comprehensive business intelligence capabilities including
 revenue analytics, product performance analysis, and marketing attribution.
 """
 
+from .product_analytics import ProductAnalytics
 from .revenue_analytics import RevenueAnalytics
 
 __all__ = [
     "RevenueAnalytics",
+    "ProductAnalytics",
 ]
