@@ -63,7 +63,11 @@ This checklist must be followed for **EVERY** task start and completion to ensur
    - [ ] **Pull latest changes from master** after PR merge
    - [ ] **Delete local feature branch**: `git branch -d feature/task-X.X.X`
    - [ ] **Verify remote branch deletion**: Automatic with `--delete-branch` flag
-   - [ ] **Confirm branch cleanup**: Use `git branch -a` to verify no stale branches
+   - [ ] **Clean up ALL merged remote branches**: If any merged feature branches still exist on remote, delete them manually:
+     - [ ] Check for stale remote branches: `gh api repos/OWNER/REPO/branches --jq '.[] | select(.name | startswith("feature/")) | .name'`
+     - [ ] Verify branches are merged: `gh pr list --state merged --json headRefName`
+     - [ ] Delete merged remote branches: `git push origin --delete feature/branch-name`
+   - [ ] **Confirm complete branch cleanup**: Use `git branch -a` and verify no stale feature branches remain
 
 6. **✅ DOCUMENTATION UPDATE (CRITICAL)**
    - [ ] **ECAP_tasklist.md** updated with:
@@ -127,7 +131,20 @@ git pull origin master
 # Delete local feature branch
 git branch -d feature/task-X.X.X
 
-# Verify branch cleanup
+# Check for stale remote feature branches
+gh api repos/joaoblasques/e-commerce-analytics-platform/branches --jq '.[] | select(.name | startswith("feature/")) | .name'
+
+# Verify which branches have been merged
+gh pr list --state merged --json headRefName --limit 10
+
+# Delete any merged remote branches that still exist
+git push origin --delete feature/branch-name-1
+git push origin --delete feature/branch-name-2
+
+# Prune local references to deleted remote branches
+git fetch --prune
+
+# Final verification - should show no stale feature branches
 git branch -a
 ```
 
@@ -187,6 +204,7 @@ A task is only considered complete when:
 **This checklist exists because:**
 - Documentation updates were forgotten multiple times
 - Tasks were considered complete with failing CI/CD pipelines
-- Feature branches were not deleted after PR merges, causing branch accumulation
+- Feature branches were not deleted after PR merges, causing branch accumulation on both local and remote repositories
+- Remote feature branches accumulated even when `--delete-branch` was used, requiring manual cleanup
 - PR workflow was occasionally bypassed, leading to process violations
 - Following it ensures consistent project tracking and prevents human frustration with missing updates, broken builds, or messy git history
