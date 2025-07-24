@@ -6,13 +6,15 @@ This module contains all v1 API endpoints and routers.
 
 from fastapi import APIRouter
 
-from .endpoints import analytics, customers, fraud, health
+from .endpoints import analytics, auth, customers, fraud, health
 
 # Create the main API router for v1
 api_router = APIRouter()
 
 # Include endpoint routers
 api_router.include_router(health.router, prefix="/health", tags=["health"])
+
+api_router.include_router(auth.router, prefix="/auth", tags=["authentication"])
 
 api_router.include_router(customers.router, prefix="/customers", tags=["customers"])
 
