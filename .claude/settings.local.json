@@ -59,7 +59,9 @@
       "Bash(git branch:*)",
       "Bash(git for-each-ref:*)",
       "Bash(git remote:*)",
-      "Bash(gh api:*)"
+      "Bash(gh api:*)",
+      "Bash(rg:*)",
+      "Bash(true)"
     ],
     "deny": []
   }

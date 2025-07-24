@@ -35,6 +35,12 @@ class Settings(BaseSettings):
         default="your-secret-key-change-in-production",
         description="Secret key for JWT tokens",
     )
+    access_token_expire_minutes: int = Field(
+        default=1440, description="Access token expiration time in minutes (24 hours)"
+    )
+    refresh_token_expire_days: int = Field(
+        default=30, description="Refresh token expiration time in days"
+    )
     allowed_origins: List[str] = Field(
         default=["http://localhost:3000", "http://localhost:8080"],
         description="Allowed CORS origins",
