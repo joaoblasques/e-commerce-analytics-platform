@@ -11,32 +11,27 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
+from ...auth.auth import AuthService, get_auth_service, get_current_active_user
+from ...auth.dependencies import (
+    APIKeyService,
+    get_api_key_service,
+    get_current_admin_user,
+    get_current_api_key,
+    require_manage_users,
+    require_permission,
+)
 from ...auth.models import (
-    User,
-    UserCreate,
-    UserUpdate,
-    Token,
     APIKey,
     APIKeyCreate,
     LoginRequest,
     PasswordChangeRequest,
+    Permission,
+    Token,
+    User,
+    UserCreate,
+    UserUpdate,
 )
-from ...auth.auth import (
-    get_current_active_user,
-)
-from ...auth.security import (
-    hash_password,
-    verify_password,
-)
-from ...auth.auth import AuthService, get_auth_service
-from ...auth.dependencies import (
-    get_current_admin_user,
-    get_current_api_key,
-    get_api_key_service,
-    APIKeyService,
-    require_manage_users,
-    require_manage_api_keys,
-)
+from ...auth.security import hash_password, verify_password
 
 router = APIRouter()
 
@@ -67,8 +62,7 @@ async def login(
 
     if not user.is_active:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Inactive user account"
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Inactive user account"
         )
 
     token_data = auth_service.create_user_token(user)
@@ -96,8 +90,7 @@ async def login_for_access_token(
 
     if not user.is_active:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Inactive user account"
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Inactive user account"
         )
 
     token_data = auth_service.create_user_token(user)
@@ -161,15 +154,13 @@ async def change_password(
     user_in_db = auth_service.get_user_by_id(current_user.id)
     if not user_in_db:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
         )
 
     # Verify current password
     if not verify_password(password_data.current_password, user_in_db.hashed_password):
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Incorrect current password"
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Incorrect current password"
         )
 
     # Hash new password
@@ -197,14 +188,13 @@ async def create_user(
     if existing_user:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Username already registered"
+            detail="Username already registered",
         )
 
     existing_user = auth_service.get_user_by_email(user_create.email)
     if existing_user:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Email already registered"
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered"
         )
 
     # Hash password
@@ -280,8 +270,7 @@ async def get_user(
     user = auth_service.get_user_by_id(user_id)
     if not user:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
         )
 
     return User(
@@ -313,8 +302,7 @@ async def update_user(
     user = auth_service.get_user_by_id(user_id)
     if not user:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
         )
 
     # TODO: Update user in database
@@ -350,14 +338,13 @@ async def delete_user(
     if user_id == current_user.id:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Cannot delete your own account"
+            detail="Cannot delete your own account",
         )
 
     user = auth_service.get_user_by_id(user_id)
     if not user:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
         )
 
     # TODO: Delete user from database
@@ -369,7 +356,8 @@ async def delete_user(
 @router.post("/api-keys", response_model=APIKey, summary="Create API Key")
 async def create_api_key(
     api_key_create: APIKeyCreate,
-    current_user: User = Depends(require_manage_api_keys),
+    current_user: User = Depends(get_current_active_user),
+    _: None = Depends(require_permission(Permission.MANAGE_API_KEYS)),
     api_service: APIKeyService = Depends(get_api_key_service),
 ):
     """
@@ -391,7 +379,8 @@ async def create_api_key(
 
 @router.get("/api-keys", response_model=List[APIKey], summary="List API Keys")
 async def list_api_keys(
-    current_user: User = Depends(require_manage_api_keys),
+    current_user: User = Depends(get_current_active_user),
+    _: None = Depends(require_permission(Permission.MANAGE_API_KEYS)),
     api_service: APIKeyService = Depends(get_api_key_service),
 ):
     """
@@ -407,7 +396,8 @@ async def list_api_keys(
 @router.delete("/api-keys/{api_key}", summary="Revoke API Key")
 async def revoke_api_key(
     api_key: str,
-    current_user: User = Depends(require_manage_api_keys),
+    current_user: User = Depends(get_current_active_user),
+    _: None = Depends(require_permission(Permission.MANAGE_API_KEYS)),
     api_service: APIKeyService = Depends(get_api_key_service),
 ):
     """
@@ -418,8 +408,7 @@ async def revoke_api_key(
     success = api_service.revoke_api_key(api_key)
     if not success:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="API key not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="API key not found"
         )
 
     return {"message": "API key revoked successfully"}
