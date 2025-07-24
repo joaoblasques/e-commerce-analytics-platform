@@ -1,0 +1,272 @@
+/* Custom CSS for E-Commerce Analytics Platform Dashboard */
+
+/* Main layout improvements */
+.main > div {
+    padding-top: 2rem;
+}
+
+/* Header styling */
+.main h1 {
+    color: #262730;
+    font-size: 2.5rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+/* Metric cards styling */
+.metric-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+    border-left: 4px solid #ff6b6b;
+    margin-bottom: 1rem;
+}
+
+.metric-card.revenue {
+    border-left-color: #51cf66;
+}
+
+.metric-card.customers {
+    border-left-color: #339af0;
+}
+
+.metric-card.orders {
+    border-left-color: #fab005;
+}
+
+.metric-card.conversion {
+    border-left-color: #845ef7;
+}
+
+/* Sidebar improvements */
+.css-1d391kg {
+    background-color: #f8f9fa;
+}
+
+/* Button styling */
+.stButton > button {
+    width: 100%;
+    border-radius: 0.375rem;
+    border: none;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.stButton > button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Chart containers */
+.chart-container {
+    background: white;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+    margin-bottom: 1.5rem;
+}
+
+/* Status indicators */
+.status-indicator {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.status-indicator.success {
+    background-color: #d1f2eb;
+    color: #0f5132;
+}
+
+.status-indicator.warning {
+    background-color: #fff3cd;
+    color: #664d03;
+}
+
+.status-indicator.danger {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* KPI cards */
+.kpi-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 1rem;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.kpi-card h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 2.5rem;
+    font-weight: 700;
+}
+
+.kpi-card p {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 1.1rem;
+}
+
+/* Data tables */
+.dataframe {
+    border: none !important;
+}
+
+.dataframe thead {
+    background-color: #f8f9fa;
+}
+
+.dataframe th {
+    border: none !important;
+    padding: 12px 8px;
+    font-weight: 600;
+    color: #495057;
+}
+
+.dataframe td {
+    border: none !important;
+    padding: 12px 8px;
+    border-bottom: 1px solid #dee2e6 !important;
+}
+
+/* Alert styling */
+.alert {
+    padding: 1rem;
+    border-radius: 0.375rem;
+    margin-bottom: 1rem;
+}
+
+.alert-success {
+    background-color: #d1f2eb;
+    border-left: 4px solid #28a745;
+    color: #155724;
+}
+
+.alert-warning {
+    background-color: #fff3cd;
+    border-left: 4px solid #ffc107;
+    color: #856404;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    border-left: 4px solid #dc3545;
+    color: #721c24;
+}
+
+/* Footer styling */
+.footer {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid #dee2e6;
+    text-align: center;
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .main h1 {
+        font-size: 2rem;
+    }
+
+    .metric-card {
+        padding: 1rem;
+    }
+
+    .kpi-card {
+        padding: 1.5rem;
+    }
+
+    .kpi-card h3 {
+        font-size: 2rem;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .metric-card,
+    .chart-container {
+        background-color: #1e1e1e;
+        color: white;
+        box-shadow: 0 1px 3px rgba(255,255,255,0.1);
+    }
+
+    .main h1 {
+        color: white;
+    }
+}
+
+/* Loading animations */
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255,255,255,.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Custom selectbox styling */
+.stSelectbox > div > div > div {
+    border-radius: 0.375rem;
+}
+
+/* Custom date input styling */
+.stDateInput > div > div > input {
+    border-radius: 0.375rem;
+}
+
+/* Sidebar enhancements */
+.css-1lcbmhc {
+    padding-top: 2rem;
+}
+
+/* Hide Streamlit branding */
+#MainMenu {
+    visibility: hidden;
+}
+
+.stDeployButton {
+    display: none;
+}
+
+footer {
+    visibility: hidden;
+}
+
+.stApp > header {
+    background-color: transparent;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
