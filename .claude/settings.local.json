@@ -61,7 +61,11 @@
       "Bash(git remote:*)",
       "Bash(gh api:*)",
       "Bash(rg:*)",
-      "Bash(true)"
+      "Bash(true)",
+      "Bash(PYTHONPATH=/Users/jonasblasques/Dev/Data_Engineering/projects/e-commerce_analytics_platform python3 tests/api/test_analytics_endpoints.py)",
+      "Bash(PYTHONPATH=/Users/jonasblasques/Dev/Data_Engineering/projects/e-commerce_analytics_platform python3 -c \"from src.api.main import app; print(''✅ FastAPI app loaded successfully''); print(f''📊 Total routes: {len([route for route in app.routes])}''); from fastapi.routing import APIRoute; api_routes = [route for route in app.routes if isinstance(route, APIRoute)]; print(f''🔗 API endpoints: {len(api_routes)}''); print(''\\n📋 Analytics endpoints:''); analytics_endpoints = [route.path for route in api_routes if ''/analytics'' in route.path]; print(''\\n''.join(analytics_endpoints[:10]))\")",
+      "Bash(PYTHONPATH=/Users/jonasblasques/Dev/Data_Engineering/projects/e-commerce_analytics_platform python3 tests/api/test_performance_optimizations.py)",
+      "Bash(PYTHONPATH=/Users/jonasblasques/Dev/Data_Engineering/projects/e-commerce_analytics_platform python3 -c \"from src.api.main import app; print(''✅ FastAPI app with performance optimizations loaded successfully''); from fastapi.routing import APIRoute; api_routes = [route for route in app.routes if isinstance(route, APIRoute)]; print(f''🚀 Total API endpoints: {len(api_routes)}''); cache_endpoints = [route.path for route in api_routes if ''/cache'' in route.path]; print(f''📊 Cache management endpoints: {len(cache_endpoints)}''); print(''Cache endpoints:'', cache_endpoints); middleware_count = len(app.user_middleware); print(f''⚡ Middleware layers: {middleware_count}'')\")"
     ],
     "deny": []
   }

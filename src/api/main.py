@@ -18,6 +18,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from .config import get_settings
 from .dependencies import get_database_session, get_redis_client
 from .exceptions import ECAPException
+from .middleware.compression import get_compression_middleware
 from .v1 import api_router as v1_router
 
 # Configure logging
@@ -80,6 +81,10 @@ def create_application() -> FastAPI:
         openapi_url="/openapi.json" if settings.environment != "production" else None,
         lifespan=lifespan,
     )
+
+    # Add compression middleware (before CORS)
+    compression_middleware = get_compression_middleware(app)
+    app.add_middleware(type(compression_middleware), app=app)
 
     # Add CORS middleware
     app.add_middleware(
