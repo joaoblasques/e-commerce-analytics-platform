@@ -5,7 +5,7 @@ This module provides the executive dashboard with high-level business metrics,
 KPIs, and strategic insights for business leadership.
 """
 
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Any, Dict
 
 import pandas as pd
@@ -14,22 +14,102 @@ import streamlit as st
 from dashboard.components import (
     render_alert_summary,
     render_bar_chart,
-    render_business_metrics,
-    render_gauge_chart,
+    render_customer_metrics_executive,
+    render_executive_kpi_overview,
+    render_geographic_map,
     render_kpi_row,
-    render_line_chart,
     render_metric_card,
     render_pie_chart,
-    render_revenue_metrics,
+    render_revenue_performance_executive,
     render_time_series_chart,
 )
 from dashboard.utils.api_client import APIError, handle_api_error
-from dashboard.utils.data_processing import (
-    cached_data_processing,
-    calculate_growth_rate,
-    format_currency,
-    format_percentage,
-)
+from dashboard.utils.data_processing import format_currency
+
+
+def generate_executive_mock_data() -> Dict[str, Any]:
+    """Generate enhanced mock data for executive dashboard views."""
+
+    # Executive KPI data
+    executive_kpis = {
+        "total_revenue": 12_500_000,
+        "revenue_growth": 15.2,
+        "market_share": 8.5,
+        "market_share_change": 0.3,
+        "customer_satisfaction": 4.2,
+        "satisfaction_change": 0.1,
+        "profit_margin": 18.5,
+        "margin_change": 1.2,
+        "goal_achievement": 92.0,
+    }
+
+    # Geographic sales data
+    geographic_data = [
+        {"location": "US", "revenue": 4_200_000, "country": "United States"},
+        {"location": "CA", "revenue": 2_100_000, "country": "Canada"},
+        {"location": "GB", "revenue": 1_800_000, "country": "United Kingdom"},
+        {"location": "DE", "revenue": 1_500_000, "country": "Germany"},
+        {"location": "FR", "revenue": 1_200_000, "country": "France"},
+        {"location": "AU", "revenue": 800_000, "country": "Australia"},
+        {"location": "JP", "revenue": 600_000, "country": "Japan"},
+        {"location": "BR", "revenue": 400_000, "country": "Brazil"},
+    ]
+
+    # Executive revenue performance data
+    revenue_performance = {
+        "yoy_comparison": {
+            "previous_year": 10_800_000,
+            "current_year": 12_500_000,
+            "growth_amount": 1_700_000,
+        },
+        "profit_trends": [
+            {"period": "Q1", "revenue": 2_800_000, "profit_margin": 16.2},
+            {"period": "Q2", "revenue": 3_100_000, "profit_margin": 17.8},
+            {"period": "Q3", "revenue": 3_300_000, "profit_margin": 18.9},
+            {"period": "Q4", "revenue": 3_300_000, "profit_margin": 19.2},
+        ],
+        "channel_performance": [
+            {"channel": "Online", "revenue": 7_500_000, "growth_rate": 18.5},
+            {"channel": "Mobile", "revenue": 3_200_000, "growth_rate": 25.2},
+            {"channel": "Retail", "revenue": 1_800_000, "growth_rate": 8.1},
+        ],
+    }
+
+    # Executive customer analytics data
+    customer_analytics = {
+        "acquisition_trends": [
+            {"period": "Jan", "customer_acquisition_cost": 45.20},
+            {"period": "Feb", "customer_acquisition_cost": 42.80},
+            {"period": "Mar", "customer_acquisition_cost": 38.90},
+            {"period": "Apr", "customer_acquisition_cost": 41.20},
+            {"period": "May", "customer_acquisition_cost": 39.50},
+            {"period": "Jun", "customer_acquisition_cost": 37.10},
+        ],
+        "clv_distribution": [
+            {"clv_range": "$0-100", "customer_count": 15_200},
+            {"clv_range": "$100-500", "customer_count": 28_500},
+            {"clv_range": "$500-1000", "customer_count": 12_800},
+            {"clv_range": "$1000-2000", "customer_count": 5_200},
+            {"clv_range": "$2000+", "customer_count": 1_800},
+        ],
+        "retention_data": [
+            {"cohort_period": "Month 1", "retention_rate": 0.82},
+            {"cohort_period": "Month 2", "retention_rate": 0.68},
+            {"cohort_period": "Month 3", "retention_rate": 0.55},
+            {"cohort_period": "Month 6", "retention_rate": 0.42},
+            {"cohort_period": "Month 12", "retention_rate": 0.28},
+        ],
+        "churn_analysis": {
+            "current_churn_rate": 0.065,  # 6.5% monthly churn
+        },
+    }
+
+    return {
+        "executive_kpis": executive_kpis,
+        "geographic_data": geographic_data,
+        "revenue_performance": revenue_performance,
+        "customer_analytics": customer_analytics,
+    }
 
 
 @handle_api_error
@@ -78,6 +158,10 @@ def load_executive_data() -> Dict[str, Any]:
 
         # Load system health
         data["system_health"] = api_client.get_system_health(include_details=False)
+
+        # Add executive-specific mock data
+        executive_mock_data = generate_executive_mock_data()
+        data.update(executive_mock_data)
 
     except APIError as e:
         st.error(f"Failed to load data: {e.message}")
@@ -495,7 +579,7 @@ def render_forecasting_insights(revenue_data: Dict[str, Any]) -> None:
 def render() -> None:
     """Render the executive dashboard page."""
     st.title("📈 Executive Dashboard")
-    st.markdown("High-level business metrics and strategic insights")
+    st.markdown("High-level business metrics and strategic insights for executives")
 
     # Load data
     with st.spinner("Loading executive dashboard data..."):
@@ -512,29 +596,79 @@ def render() -> None:
         business_data=data.get("business_metrics"),
     )
 
-    # Executive summary
+    # Executive KPI Overview (NEW)
+    if "executive_kpis" in data:
+        render_executive_kpi_overview(data["executive_kpis"])
+        st.markdown("---")
+
+    # Executive summary (Enhanced)
     render_executive_summary(data)
 
     st.markdown("---")
 
-    # Revenue overview
+    # Revenue & Sales Performance (NEW Executive Level)
+    if "revenue_performance" in data:
+        render_revenue_performance_executive(data["revenue_performance"])
+        st.markdown("---")
+
+    # Customer Analytics (NEW Executive Level)
+    if "customer_analytics" in data:
+        render_customer_metrics_executive(data["customer_analytics"])
+        st.markdown("---")
+
+    # Geographic Sales Maps (NEW)
+    if "geographic_data" in data:
+        st.header("🌍 Geographic Sales Performance")
+
+        col1, col2 = st.columns(2)
+
+        with col1:
+            render_geographic_map(
+                data=data["geographic_data"],
+                location_column="location",
+                value_column="revenue",
+                title="Revenue by Country",
+                map_type="choropleth",
+                color_scale="Blues",
+            )
+
+        with col2:
+            # Top countries table
+            st.subheader("Top Countries by Revenue")
+            geo_df = pd.DataFrame(data["geographic_data"])
+            geo_df = geo_df.sort_values("revenue", ascending=False)
+
+            st.dataframe(
+                geo_df,
+                column_config={
+                    "country": st.column_config.TextColumn("Country"),
+                    "revenue": st.column_config.NumberColumn("Revenue", format="$%.0f"),
+                    "location": st.column_config.TextColumn("Code"),
+                },
+                hide_index=True,
+                use_container_width=True,
+            )
+
+        st.markdown("---")
+
+    # Revenue overview (Original)
     render_revenue_overview(data.get("revenue", {}))
 
     st.markdown("---")
 
-    # Customer overview
+    # Customer overview (Original)
     render_customer_overview(data.get("segments", {}))
 
     st.markdown("---")
 
-    # Operational metrics
+    # Operational metrics (Original)
     render_operational_metrics(
         data.get("business_metrics", {}), data.get("fraud_summary", {})
     )
 
     st.markdown("---")
 
-    # Forecasting insights
+    # Forecasting insights (Original)
     render_forecasting_insights(data.get("revenue", {}))
 
     # Footer with last update time

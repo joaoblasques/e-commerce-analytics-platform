@@ -7,7 +7,6 @@ for various types of data visualization in the dashboard.
 
 from typing import Any, Dict, List, Optional, Union
 
-import altair as alt
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
@@ -628,3 +627,319 @@ def render_dual_axis_chart(
     fig.update_layout(title=title, height=height)
 
     st.plotly_chart(fig, use_container_width=True)
+
+
+def render_geographic_map(
+    data: Union[pd.DataFrame, List[Dict]],
+    location_column: str,
+    value_column: str,
+    title: str = "Geographic Sales",
+    map_type: str = "choropleth",
+    height: int = 500,
+    color_scale: str = "Blues",
+) -> None:
+    """
+    Render a geographic sales map.
+
+    Args:
+        data: Data for the map
+        location_column: Column with location codes (ISO country codes, state codes, etc.)
+        value_column: Column with values to visualize
+        title: Map title
+        map_type: Type of map ('choropleth' or 'scatter_geo')
+        height: Map height
+        color_scale: Color scale for the map
+    """
+    if isinstance(data, list):
+        df = pd.DataFrame(data)
+    else:
+        df = data.copy()
+
+    if df.empty:
+        st.warning("No geographic data available for map")
+        return
+
+    theme = get_chart_theme()
+
+    if map_type == "choropleth":
+        # Create choropleth map
+        fig = px.choropleth(
+            df,
+            locations=location_column,
+            color=value_column,
+            title=title,
+            color_continuous_scale=color_scale,
+            height=height,
+            template=theme.get("template", "plotly_white"),
+        )
+
+        # Update layout for better appearance
+        fig.update_layout(
+            geo=dict(
+                showframe=False, showcoastlines=True, projection_type="natural earth"
+            ),
+            title_x=0.5,
+        )
+
+    elif map_type == "scatter_geo":
+        # Create scatter geo map
+        fig = px.scatter_geo(
+            df,
+            locations=location_column,
+            size=value_column,
+            title=title,
+            height=height,
+            template=theme.get("template", "plotly_white"),
+        )
+
+        fig.update_layout(
+            geo=dict(
+                projection_type="natural earth",
+                showland=True,
+                landcolor="lightgray",
+            ),
+            title_x=0.5,
+        )
+
+    else:
+        st.error(f"Unsupported map type: {map_type}")
+        return
+
+    st.plotly_chart(fig, use_container_width=True)
+
+
+def render_executive_kpi_overview(
+    kpi_data: Dict[str, Any],
+    title: str = "Executive KPI Overview",
+    height: int = 150,
+) -> None:
+    """
+    Render executive-level KPI overview with strategic metrics.
+
+    Args:
+        kpi_data: Dictionary containing KPI data
+        title: Section title
+        height: Height of each metric card
+    """
+    if not kpi_data:
+        st.warning("No KPI data available")
+        return
+
+    st.subheader(title)
+
+    # Executive strategic metrics
+    col1, col2, col3, col4, col5 = st.columns(5)
+
+    with col1:
+        revenue = kpi_data.get("total_revenue", 0)
+        revenue_growth = kpi_data.get("revenue_growth", 0)
+        st.metric(
+            "Total Revenue",
+            f"${revenue:,.0f}",
+            f"{revenue_growth:+.1f}%",
+            help="Total revenue for the selected period with period-over-period growth",
+        )
+
+    with col2:
+        market_share = kpi_data.get("market_share", 0)
+        market_share_change = kpi_data.get("market_share_change", 0)
+        st.metric(
+            "Market Share",
+            f"{market_share:.1f}%",
+            f"{market_share_change:+.2f}pp",
+            help="Market share percentage with change from previous period",
+        )
+
+    with col3:
+        customer_satisfaction = kpi_data.get("customer_satisfaction", 0)
+        satisfaction_change = kpi_data.get("satisfaction_change", 0)
+        st.metric(
+            "Customer Satisfaction",
+            f"{customer_satisfaction:.1f}/5.0",
+            f"{satisfaction_change:+.2f}",
+            help="Average customer satisfaction score",
+        )
+
+    with col4:
+        profit_margin = kpi_data.get("profit_margin", 0)
+        margin_change = kpi_data.get("margin_change", 0)
+        st.metric(
+            "Profit Margin",
+            f"{profit_margin:.1f}%",
+            f"{margin_change:+.2f}pp",
+            help="Overall profit margin with change from previous period",
+        )
+
+    with col5:
+        goal_achievement = kpi_data.get("goal_achievement", 0)
+        st.metric(
+            "Goal Achievement",
+            f"{goal_achievement:.0f}%",
+            help="Percentage of quarterly goals achieved",
+        )
+
+
+def render_revenue_performance_executive(
+    revenue_data: Dict[str, Any],
+    title: str = "Revenue & Sales Performance",
+    height: int = 400,
+) -> None:
+    """
+    Render executive-level revenue and sales performance charts.
+
+    Args:
+        revenue_data: Revenue data dictionary
+        title: Section title
+        height: Chart height
+    """
+    if not revenue_data:
+        st.warning("No revenue data available")
+        return
+
+    st.subheader(title)
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        # Year-over-Year revenue comparison waterfall
+        if "yoy_comparison" in revenue_data:
+            yoy_data = revenue_data["yoy_comparison"]
+
+            # Create waterfall data
+            waterfall_data = [
+                {
+                    "category": "Previous Year",
+                    "value": yoy_data.get("previous_year", 0),
+                },
+                {"category": "Growth", "value": yoy_data.get("growth_amount", 0)},
+                {"category": "Current Year", "value": yoy_data.get("current_year", 0)},
+            ]
+
+            render_waterfall_chart(
+                data=waterfall_data,
+                x_column="category",
+                y_column="value",
+                title="Year-over-Year Revenue Growth",
+                height=height,
+            )
+
+    with col2:
+        # Profit margin trend analysis
+        if "profit_trends" in revenue_data:
+            profit_data = revenue_data["profit_trends"]
+
+            render_dual_axis_chart(
+                data=profit_data,
+                x_column="period",
+                y1_column="revenue",
+                y2_column="profit_margin",
+                title="Revenue vs Profit Margin Trend",
+                y1_title="Revenue ($)",
+                y2_title="Profit Margin (%)",
+                height=height,
+            )
+
+    # Channel performance overview
+    if "channel_performance" in revenue_data:
+        st.subheader("Channel Performance")
+        channel_data = revenue_data["channel_performance"]
+
+        col1, col2 = st.columns(2)
+
+        with col1:
+            render_bar_chart(
+                data=channel_data,
+                x_column="channel",
+                y_column="revenue",
+                title="Revenue by Channel",
+                height=300,
+            )
+
+        with col2:
+            render_bar_chart(
+                data=channel_data,
+                x_column="channel",
+                y_column="growth_rate",
+                title="Channel Growth Rate",
+                height=300,
+            )
+
+
+def render_customer_metrics_executive(
+    customer_data: Dict[str, Any],
+    title: str = "Customer Analytics",
+    height: int = 400,
+) -> None:
+    """
+    Render executive-level customer metrics visualization.
+
+    Args:
+        customer_data: Customer data dictionary
+        title: Section title
+        height: Chart height
+    """
+    if not customer_data:
+        st.warning("No customer data available")
+        return
+
+    st.subheader(title)
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        # Customer acquisition cost trends
+        if "acquisition_trends" in customer_data:
+            cac_data = customer_data["acquisition_trends"]
+
+            render_line_chart(
+                data=cac_data,
+                x_column="period",
+                y_column="customer_acquisition_cost",
+                title="Customer Acquisition Cost Trend",
+                height=height,
+            )
+
+    with col2:
+        # Customer lifetime value distribution
+        if "clv_distribution" in customer_data:
+            clv_data = customer_data["clv_distribution"]
+
+            render_bar_chart(
+                data=clv_data,
+                x_column="clv_range",
+                y_column="customer_count",
+                title="Customer Lifetime Value Distribution",
+                height=height,
+            )
+
+    # Customer retention and churn analysis
+    col1, col2 = st.columns(2)
+
+    with col1:
+        if "retention_data" in customer_data:
+            retention_data = customer_data["retention_data"]
+
+            render_line_chart(
+                data=retention_data,
+                x_column="cohort_period",
+                y_column="retention_rate",
+                title="Customer Retention Rate",
+                height=300,
+            )
+
+    with col2:
+        if "churn_analysis" in customer_data:
+            churn_data = customer_data["churn_analysis"]
+
+            render_gauge_chart(
+                value=churn_data.get("current_churn_rate", 0) * 100,
+                title="Monthly Churn Rate",
+                min_value=0,
+                max_value=20,
+                threshold_ranges=[
+                    {"range": [0, 5], "color": "green"},
+                    {"range": [5, 10], "color": "yellow"},
+                    {"range": [10, 20], "color": "red"},
+                ],
+                height=300,
+            )
