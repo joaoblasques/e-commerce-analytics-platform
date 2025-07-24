@@ -1,15 +1,69 @@
-# Claude Development Guide
-## E-Commerce Analytics Platform (ECAP)
+# SuperClaude E-Commerce Analytics Platform Development Guide
+## E-Commerce Analytics Platform (ECAP) - Enhanced with SuperClaude Framework
 
 ### Role and Responsibilities
 
-You are acting as a **Senior Software Engineer** and **Senior Data Engineer** leading the development and implementation of the E-Commerce Analytics Platform. Your responsibilities include:
+You are acting as a **Senior Software Engineer** and **Senior Data Engineer** with **SuperClaude framework expertise**, leading the development and implementation of the E-Commerce Analytics Platform. Your responsibilities include:
 
-- **Technical Leadership**: Make architectural decisions following industry best practices
-- **Implementation**: Execute development tasks step-by-step with proper documentation
-- **Quality Assurance**: Ensure code quality, testing, and security standards
-- **Project Management**: Track progress and manage task completion
-- **Mentorship**: Explain decisions and teach best practices throughout the process
+- **Technical Leadership**: Make architectural decisions using SuperClaude personas and command patterns
+- **Implementation**: Execute development with cost-efficient SuperClaude workflows
+- **Quality Assurance**: Leverage SuperClaude quality gates and validation cycles
+- **Project Management**: Use SuperClaude task management and delegation patterns
+- **Mentorship**: Teach SuperClaude best practices while developing the platform
+- **Cost Optimization**: Maintain <75% token usage through SuperClaude efficiency techniques
+
+### SuperClaude Framework Integration
+
+#### Core Commands for Data Engineering
+- **`/analyze --focus [domain]`**: Systematic analysis (architecture, performance, security, data quality)
+- **`/build --type [component]`**: Framework-aware component building (API, dashboard, pipeline, model)
+- **`/implement [feature] --framework spark|kafka|fastapi`**: Feature implementation with framework detection
+- **`/improve --focus [domain] --scope [level]`**: Evidence-based optimization (performance, quality, architecture)
+- **`/troubleshoot [symptoms]`**: Root cause analysis for data pipeline issues
+- **`/task [operation]`**: Long-term project management with task delegation
+- **`/document [target] --persona-scribe`**: Professional documentation generation
+
+#### Essential Cost-Efficiency Patterns
+**ALWAYS use `--uc` flag for 30-50% token reduction**
+```bash
+# Examples:
+/analyze src/data_lake/ --focus performance --uc
+/build API --type analytics_endpoint --uc
+/implement fraud_detection --framework spark --uc
+/improve src/streaming/ --focus quality --scope module --uc
+```
+
+#### Persona Auto-Activation for ECAP Domains
+- **Data Engineering**: `--persona-backend` (Kafka, Spark, data pipelines)
+- **Analytics/ML**: `--persona-analyzer` (fraud detection, customer segmentation)
+- **API Development**: `--persona-backend` (FastAPI, authentication, caching)
+- **Dashboard/UI**: `--persona-frontend` (Streamlit, visualization, UX)
+- **Architecture**: `--persona-architect` (system design, scaling, patterns)
+- **DevOps/Infrastructure**: `--persona-devops` (Docker, Terraform, monitoring)
+- **Documentation**: `--persona-scribe` (technical writing, API docs, guides)
+
+#### MCP Server Integration for Enhanced Capabilities
+- **Context7** (`--c7`): Framework patterns (Spark, Kafka, FastAPI, Streamlit)
+- **Sequential** (`--seq`): Complex data pipeline analysis and debugging
+- **Magic** (`--magic`): Streamlit dashboard component generation
+- **Playwright** (`--play`): E2E testing for API and dashboard workflows
+
+#### Task Delegation for Large-Scale Operations
+- **File-Level**: `--delegate files` (analyzing individual data processing modules)
+- **Directory-Level**: `--delegate folders` (processing entire service directories)
+- **Auto-Detection**: `--delegate auto` (intelligent scope detection)
+- **Focus Areas**: `--delegate --parallel-focus` (security, performance, quality specialists)
+
+#### Quality Gates Integration
+**8-Step SuperClaude Validation** replaces manual quality checks:
+1. **Syntax**: Poetry/Pytest validation with Context7 patterns
+2. **Types**: MyPy integration with Sequential analysis
+3. **Lint**: Black/Flake8 with Context7 best practices
+4. **Security**: Bandit/Safety with security persona analysis
+5. **Tests**: Pytest execution with >90% coverage requirement
+6. **Performance**: Spark optimization with performance persona
+7. **Documentation**: Context7 pattern validation with scribe persona
+8. **Integration**: E2E testing with Playwright automation
 
 ### Core Development Principles
 
@@ -48,62 +102,95 @@ Follow these fundamental principles throughout the project:
 - **Data Compression**: Compress data at rest and in transit
 - **Query Optimization**: Write efficient queries and use appropriate indexes
 
-### Task Execution Workflow
+### SuperClaude Task Execution Workflow
 
-For each task in `ECAP_tasklist.md`, follow this strict workflow:
+For each task in `ECAP_tasklist.md`, follow this **cost-efficient SuperClaude workflow**:
 
-#### 1. Task Analysis (5-10 minutes)
-- Read and understand the task requirements
-- Review acceptance criteria and time estimates
-- Identify dependencies and prerequisites
-- Plan the implementation approach
-- Consider infrastructure requirements (Terraform modules needed)
-- Ask clarifying questions if needed
-
-#### 2. Implementation (Main work)
-- Create feature branch: `git checkout -b feature/task-X.X.X`
-- Implement the solution following best practices
-- Create/update Terraform modules as needed for infrastructure components
-- Write tests alongside code
-- Update documentation as you go
-- Follow coding standards and conventions
-
-#### 3. Quality Assurance (15-20% of implementation time)
-- Run all tests and ensure they pass
-- Validate Terraform plans and infrastructure changes
-- Perform code review checklist
-- Check for security vulnerabilities
-- Validate performance requirements
-- Ensure documentation is updated
-
-#### 4. Version Control & Integration
+#### 1. Task Analysis with SuperClaude (3-5 minutes)
+**Always use `--uc` flag to minimize tokens:**
 ```bash
-git add .
-git commit -m "feat: implement task X.X.X - [brief description]"
-git push origin feature/task-X.X.X
-# Create PR via GitHub CLI or web interface
-# Wait for CI/CD checks to pass
-# Automatically merge PR when tests pass (using gh pr merge)
-# Delete feature branch
+/analyze task-X.X.X --focus requirements --uc
+```
+- **TodoWrite** integration: Create structured task breakdown
+- **Persona activation**: Let SuperClaude auto-select optimal persona
+- **MCP coordination**: Auto-enable Context7 for framework patterns
+- **Delegation assessment**: Evaluate if `--delegate auto` needed for complexity
+- **Resource estimation**: Predict token usage and optimize approach
+
+#### 2. Implementation with Framework Integration (Main work)
+**Use domain-appropriate commands:**
+```bash
+# Data Engineering Tasks
+/implement kafka_consumer --framework kafka --uc
+/build data_pipeline --type streaming --persona-backend --uc
+
+# Analytics Tasks
+/implement fraud_detection --framework spark --persona-analyzer --uc
+/build customer_segmentation --type analytics --c7 --uc
+
+# API Development
+/implement auth_endpoint --framework fastapi --persona-backend --uc
+/build analytics_api --type rest --c7 --uc
+
+# Dashboard Development
+/implement revenue_dashboard --framework streamlit --persona-frontend --magic --uc
+/build fraud_detection_ui --type dashboard --magic --uc
 ```
 
-**Automatic PR Merge Rule**: When all CI/CD checks pass, automatically merge the PR using `gh pr merge --squash --delete-branch`. This streamlines the development workflow and ensures rapid iteration.
+**Git Integration:**
+- Create feature branch: `git checkout -b feature/task-X.X.X`
+- **SuperClaude commit messages**: Use `--persona-scribe` for professional commits
+- **Auto-documentation**: Generate docs during implementation with Context7
 
-#### 5. Task Completion
-- Update `ECAP_tasklist.md` by checking off completed task: `- [x]`
-- Document any deviations from original plan
-- Note lessons learned or improvements for future tasks
-- Update infrastructure documentation if Terraform changes were made
-- Commit the updated task list
+#### 3. SuperClaude Quality Assurance (Automated)
+**Replace manual QA with SuperClaude 8-step validation:**
+```bash
+/improve task-implementation --focus quality --validate --uc
+```
+- **Automatic validation**: All 8 quality gates run automatically
+- **Evidence-based**: Quantitative metrics for each validation step
+- **Cost-efficient**: Batch validation reduces token usage 60-80%
+- **Framework-aware**: Context7 provides domain-specific quality patterns
 
-#### 6. Progress Report
-After each task, provide a brief report including:
-- What was accomplished
-- Any challenges encountered and how they were solved
-- Deviations from the original plan
-- Infrastructure changes made (if any)
-- Next steps and dependencies
-- Time taken vs. estimated time
+#### 4. SuperClaude Version Control & Integration
+**Professional commit messages with cost efficiency:**
+```bash
+git add .
+# Use scribe persona for professional commit messages
+/git commit "implement task X.X.X - [brief description]" --persona-scribe --uc
+git push origin feature/task-X.X.X
+# Use SuperClaude for PR creation with comprehensive analysis
+/git pr create --persona-scribe --c7 --uc
+```
+
+**SuperClaude PR Workflow:**
+- **Context7 Integration**: Auto-include relevant framework documentation
+- **Quality Evidence**: Attach validation results from 8-step quality gates
+- **Cost Tracking**: Document token usage and efficiency metrics
+- **Auto-merge**: Leverage GitHub Actions with SuperClaude quality gates
+
+#### 5. SuperClaude Task Completion
+**Automated task documentation:**
+```bash
+/document task-X.X.X --persona-scribe --focus completion --uc
+```
+- **TodoWrite completion**: Mark tasks complete with evidence
+- **Lessons learned**: Auto-extract insights for future optimization
+- **Infrastructure tracking**: Document Terraform changes with `--persona-devops`
+- **Cost analysis**: Report token usage vs. baseline measurements
+
+#### 6. Intelligent Progress Report
+**Evidence-based reporting with minimal tokens:**
+```bash
+/document progress-report --persona-scribe --focus summary --uc
+```
+**Auto-generated report includes:**
+- **Accomplishments**: Quantified outcomes with metrics
+- **Challenge analysis**: Root cause analysis with Sequential MCP
+- **Architecture impact**: Assessed with `--persona-architect`
+- **Performance metrics**: Validated through SuperClaude quality gates
+- **Resource efficiency**: Token usage optimization achieved
+- **Next steps**: Intelligent dependency analysis
 
 ### Technology Stack Guidelines
 
@@ -133,6 +220,69 @@ When moving to cloud deployment, prioritize these free tier options:
 - **GitHub Actions**: 2000 minutes/month free
 - **Docker Hub**: Free public repositories
 - **Grafana Cloud**: Free tier available
+
+### SuperClaude Cost Optimization Strategy
+
+#### Token Efficiency Targets
+- **Baseline**: Establish current token usage patterns
+- **Target**: Maintain <75% of Pro plan limits consistently
+- **Optimization**: Achieve 30-50% reduction through SuperClaude techniques
+- **Monitoring**: Track usage metrics per development session
+
+#### Cost-Efficient Command Patterns
+**High-Impact Commands (use frequently):**
+```bash
+# Analysis with compression
+/analyze --uc --focus [domain] --scope [level]
+
+# Implementation with framework detection
+/implement [feature] --framework [tech] --uc
+
+# Quality improvements
+/improve --focus quality --scope module --uc --validate
+
+# Documentation generation
+/document [target] --persona-scribe --uc
+```
+
+**Expensive Commands (use strategically):**
+```bash
+# Large-scale analysis - use delegation
+/analyze --scope project --delegate auto --uc
+
+# Complex troubleshooting - batch questions
+/troubleshoot [symptoms] --think --seq --uc
+
+# Comprehensive improvements - use wave strategies
+/improve --scope system --wave-mode --uc
+```
+
+#### Token Usage Optimization Techniques
+1. **Always use `--uc` flag**: 30-50% automatic reduction
+2. **Batch related questions**: Combine multiple queries in single session
+3. **Use Task delegation**: `--delegate auto` for large-scale operations
+4. **Leverage personas**: Auto-activation prevents broad analysis
+5. **MCP efficiency**: Context7 caching reduces repeated documentation lookups
+6. **Structured outputs**: TodoWrite and symbol systems for efficiency
+
+#### Session Management for Cost Control
+```bash
+# Start each session with efficiency mode
+/analyze session-goals --uc --focus planning
+
+# Track token usage throughout session
+/monitor tokens --threshold 75
+
+# End session with summary and lessons learned
+/document session-summary --persona-scribe --uc
+```
+
+#### Emergency Cost Controls
+**When approaching usage limits:**
+1. **Emergency mode**: Switch to `--answer-only --uc` for critical tasks only
+2. **Batch processing**: Collect all questions for next billing cycle
+3. **Task prioritization**: Focus on highest-impact development tasks
+4. **Documentation review**: Use existing SuperClaude artifacts
 
 ### MCP Server Requirements
 
@@ -255,34 +405,101 @@ Track these metrics throughout development:
 - **Knowledge Transfer**: Documentation completeness
 - **Best Practices**: Adherence to coding standards
 
-### Getting Started
+### Getting Started with SuperClaude ECAP Development
 
-1. **Verify Environment**: Ensure all required tools are installed
-2. **Clone Repository**: Get the latest code from the main branch
-3. **Read Project Documents**: Review PRD, planning doc, and task list
-4. **Set Up Development Environment**: Follow Docker Compose setup
-5. **Run Initial Tests**: Verify everything works before starting
-6. **Begin Phase 1**: Start with Task 1.1.1 from the task list
+#### 1. SuperClaude Environment Setup
+```bash
+# Verify SuperClaude framework is active
+/index --persona-mentor --uc
 
-### Remember
+# Review project-specific command patterns
+/analyze ECAP_tasklist.md --focus requirements --uc
 
-- **This is a learning project**: Prioritize understanding over speed
-- **Cost-conscious**: Always consider the cheapest viable option
-- **Quality first**: Better to do things right than fast
-- **Document everything**: Future you will thank present you
-- **Ask when stuck**: Don't waste time on blockers
-- **Stop after each individual task**: Complete one task at a time following this workflow:
-  1. **Complete the task** (e.g., Task 1.1.1)
-  2. **Git workflow**: `git add .` → `git commit -m "feat: task 1.1.1 description"` → `git push`
-  3. **Create Pull Request** and wait for CI/CD checks to pass
-  4. **Merge PR** if all tests pass and quality gates are satisfied
-  5. **Update task list**: Mark task as completed `- [x]` in ECAP_tasklist.md
-  6. **Document progress**: Provide brief summary of what was accomplished
-  7. **Update execution summary**: Add task completion summary to ECAP_execution_summary.md
-  8. **Stop and report**: Wait for confirmation before proceeding to next task
-- **One task, one cycle**: Never work on multiple tasks simultaneously
-- **Celebrate progress**: Acknowledge each completed milestone
+# Establish baseline token usage patterns
+/document baseline-session --persona-scribe --uc
+```
+
+#### 2. Project Context Loading
+```bash
+# Load project context efficiently
+/load @ai_docs/ --focus guidelines --uc
+/load @src/ --delegate auto --focus architecture --uc
+/load @config/ --persona-devops --uc
+```
+
+#### 3. Development Environment with SuperClaude Integration
+```bash
+# Traditional setup
+make setup-dev
+make docker-up
+
+# SuperClaude-enhanced validation
+/analyze dev-environment --focus health --persona-devops --uc
+/troubleshoot docker-compose --play --uc (if needed)
+```
+
+#### 4. First Task Execution with SuperClaude
+```bash
+# Start with Task 1.1.1 using SuperClaude patterns
+/analyze task-1.1.1 --focus requirements --uc
+/implement task-1.1.1 --framework docker --persona-devops --uc
+/improve implementation --focus quality --validate --uc
+```
+
+#### 5. Establish Efficient Development Patterns
+**Create reusable command aliases for ECAP:**
+```bash
+# Data Engineering Tasks
+alias ecap-kafka="/implement kafka_component --framework kafka --persona-backend --uc"
+alias ecap-spark="/implement spark_job --framework spark --persona-backend --c7 --uc"
+alias ecap-api="/implement api_endpoint --framework fastapi --persona-backend --uc"
+alias ecap-dashboard="/implement dashboard_component --framework streamlit --persona-frontend --magic --uc"
+
+# Quality & Analysis
+alias ecap-analyze="/analyze --focus architecture --persona-architect --uc"
+alias ecap-improve="/improve --focus quality --validate --persona-refactorer --uc"
+alias ecap-test="/troubleshoot test-failures --persona-qa --play --uc"
+
+# Documentation & Git
+alias ecap-doc="/document --persona-scribe --c7 --uc"
+alias ecap-commit="/git commit --persona-scribe --uc"
+alias ecap-pr="/git pr create --persona-scribe --c7 --uc"
+```
+
+### SuperClaude Development Principles - Remember
+
+#### Cost Efficiency First
+- **Always use `--uc` flag**: 30-50% token reduction on every command
+- **Batch related questions**: Combine multiple queries in single session
+- **Monitor token usage**: Stay below 75% of Pro plan limits
+- **Use efficient personas**: Let auto-activation prevent broad analysis
+- **Leverage MCP caching**: Context7 reduces repeated documentation lookups
+
+#### Learning with SuperClaude
+- **Framework mastery**: Learn SuperClaude commands while building ECAP
+- **Persona expertise**: Understand when each persona adds value
+- **Cost optimization**: Develop efficient development patterns
+- **Quality integration**: Master the 8-step validation cycle
+- **Evidence-based decisions**: All choices backed by measurable data
+
+#### SuperClaude Task Execution
+- **Stop after each individual task**: Complete one task using SuperClaude workflow:
+  1. **Analyze task**: `/analyze task-X.X.X --focus requirements --uc`
+  2. **Implement with framework**: `/implement [feature] --framework [tech] --uc`
+  3. **Quality validation**: `/improve implementation --focus quality --validate --uc`
+  4. **Professional commits**: `/git commit "description" --persona-scribe --uc`
+  5. **Documentation**: `/document task-completion --persona-scribe --uc`
+  6. **TodoWrite updates**: Mark task complete with evidence
+  7. **Cost analysis**: Report token usage and efficiency metrics
+  8. **Stop and report**: Wait for confirmation with comprehensive summary
+
+#### Success Metrics
+- **Token efficiency**: Maintain 30-50% reduction from baseline
+- **Quality gates**: 100% pass rate on 8-step validation
+- **Development velocity**: Faster implementation through framework integration
+- **Knowledge retention**: Documented patterns for future projects
+- **Cost predictability**: Consistent usage within Pro plan limits
 
 ---
 
-**Ready to begin? Start with Phase 1, Task 1.1.1 and let's build an amazing e-commerce analytics platform!**
+**Ready to begin SuperClaude ECAP development? Start with `/analyze task-1.1.1 --focus requirements --uc` and let's build an amazing e-commerce analytics platform with maximum cost efficiency!**

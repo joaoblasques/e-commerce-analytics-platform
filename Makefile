@@ -1,6 +1,6 @@
 # E-Commerce Analytics Platform Makefile
 
-.PHONY: help install install-dev test test-unit test-integration test-performance lint format type-check pre-commit clean build run-api run-dashboard docker-build docker-up docker-down
+.PHONY: help install install-dev test test-unit test-integration test-performance lint format type-check pre-commit clean build run-api run-dashboard docker-build docker-up docker-down sc-analyze sc-implement sc-improve sc-doc sc-session-start sc-session-monitor sc-quality-gates sc-help
 
 # Default target
 .DEFAULT_GOAL := help
@@ -260,3 +260,62 @@ setup-db: ## Set up database
 # Full setup
 setup: setup-dev docker-up setup-db ## Complete project setup
 	@echo "$(GREEN)Project setup completed successfully!$(NC)"
+
+# SuperClaude Cost-Efficient Development Commands
+sc-analyze: ## SuperClaude analysis with cost optimization
+	@echo "$(BLUE)Running SuperClaude analysis with cost optimization...$(NC)"
+	@echo "Use: /analyze --scope module --focus [domain] --uc"
+	@echo "Available domains: architecture, performance, security, quality"
+
+sc-implement: ## SuperClaude implementation patterns
+	@echo "$(BLUE)SuperClaude implementation patterns:$(NC)"
+	@echo "Kafka: /implement kafka_component --framework kafka --persona-backend --uc"
+	@echo "Spark: /implement spark_job --framework spark --persona-backend --c7 --uc"
+	@echo "API: /implement api_endpoint --framework fastapi --persona-backend --uc"
+	@echo "Dashboard: /implement dashboard_component --framework streamlit --persona-frontend --magic --uc"
+
+sc-improve: ## SuperClaude quality improvement
+	@echo "$(BLUE)Running SuperClaude quality improvement...$(NC)"
+	@echo "Use: /improve --focus quality --validate --persona-refactorer --uc"
+
+sc-doc: ## SuperClaude documentation generation
+	@echo "$(BLUE)SuperClaude documentation patterns:$(NC)"
+	@echo "General: /document [target] --persona-scribe --c7 --uc"
+	@echo "API: /document src/api/ --focus api-docs --persona-scribe --uc"
+
+sc-session-start: ## Start SuperClaude development session
+	@echo "$(BLUE)Starting SuperClaude ECAP development session...$(NC)"
+	@echo "1. Load project context: /load @ai_docs/CLAUDE.md --uc"
+	@echo "2. Review current tasks: /analyze ECAP_tasklist.md --focus current-phase --uc"
+	@echo "3. Initialize TODO: /todowrite session-tasks --uc"
+	@echo "4. Set development focus based on current phase"
+
+sc-session-monitor: ## Monitor SuperClaude session efficiency
+	@echo "$(BLUE)SuperClaude session monitoring:$(NC)"
+	@echo "Token efficiency target: 30-50% reduction"
+	@echo "Always use --uc flag for cost optimization"
+	@echo "Batch related questions in single session"
+
+sc-quality-gates: ## Run SuperClaude quality validation
+	@echo "$(BLUE)SuperClaude 8-step quality validation:$(NC)"
+	@echo "Use: /improve implementation --focus quality --validate --uc"
+	@echo "This replaces manual quality checks with automated SuperClaude validation"
+
+sc-help: ## Show SuperClaude command patterns for ECAP
+	@echo "$(BLUE)SuperClaude E-Commerce Analytics Platform Commands$(NC)"
+	@echo ""
+	@echo "$(GREEN)Cost-Efficient Patterns:$(NC)"
+	@echo "  $(YELLOW)Always use --uc flag for 30-50% token reduction$(NC)"
+	@echo "  sc-analyze         - Analysis with cost optimization"
+	@echo "  sc-implement       - Framework-aware implementation patterns"
+	@echo "  sc-improve         - Quality improvement with validation"
+	@echo "  sc-doc             - Professional documentation generation"
+	@echo ""
+	@echo "$(GREEN)Session Management:$(NC)"
+	@echo "  sc-session-start   - Start cost-optimized development session"
+	@echo "  sc-session-monitor - Monitor token usage and efficiency"
+	@echo "  sc-quality-gates   - Automated quality validation"
+	@echo ""
+	@echo "$(GREEN)Quick Reference:$(NC)"
+	@echo "  View ai_docs/SUPERCLAUDECONFIG.md for detailed patterns"
+	@echo "  View ai_docs/CLAUDE.md for complete SuperClaude integration"
