@@ -1,0 +1,30 @@
+---
+image:
+  repository: confluentinc/cp-kafka
+  pullPolicy: IfNotPresent
+  tag: "7.4.0"
+
+zookeeper:
+  image:
+    repository: confluentinc/cp-zookeeper
+    pullPolicy: IfNotPresent
+    tag: "7.4.0"
+  clientPort: 2181
+  tickTime: 2000
+
+kafka:
+  brokerId: 1
+  advertisedListeners: "PLAINTEXT://kafka:9092"
+  offsetsTopicReplicationFactor: 1
+  groupInitialRebalanceDelayMs: 0
+  jmxPort: 9997
+
+service:
+  type: ClusterIP
+  port: 9092
+
+persistence:
+  enabled: true
+  size: 10Gi
+
+resources: {}

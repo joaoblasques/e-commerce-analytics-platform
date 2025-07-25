@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{include "ecap.fullname" .}}
+  labels:
+    {{- include "ecap.labels" . | nindent 4}}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "ecap.selectorLabels" . | nindent 6}}
+  template:
+    metadata:
+      labels:
+        {{- include "ecap.selectorLabels" . | nindent 8}}
+    spec:
+      containers:
+        - name: {{.Chart.Name}}
+          image: "{{.Values.image.repository}}:{{.Values.image.tag | default .Chart.AppVersion}}"
+          imagePullPolicy: {{.Values.image.pullPolicy}}
+          env:
+            - name: MINIO_ROOT_USER
+              value: {{.Values.environment.MINIO_ROOT_USER}}
+            - name: MINIO_ROOT_PASSWORD
+              value: {{.Values.environment.MINIO_ROOT_PASSWORD}}
+          command: ["minio", "server", "/data", "--console-address", ":{{.Values.service.consolePort}}"]
+          ports:
+            - name: api
+              containerPort: {{.Values.service.port}}
+              protocol: TCP
+            - name: console
+              containerPort: {{.Values.service.consolePort}}
+              protocol: TCP
+          volumeMounts:
+            - name: minio-data
+              mountPath: /data
+          resources:
+            {{- toYaml .Values.resources | nindent 12}}
+      volumes:
+        - name: minio-data
+          persistentVolumeClaim:
+            claimName: {{include "ecap.fullname" .}}-data

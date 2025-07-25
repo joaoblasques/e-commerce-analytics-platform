@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{include "ecap.fullname" .}}
+  labels:
+    {{- include "ecap.labels" . | nindent 4}}
+spec:
+  replicas: {{.Values.replicaCount}}
+  selector:
+    matchLabels:
+      {{- include "ecap.selectorLabels" . | nindent 6}}
+  template:
+    metadata:
+      labels:
+        {{- include "ecap.selectorLabels" . | nindent 8}}
+    spec:
+      containers:
+        - name: {{.Chart.Name}}
+          image: "{{.Values.image.repository}}:{{.Values.image.tag | default .Chart.AppVersion}}"
+          imagePullPolicy: {{.Values.image.pullPolicy}}
+          env:
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: {{.Values.kafka.bootstrapServers}}
+            - name: KAFKA_TOPIC
+              value: {{.Values.kafka.topic}}
+          resources:
+            {{- toYaml .Values.resources | nindent 12}}

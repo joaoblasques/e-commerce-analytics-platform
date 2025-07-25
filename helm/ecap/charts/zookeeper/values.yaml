@@ -1,0 +1,15 @@
+---
+image:
+  repository: confluentinc/cp-zookeeper
+  pullPolicy: IfNotPresent
+  tag: "7.4.0"
+
+clientPort: 2181
+tickTime: 2000
+
+persistence:
+  enabled: true
+  dataSize: 1Gi
+  logSize: 1Gi
+
+resources: {}

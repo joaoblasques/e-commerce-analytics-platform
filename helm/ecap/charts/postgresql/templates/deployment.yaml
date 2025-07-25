@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{include "ecap.fullname" .}}
+  labels:
+    {{- include "ecap.labels" . | nindent 4}}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "ecap.selectorLabels" . | nindent 6}}
+  template:
+    metadata:
+      labels:
+        {{- include "ecap.selectorLabels" . | nindent 8}}
+    spec:
+      containers:
+        - name: {{.Chart.Name}}
+          image: "{{.Values.image.repository}}:{{.Values.image.tag | default .Chart.AppVersion}}"
+          imagePullPolicy: {{.Values.image.pullPolicy}}
+          env:
+            - name: POSTGRES_DB
+              value: {{.Values.environment.POSTGRES_DB}}
+            - name: POSTGRES_USER
+              value: {{.Values.environment.POSTGRES_USER}}
+            - name: POSTGRES_PASSWORD
+              value: {{.Values.environment.POSTGRES_PASSWORD}}
+          ports:
+            - name: postgres
+              containerPort: 5432
+              protocol: TCP
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
+          resources:
+            {{- toYaml .Values.resources | nindent 12}}
+      volumes:
+        - name: postgres-data
+          persistentVolumeClaim:
+            claimName: {{include "ecap.fullname" .}}-data
