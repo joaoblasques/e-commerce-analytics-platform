@@ -1,0 +1,184 @@
+# Default Configuration
+# Base configuration values that apply to all environments
+
+# Application settings
+app:
+  name: "E-Commerce Analytics Platform"
+  version: "0.1.0"
+  debug: false
+
+  # API settings
+  api:
+    host: "0.0.0.0"
+    port: 8000
+    workers: 4
+    timeout: 30
+    cors_origins: ["*"]
+
+  # Dashboard settings
+  dashboard:
+    host: "0.0.0.0"
+    port: 8501
+    theme: "dark"
+
+# Database configuration
+database:
+  pool_size: 10
+  max_overflow: 20
+  pool_timeout: 30
+  pool_recycle: 3600
+  echo: false
+  autocommit: false
+  autoflush: false
+
+# Kafka configuration
+kafka:
+  topics:
+    transactions: "transactions"
+    user_events: "user-events"
+    product_updates: "product-updates"
+    fraud_alerts: "fraud-alerts"
+    analytics_results: "analytics-results"
+
+  consumer:
+    group_id: "ecap-consumer-group"
+    auto_offset_reset: "earliest"
+    batch_size: 1000
+    max_poll_records: 500
+    session_timeout_ms: 30000
+    heartbeat_interval_ms: 3000
+
+  producer:
+    batch_size: 16384
+    linger_ms: 10
+    buffer_memory: 33554432
+    compression_type: "lz4"
+    retries: 3
+    acks: "all"
+
+# Redis configuration
+redis:
+  db: 0
+  max_connections: 20
+  socket_timeout: 30
+  socket_connect_timeout: 30
+  socket_keepalive: true
+  health_check_interval: 30
+
+# MinIO/S3 configuration
+minio:
+  buckets:
+    raw_data: "raw-data"
+    processed_data: "processed-data"
+    analytics_results: "analytics-results"
+    model_artifacts: "model-artifacts"
+    logs: "logs"
+    backups: "backups"
+
+  lifecycle:
+    raw_data_retention_days: 90
+    processed_data_retention_days: 365
+    logs_retention_days: 30
+
+# Spark configuration
+spark:
+  app_name: "ecommerce-analytics-platform"
+  master_url: "spark://localhost:7077"
+  executor_memory: "2g"
+  executor_cores: 2
+  driver_memory: "1g"
+  sql:
+    adaptive:
+      enabled: true
+      coalescePartitions:
+        enabled: true
+  serializer: "org.apache.spark.serializer.KryoSerializer"
+
+# Logging configuration
+logging:
+  level: "INFO"
+  format: "json"
+  output: "console"
+  max_file_size: "100MB"
+  backup_count: 5
+
+  loggers:
+    uvicorn: "WARNING"
+    sqlalchemy: "WARNING"
+    kafka: "WARNING"
+
+# Monitoring configuration
+monitoring:
+  metrics:
+    enabled: true
+    interval: 30
+    retention_days: 7
+
+  health_checks:
+    enabled: true
+    interval: 30
+    timeout: 10
+
+  alerts:
+    enabled: true
+    channels: ["email", "slack"]
+
+# Security configuration
+security:
+  jwt:
+    algorithm: "HS256"
+    access_token_expire_minutes: 30
+    refresh_token_expire_days: 7
+
+  rate_limiting:
+    enabled: true
+    requests_per_minute: 100
+    burst_limit: 200
+
+  cors:
+    allow_credentials: true
+    allow_methods: ["GET", "POST", "PUT", "DELETE"]
+    allow_headers: ["*"]
+
+# Feature flags
+features:
+  fraud_detection: true
+  real_time_analytics: true
+  customer_segmentation: true
+  recommendation_engine: false
+  advanced_ml_models: false
+
+# Performance tuning
+performance:
+  connection_pool_size: 10
+  max_overflow: 20
+  pool_timeout: 30
+  query_timeout: 60
+  cache_ttl: 300
+
+  # Streaming settings
+  streaming:
+    batch_interval: 10
+    checkpoint_interval: 60
+    watermark_delay: "2 minutes"
+    max_files_per_trigger: 1000
+
+# Data quality settings
+data_quality:
+  validation:
+    enabled: true
+    fail_on_error: false
+    max_error_rate: 0.1
+
+  monitoring:
+    enabled: true
+    alert_threshold: 0.05
+    check_interval: 300
+
+# Backup and recovery
+backup:
+  enabled: true
+  interval: "daily"
+  retention_days: 7
+  compression: true
+  encryption: true

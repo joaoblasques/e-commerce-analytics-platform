@@ -1,94 +1,135 @@
-# Production environment configuration
+# Production Environment Configuration
+# Configuration overrides for production environment
 
-# Application settings
+# Application settings - production optimized
 app:
-  name: "E-Commerce Analytics Platform"
-  version: "0.1.0"
   debug: false
-  log_level: "WARNING"
+  api:
+    workers: 8
+    timeout: 30
+    cors_origins: ["https://ecap.example.com"]
+  dashboard:
+    theme: "dark"
 
-# Database configuration
+# Database configuration - production scale
 database:
-  host: "${DB_HOST}"
-  port: 5432
-  name: "${DB_NAME}"
-  user: "${DB_USER}"
-  password: "${DB_PASSWORD}"
   pool_size: 20
-  max_overflow: 50
-  ssl_mode: "require"
+  max_overflow: 40
+  pool_timeout: 60
+  pool_recycle: 1800
+  echo: false
 
-# Kafka configuration
+# Kafka configuration - production cluster
 kafka:
-  bootstrap_servers: "${KAFKA_BOOTSTRAP_SERVERS}"
-  topics:
-    transactions: "transactions"
-    user_events: "user-events"
-    product_updates: "product-updates"
-  consumer_group: "analytics-consumer-group"
-  auto_offset_reset: "latest"
-  security_protocol: "SSL"
-  ssl_ca_location: "${KAFKA_SSL_CA_LOCATION}"
-  ssl_certificate_location: "${KAFKA_SSL_CERT_LOCATION}"
-  ssl_key_location: "${KAFKA_SSL_KEY_LOCATION}"
+  consumer:
+    group_id: "ecap-prod-consumer-group"
+    batch_size: 2000
+    max_poll_records: 1000
+    session_timeout_ms: 60000
+    heartbeat_interval_ms: 5000
 
-# Spark configuration
-spark:
-  app_name: "ECommerceAnalytics-Prod"
-  master: "spark://spark-master:7077"
-  driver_memory: "8g"
-  executor_memory: "8g"
-  executor_cores: 8
-  sql_adaptive_enabled: true
-  sql_adaptive_coalesce_partitions_enabled: true
-  serializer: "org.apache.spark.serializer.KryoSerializer"
-  dynamic_allocation_enabled: true
+  producer:
+    batch_size: 32768
+    linger_ms: 5
+    buffer_memory: 67108864
+    retries: 10
+    acks: "all"
 
-# Redis configuration
+# Redis configuration - production
 redis:
-  host: "${REDIS_HOST}"
-  port: 6379
+  max_connections: 50
   db: 0
-  password: "${REDIS_PASSWORD}"
-  decode_responses: true
-  ssl: true
+  socket_timeout: 60
+  health_check_interval: 60
 
-# S3 configuration
-storage:
-  endpoint: "${S3_ENDPOINT}"
-  access_key: "${S3_ACCESS_KEY}"
-  secret_key: "${S3_SECRET_KEY}"
-  bucket: "${S3_BUCKET}"
-  secure: true
-  region: "${AWS_REGION}"
+# MinIO configuration - production buckets
+minio:
+  buckets:
+    raw_data: "prod-raw-data"
+    processed_data: "prod-processed-data"
+    analytics_results: "prod-analytics-results"
+    model_artifacts: "prod-model-artifacts"
+    logs: "prod-logs"
+    backups: "prod-backups"
 
-# API configuration
-api:
-  host: "0.0.0.0"
-  port: 8000
-  workers: 4
-  reload: false
-  access_log: false
+  lifecycle:
+    raw_data_retention_days: 365
+    processed_data_retention_days: 1095  # 3 years
+    logs_retention_days: 90
 
-# Dashboard configuration
-dashboard:
-  host: "0.0.0.0"
-  port: 8501
-  debug: false
+# Spark configuration - production cluster
+spark:
+  executor_memory: "4g"
+  executor_cores: 4
+  driver_memory: "2g"
 
-# Monitoring configuration
-monitoring:
-  prometheus:
-    enabled: true
-    port: 9090
-  grafana:
-    enabled: true
-    port: 3000
-
-# Logging configuration
+# Logging configuration - production level
 logging:
   level: "WARNING"
-  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-  file: "logs/app.log"
-  max_size: "100MB"
-  backup_count: 30
+  format: "json"
+  max_file_size: "500MB"
+  backup_count: 10
+
+  loggers:
+    uvicorn: "ERROR"
+    sqlalchemy: "ERROR"
+    kafka: "ERROR"
+    ecap: "INFO"
+
+# Monitoring configuration - comprehensive production monitoring
+monitoring:
+  metrics:
+    enabled: true
+    interval: 15
+    retention_days: 30
+
+  health_checks:
+    enabled: true
+    interval: 15
+    timeout: 5
+
+  alerts:
+    enabled: true
+    channels: ["email", "slack", "pagerduty"]
+
+# Security configuration - strict production security
+security:
+  jwt:
+    access_token_expire_minutes: 15
+    refresh_token_expire_days: 1
+
+  rate_limiting:
+    enabled: true
+    requests_per_minute: 50
+    burst_limit: 100
+
+# Feature flags - stable features only
+features:
+  fraud_detection: true
+  real_time_analytics: true
+  customer_segmentation: true
+  recommendation_engine: false
+  advanced_ml_models: false
+
+# Performance tuning - production optimized
+performance:
+  connection_pool_size: 20
+  max_overflow: 40
+  pool_timeout: 60
+  query_timeout: 120
+  cache_ttl: 300
+
+# Data quality settings - strict production standards
+data_quality:
+  validation:
+    enabled: true
+    fail_on_error: true
+    max_error_rate: 0.01
+
+# Backup and recovery - comprehensive production backup
+backup:
+  enabled: true
+  interval: "hourly"
+  retention_days: 30
+  compression: true
+  encryption: true

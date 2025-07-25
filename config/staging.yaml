@@ -1,0 +1,126 @@
+# Staging Environment Configuration
+# Configuration overrides for staging environment
+
+# Application settings
+app:
+  debug: false
+  api:
+    workers: 2
+    timeout: 60
+  dashboard:
+    theme: "light"
+
+# Database configuration - staging values
+database:
+  pool_size: 5
+  max_overflow: 10
+  echo: false
+
+# Kafka configuration - staging cluster
+kafka:
+  consumer:
+    group_id: "ecap-staging-consumer-group"
+    batch_size: 500
+    max_poll_records: 250
+
+  producer:
+    batch_size: 8192
+    retries: 5
+
+# Redis configuration - staging
+redis:
+  max_connections: 10
+  db: 1
+
+# MinIO configuration - staging buckets
+minio:
+  buckets:
+    raw_data: "staging-raw-data"
+    processed_data: "staging-processed-data"
+    analytics_results: "staging-analytics-results"
+    model_artifacts: "staging-model-artifacts"
+    logs: "staging-logs"
+    backups: "staging-backups"
+
+  lifecycle:
+    raw_data_retention_days: 30
+    processed_data_retention_days: 90
+    logs_retention_days: 14
+
+# Spark configuration - staging cluster
+spark:
+  executor_memory: "1g"
+  executor_cores: 1
+  driver_memory: "512m"
+
+# Logging configuration - more verbose for staging
+logging:
+  level: "DEBUG"
+  loggers:
+    uvicorn: "INFO"
+    sqlalchemy: "INFO"
+    ecap: "DEBUG"
+
+# Monitoring configuration - staging
+monitoring:
+  metrics:
+    interval: 60
+    retention_days: 3
+
+  health_checks:
+    interval: 60
+    timeout: 15
+
+  alerts:
+    enabled: true
+    channels: ["slack"]
+
+# Security configuration - relaxed for staging
+security:
+  jwt:
+    access_token_expire_minutes: 60
+    refresh_token_expire_days: 3
+
+  rate_limiting:
+    requests_per_minute: 200
+    burst_limit: 400
+
+  cors:
+    allow_origins: ["https://staging-ecap.example.com", "http://localhost:3000"]
+
+# Feature flags - staging can test new features
+features:
+  fraud_detection: true
+  real_time_analytics: true
+  customer_segmentation: true
+  recommendation_engine: true
+  advanced_ml_models: true
+
+# Performance tuning - staging optimized
+performance:
+  connection_pool_size: 5
+  max_overflow: 10
+  cache_ttl: 600
+
+  streaming:
+    batch_interval: 30
+    checkpoint_interval: 120
+    watermark_delay: "5 minutes"
+    max_files_per_trigger: 500
+
+# Data quality settings - more lenient for testing
+data_quality:
+  validation:
+    fail_on_error: false
+    max_error_rate: 0.2
+
+  monitoring:
+    alert_threshold: 0.1
+    check_interval: 600
+
+# Backup and recovery - reduced for staging
+backup:
+  interval: "weekly"
+  retention_days: 3
+  compression: true
+  encryption: false
