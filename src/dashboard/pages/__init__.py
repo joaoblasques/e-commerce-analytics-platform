@@ -16,7 +16,7 @@ from . import (
 
 __all__ = [
     "customer_analytics",
-    "executive_dashboard", 
+    "executive_dashboard",
     "fraud_detection",
     "operational_dashboard",
     "real_time_monitoring",
