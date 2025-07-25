@@ -1800,6 +1800,8 @@ The implementation provides enterprise-grade business intelligence dashboards wi
 
 **⏱ Performance**: **4 hours actual vs 24 hours estimated (83% under estimate ✅)**
 
+**Pull Request**: https://github.com/joaoblasques/e-commerce-analytics-platform/pull/64 (Merged)
+
 **🏗 Infrastructure Modules Created**
 
 ### 1. **VPC Module** (`terraform/modules/vpc/`)
