@@ -70,7 +70,9 @@
       "mcp__sequential-thinking__sequentialthinking",
       "Bash(poetry show:*)",
       "Bash(poetry run streamlit:*)",
-      "Bash(git reset:*)"
+      "Bash(git reset:*)",
+      "Bash(gh pr checkout:*)",
+      "Bash(git merge:*)"
     ],
     "deny": []
   }
