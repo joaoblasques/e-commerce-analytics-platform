@@ -86,6 +86,9 @@ def create_application() -> FastAPI:
     compression_middleware = get_compression_middleware(app)
     app.add_middleware(type(compression_middleware), app=app)
 
+    # Add correlation ID middleware
+    app.add_middleware(CorrelationIdMiddleware)
+
     # Add CORS middleware
     app.add_middleware(
         CORSMiddleware,

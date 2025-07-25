@@ -1,0 +1,22 @@
+---
+actions:
+  1:
+    action: delete_indices
+    description: >
+      Delete indices older than 30 days (based on index name),
+      for `ecap-logs-` prefixed indices.
+    options:
+      ignore_empty_list: True
+      disable_action: False
+    filters:
+      - filter_type: pattern
+        kind: prefix
+        value: ecap-logs-
+      - filter_type: age
+        source: name
+        direction: older
+        unit: days
+        unit_count: 30
+        field: '@timestamp'
+        stats_result: False
+        epoch: False

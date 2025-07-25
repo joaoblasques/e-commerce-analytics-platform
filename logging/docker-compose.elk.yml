@@ -1,0 +1,198 @@
+version: '3.8'
+
+services:
+  # Elasticsearch - Log storage and search engine
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.12.0
+    container_name: ecap-elasticsearch
+    environment:
+      - node.name=es-node01
+      - cluster.name=ecap-logging
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms2g -Xmx2g
+      - xpack.security.enabled=false
+      - xpack.security.enrollment.enabled=false
+      - action.destructive_requires_name=false
+      # Performance optimizations
+      - indices.memory.index_buffer_size=30%
+      - indices.memory.min_index_buffer_size=96mb
+      - thread_pool.write.queue_size=1000
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+      - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+      
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    networks:
+      - elk
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  # Kibana - Log visualization and dashboards
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.12.0
+    container_name: ecap-kibana
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - SERVER_NAME=ecap-kibana
+      - SERVER_HOST=0.0.0.0
+      - XPACK_SECURITY_ENABLED=false
+      - XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY=abcdefghijklmnopqrstuvwxyz123456
+    volumes:
+      - kibana_data:/usr/share/kibana/data
+      - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml:ro
+      - ./kibana/dashboards:/usr/share/kibana/dashboards:ro
+    ports:
+      - "5601:5601"
+    networks:
+      - elk
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5601/api/status || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  # Logstash - Log processing and transformation
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.12.0
+    container_name: ecap-logstash
+    environment:
+      - LS_JAVA_OPTS=-Xms1g -Xmx1g
+      - PIPELINE_WORKERS=4
+      - PIPELINE_BATCH_SIZE=1000
+      - PIPELINE_BATCH_DELAY=50
+    volumes:
+      - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
+      - ./logstash/pipeline:/usr/share/logstash/pipeline:ro
+      - ./logstash/patterns:/usr/share/logstash/patterns:ro
+      - logstash_data:/usr/share/logstash/data
+    ports:
+      - "5044:5044"  # Beats input
+      - "9600:9600"  # Monitoring API
+      - "5000:5000/tcp"  # TCP input
+      - "5000:5000/udp"  # UDP input
+    networks:
+      - elk
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9600/_node/stats || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  # Filebeat - Log shipping from files
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:8.12.0
+    container_name: ecap-filebeat
+    user: root
+    environment:
+      - ELASTICSEARCH_HOSTS=elasticsearch:9200
+      - KIBANA_HOST=kibana:5601
+    volumes:
+      - ./filebeat/config/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - filebeat_data:/usr/share/filebeat/data
+      # Mount application log directories
+      - ../logs:/app/logs:ro
+    networks:
+      - elk
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    command: ["--strict.perms=false"]
+
+  # Metricbeat - System and Docker metrics
+  metricbeat:
+    image: docker.elastic.co/beats/metricbeat:8.12.0
+    container_name: ecap-metricbeat
+    user: root
+    environment:
+      - ELASTICSEARCH_HOSTS=elasticsearch:9200
+      - KIBANA_HOST=kibana:5601
+    volumes:
+      - ./metricbeat/config/metricbeat.yml:/usr/share/metricbeat/metricbeat.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro
+      - /proc:/hostfs/proc:ro
+      - /:/hostfs:ro
+      - metricbeat_data:/usr/share/metricbeat/data
+    networks:
+      - elk
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    command: ["--strict.perms=false", "-system.hostfs=/hostfs"]
+
+  # ElastAlert - Alerting on log patterns
+  elastalert:
+    image: jertel/elastalert2:2.15.0
+    container_name: ecap-elastalert
+    environment:
+      - ELASTICSEARCH_HOST=elasticsearch
+      - ELASTICSEARCH_PORT=9200
+    volumes:
+      - ./elastalert/config/elastalert.yaml:/opt/elastalert/config.yaml:ro
+      - ./elastalert/rules:/opt/elastalert/rules:ro
+      - elastalert_data:/opt/elastalert/data
+    networks:
+      - elk
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+
+  # Curator - Index lifecycle management
+  curator:
+    image: untergeek/curator:8.0.8
+    container_name: ecap-curator
+    environment:
+      - ELASTICSEARCH_HOST=elasticsearch
+      - ELASTICSEARCH_PORT=9200
+    volumes:
+      - ./curator/config/curator.yml:/etc/curator/curator.yml:ro
+      - ./curator/config/actions.yml:/etc/curator/actions.yml:ro
+    networks:
+      - elk
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    # Run curator once per day at 2 AM
+    deploy:
+      restart_policy:
+        condition: none
+    command: ["--config", "/etc/curator/curator.yml", "/etc/curator/actions.yml"]
+
+volumes:
+  elasticsearch_data:
+    driver: local
+  kibana_data:
+    driver: local
+  logstash_data:
+    driver: local
+  filebeat_data:
+    driver: local
+  metricbeat_data:
+    driver: local
+  elastalert_data:
+    driver: local
+
+networks:
+  elk:
+    external: true
+    name: ecap-network
