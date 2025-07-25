@@ -21,6 +21,7 @@ from dashboard.pages import (
     customer_analytics,
     executive_dashboard,
     fraud_detection,
+    operational_dashboard,
     real_time_monitoring,
     revenue_analytics,
 )
@@ -141,6 +142,8 @@ def main():
             revenue_analytics.render()
         elif selected_page == "Fraud Detection":
             fraud_detection.render()
+        elif selected_page == "Operational Dashboard":
+            operational_dashboard.render()
         elif selected_page == "Real-time Monitoring":
             real_time_monitoring.render()
         else:

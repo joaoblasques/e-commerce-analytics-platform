@@ -148,6 +148,12 @@ class DashboardSettings:
                 "enabled": True,
             },
             {
+                "name": "Operational Dashboard",
+                "icon": "🎛️",
+                "description": "Operations monitoring with system health, data quality, and alerts",
+                "enabled": True,
+            },
+            {
                 "name": "Real-time Monitoring",
                 "icon": "⚡",
                 "description": "Live system metrics and performance",
