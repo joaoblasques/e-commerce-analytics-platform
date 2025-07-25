@@ -53,6 +53,9 @@ hvac = "^1.2.1"
 kubernetes = "^28.1.0"
 cryptography = "^41.0.0"
 watchdog = "^3.0.0"
+# ELK Stack Integration
+elasticsearch = "^8.12.0"
+elastic-apm = "^6.20.0"
 pytz = "^2023.3"
 # Test data generation
 faker = "^19.3.0"

@@ -65,15 +65,41 @@ spark:
 
 # Logging configuration - production level
 logging:
-  level: "WARNING"
+  level: "INFO"
   format: "json"
+  output: "both"
+  
+  # File logging with rotation
+  file_path: "/app/logs/ecap-production.log"
   max_file_size: "500MB"
   backup_count: 10
-
+  compress_rotated: true
+  
+  # Full ELK integration
+  elasticsearch:
+    enabled: true
+    host: "http://elasticsearch:9200"
+    index: "ecap-logs-production"
+    buffer_size: 200
+    flush_interval: 2.0
+  
+  # Minimal request logging for performance
+  request_logging:
+    enabled: true
+    exclude_paths: ["/health", "/metrics", "/favicon.ico", "/static"]
+    log_request_body: false
+    log_response_body: false
+    max_body_size: 512
+    slow_request_threshold: 2000.0
+    very_slow_threshold: 5000.0
+  
+  # Production logger levels
   loggers:
-    uvicorn: "ERROR"
+    uvicorn: "WARNING"
     sqlalchemy: "ERROR"
     kafka: "ERROR"
+    elasticsearch: "ERROR"
+    urllib3: "ERROR"
     ecap: "INFO"
 
 # Monitoring configuration - comprehensive production monitoring

@@ -1,0 +1,84 @@
+# Kibana Configuration for ECAP Logging Dashboard
+
+# Server settings
+server.name: "ecap-kibana"
+server.host: "0.0.0.0"
+server.port: 5601
+server.basePath: ""
+server.rewriteBasePath: false
+
+# Elasticsearch settings
+elasticsearch.hosts: ["http://elasticsearch:9200"]
+elasticsearch.requestTimeout: 30000
+elasticsearch.shardTimeout: 30000
+elasticsearch.pingTimeout: 1500
+
+# Security (disabled for development)
+xpack.security.enabled: false
+xpack.encryptedSavedObjects.encryptionKey: "abcdefghijklmnopqrstuvwxyz123456"
+
+# Logging
+logging.level: info
+logging.quiet: false
+logging.dest: stdout
+
+# Performance settings
+elasticsearch.requestHeadersWhitelist: ["authorization", "content-type", "kbn-version", "x-elastic-product-origin"]
+
+# UI settings
+server.maxPayloadBytes: 1048576
+server.keepaliveTimeout: 120000
+server.socketTimeout: 120000
+
+# Development settings
+newsfeed.enabled: false
+telemetry.enabled: false
+telemetry.optIn: false
+
+# Dashboard settings
+map.includeElasticMapsService: false
+
+# Default index patterns
+kibana.defaultAppId: "discover"
+
+# Data view settings
+data.autocomplete.valueSuggestions.terminateAfter: 100000
+data.autocomplete.valueSuggestions.timeout: 1000
+
+# Machine Learning (disabled)
+xpack.ml.enabled: false
+
+# Advanced settings
+uiSettings.overrides:
+  "dateFormat": "YYYY-MM-DD HH:mm:ss.SSS"
+  "dateFormat:tz": "UTC"
+  "format:defaultTypeMap": |
+    {
+      "ip": { "id": "ip", "params": {} },
+      "date": { "id": "date", "params": {} },
+      "number": { "id": "number", "params": {} },
+      "boolean": { "id": "boolean", "params": {} },
+      "_source": { "id": "_source", "params": {} },
+      "_default_": { "id": "string", "params": {} }
+    }
+  "format:number:defaultPattern": "0,0.[000]"
+  "histogram:barTarget": 50
+  "histogram:maxBars": 100
+  "csv:separator": ","
+  "csv:quoteValues": true
+  "search:sampleSize": 500
+  "doc_table:highlight": true
+  "courier:ignoreFilterIfFieldNotInIndex": false
+  "courier:setRequestPreference": "sessionId"
+  "courier:customRequestPreference": "_local"
+  "courier:maxSegmentCount": 30
+  "context:defaultSize": 5
+  "context:step": 5
+  "context:tieBreakerFields": ["_doc"]
+  "discover:sampleSize": 500
+  "discover:aggs:terms:size": 20
+  "discover:sort:defaultOrder": "desc"
+  "doc_table:hideTimeColumn": false
+  "indexPattern:placeholder": "logstash-*"
+  "filterManager:refreshFiltersLook": false
+  "metaFields": ["_source", "_id", "_type", "_index", "_score"]

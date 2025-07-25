@@ -1,0 +1,186 @@
+# Filebeat Configuration for ECAP Log Collection
+
+# Global settings
+name: "ecap-filebeat"
+tags: ["ecap", "logging", "docker"]
+
+# File inputs
+filebeat.inputs:
+  # Docker container logs
+  - type: container
+    enabled: true
+    paths:
+      - /var/lib/docker/containers/*/*.log
+    
+    # Container metadata
+    processors:
+      - add_docker_metadata:
+          host: "unix:///var/run/docker.sock"
+      
+      # Parse JSON logs from our services
+      - decode_json_fields:
+          fields: ["message"]
+          target: ""
+          overwrite_keys: true
+          when:
+            contains:
+              message: "{"
+      
+      # Add ECAP-specific tags
+      - add_tags:
+          tags: ["ecap-container"]
+          when:
+            contains:
+              container.image.name: "ecap"
+      
+      # Extract service name from container name
+      - script:
+          lang: javascript
+          source: >
+            function process(event) {
+              var containerName = event.Get("container.name");
+              if (containerName && containerName.startsWith("ecap-")) {
+                var serviceName = containerName.replace("ecap-", "").replace(/-\d+$/, "");
+                event.Put("service.name", serviceName);
+                event.Put("service.type", "ecap-service");
+              }
+            }
+
+  # Application log files
+  - type: log
+    enabled: true
+    paths:
+      - /app/logs/*.log
+      - /app/logs/*/*.log
+    
+    # Multiline support for stack traces
+    multiline.pattern: '^[0-9]{4}-[0-9]{2}-[0-9]{2}'
+    multiline.negate: true
+    multiline.match: after
+    multiline.max_lines: 500
+    multiline.timeout: 5s
+    
+    # Fields and processors
+    fields:
+      log_type: "application"
+      environment: "${ENVIRONMENT:development}"
+    fields_under_root: true
+    
+    processors:
+      # Parse JSON logs
+      - decode_json_fields:
+          fields: ["message"]
+          target: ""
+          overwrite_keys: true
+          when:
+            contains:
+              message: "{"
+      
+      # Add timestamp
+      - timestamp:
+          field: timestamp
+          layouts:
+            - '2006-01-02T15:04:05.000Z'
+            - '2006-01-02T15:04:05Z'
+          test:
+            - '2023-07-25T10:30:45.123Z'
+
+  # Nginx/proxy logs (if present)
+  - type: log
+    enabled: true
+    paths:
+      - /var/log/nginx/*.log
+    
+    fields:
+      log_type: "nginx"
+      service.name: "nginx"
+    fields_under_root: true
+    
+    processors:
+      # Parse Nginx access logs
+      - dissect:
+          tokenizer: '%{client_ip} - %{user} [%{timestamp}] "%{method} %{url} %{http_version}" %{status_code} %{response_size} "%{referrer}" "%{user_agent}"'
+          field: "message"
+          target_prefix: "nginx"
+
+# Output configuration
+output.logstash:
+  hosts: ["logstash:5044"]
+  
+  # Load balancing
+  loadbalance: true
+  worker: 2
+  
+  # Compression
+  compression_level: 3
+  
+  # Bulk settings
+  bulk_max_size: 2048
+  flush_interval: 1s
+  
+  # Retry settings
+  max_retries: 3
+  backoff.init: 1s
+  backoff.max: 60s
+
+# Alternative: Direct to Elasticsearch (uncomment if not using Logstash)
+# output.elasticsearch:
+#   hosts: ["elasticsearch:9200"]
+#   index: "filebeat-%{+yyyy.MM.dd}"
+#   template.enabled: true
+#   template.pattern: "filebeat-*"
+
+# Monitoring
+monitoring.enabled: false
+
+# Logging
+logging.level: info
+logging.to_files: true
+logging.files:
+  path: /var/log/filebeat
+  name: filebeat
+  keepfiles: 7
+  permissions: 0644
+
+# Performance tuning
+queue.mem:
+  events: 4096
+  flush.min_events: 512
+  flush.timeout: 1s
+
+# Security
+ssl.verification_mode: none
+
+# Processors (global)
+processors:
+  # Add host information
+  - add_host_metadata:
+      when.not.contains.tags: "forwarded"
+  
+  # Add Docker metadata
+  - add_docker_metadata: ~
+  
+  # Clean up fields
+  - drop_fields:
+      fields: ["agent", "ecs", "host.architecture", "host.os.family"]
+      ignore_missing: true
+  
+  # Rename fields for consistency
+  - rename:
+      fields:
+        - from: "container.name"
+          to: "service.container_name"
+      ignore_missing: true
+
+# Index Lifecycle Management
+setup.ilm.enabled: false
+
+# Template settings
+setup.template.enabled: false
+
+# Dashboards (disable for custom setup)
+setup.dashboards.enabled: false
+
+# Kibana settings
+setup.kibana:
+  host: "kibana:5601"

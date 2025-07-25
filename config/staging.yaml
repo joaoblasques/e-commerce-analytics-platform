@@ -1,37 +1,61 @@
-# Staging Environment Configuration
-# Configuration overrides for staging environment
+# Staging Environment Configuration Overrides
+# Enhanced logging and debugging for staging environment
 
 # Application settings
 app:
-  debug: false
+  debug: true
+  environment: "staging"
   api:
-    workers: 2
-    timeout: 60
-  dashboard:
-    theme: "light"
+    workers: 4
+    cors_origins: ["https://staging.ecap.example.com", "http://localhost:3000"]
 
-# Database configuration - staging values
+# Database configuration
 database:
-  pool_size: 5
-  max_overflow: 10
-  echo: false
+  echo: true  # Enable SQL logging for debugging
+  pool_size: 10
+  max_overflow: 20
+
+# Logging configuration for staging - enhanced debugging
+logging:
+  level: "DEBUG"
+  format: "json"
+  output: "both"
+  
+  # File logging
+  file_path: "/app/logs/ecap-staging.log"
+  max_file_size: "200MB"
+  backup_count: 5
+  
+  # Enable ELK integration in staging
+  elasticsearch:
+    enabled: true
+    host: "http://elasticsearch:9200"
+    index: "ecap-logs-staging"
+    buffer_size: 50
+    flush_interval: 10.0
+  
+  # Enhanced request logging for testing
+  request_logging:
+    enabled: true
+    log_request_body: true
+    log_response_body: true
+    max_body_size: 2048
+    slow_request_threshold: 500.0
+    very_slow_threshold: 2000.0
+  
+  # Detailed logger levels for debugging
+  loggers:
+    uvicorn: "INFO"
+    sqlalchemy: "INFO"
+    kafka: "INFO"
+    elasticsearch: "INFO"
+    ecap: "DEBUG"
 
 # Kafka configuration - staging cluster
 kafka:
   consumer:
     group_id: "ecap-staging-consumer-group"
-    batch_size: 500
-    max_poll_records: 250
-
-  producer:
-    batch_size: 8192
-    retries: 5
-
-# Redis configuration - staging
-redis:
-  max_connections: 10
-  db: 1
-
+    
 # MinIO configuration - staging buckets
 minio:
   buckets:
@@ -42,85 +66,45 @@ minio:
     logs: "staging-logs"
     backups: "staging-backups"
 
-  lifecycle:
-    raw_data_retention_days: 30
-    processed_data_retention_days: 90
-    logs_retention_days: 14
-
-# Spark configuration - staging cluster
-spark:
-  executor_memory: "1g"
-  executor_cores: 1
-  driver_memory: "512m"
-
-# Logging configuration - more verbose for staging
-logging:
-  level: "DEBUG"
-  loggers:
-    uvicorn: "INFO"
-    sqlalchemy: "INFO"
-    ecap: "DEBUG"
-
-# Monitoring configuration - staging
+# Performance settings (relaxed for testing)
+performance:
+  cache_ttl: 60  # Shorter cache for testing
+  
+# Monitoring (enhanced for staging)
 monitoring:
   metrics:
-    interval: 60
-    retention_days: 3
-
+    enabled: true
+    interval: 15  # More frequent metrics
+    retention_days: 7
+  
   health_checks:
-    interval: 60
-    timeout: 15
-
+    enabled: true
+    interval: 15
+    timeout: 5
+  
   alerts:
     enabled: true
-    channels: ["slack"]
+    channels: ["email"]
 
-# Security configuration - relaxed for staging
+# Security (relaxed for testing)
 security:
   jwt:
-    access_token_expire_minutes: 60
-    refresh_token_expire_days: 3
-
+    access_token_expire_minutes: 60  # Longer for testing
+  
   rate_limiting:
-    requests_per_minute: 200
-    burst_limit: 400
+    requests_per_minute: 200  # Higher for load testing
 
-  cors:
-    allow_origins: ["https://staging-ecap.example.com", "http://localhost:3000"]
-
-# Feature flags - staging can test new features
+# Features (enable more for testing)
 features:
   fraud_detection: true
   real_time_analytics: true
   customer_segmentation: true
-  recommendation_engine: true
-  advanced_ml_models: true
+  recommendation_engine: true  # Enable in staging
+  advanced_ml_models: false
 
-# Performance tuning - staging optimized
-performance:
-  connection_pool_size: 5
-  max_overflow: 10
-  cache_ttl: 600
-
-  streaming:
-    batch_interval: 30
-    checkpoint_interval: 120
-    watermark_delay: "5 minutes"
-    max_files_per_trigger: 500
-
-# Data quality settings - more lenient for testing
+# Data quality (relaxed for testing)
 data_quality:
   validation:
-    fail_on_error: false
-    max_error_rate: 0.2
-
-  monitoring:
-    alert_threshold: 0.1
-    check_interval: 600
-
-# Backup and recovery - reduced for staging
-backup:
-  interval: "weekly"
-  retention_days: 3
-  compression: true
-  encryption: false
+    enabled: true
+    fail_on_error: false  # Don't fail hard in staging
+    max_error_rate: 0.1

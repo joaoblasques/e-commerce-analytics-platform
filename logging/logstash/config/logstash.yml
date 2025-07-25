@@ -1,0 +1,37 @@
+# Logstash Configuration for ECAP
+# Optimized for log processing and transformation
+
+# Node settings
+node.name: "ecap-logstash-01"
+
+# Pipeline settings
+pipeline.workers: 4
+pipeline.batch.size: 1000
+pipeline.batch.delay: 50
+
+# Pipeline configuration
+path.config: "/usr/share/logstash/pipeline"
+config.reload.automatic: true
+config.reload.interval: 10s
+
+# Logging
+log.level: info
+path.logs: "/usr/share/logstash/logs"
+
+# Monitoring
+xpack.monitoring.enabled: false
+
+# HTTP API
+api.http.host: "0.0.0.0"
+api.http.port: 9600
+
+# Performance tuning
+queue.type: memory
+queue.max_events: 1000
+queue.max_bytes: 1gb
+
+# Dead letter queue
+path.dead_letter_queue: "/usr/share/logstash/data/dead_letter_queue"
+
+# Plugin path
+path.plugins: ["/usr/share/logstash/plugins"]
