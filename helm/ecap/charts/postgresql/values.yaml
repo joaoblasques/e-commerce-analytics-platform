@@ -1,0 +1,20 @@
+---
+image:
+  repository: postgres
+  pullPolicy: IfNotPresent
+  tag: "15-alpine"
+
+environment:
+  POSTGRES_DB: ecommerce_analytics
+  POSTGRES_USER: analytics_user
+  POSTGRES_PASSWORD: dev_password
+
+service:
+  type: ClusterIP
+  port: 5432
+
+persistence:
+  enabled: true
+  size: 1Gi
+
+resources: {}

@@ -1,0 +1,13 @@
+---
+replicaCount: 1
+
+image:
+  repository: ecap-transaction-producer
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+kafka:
+  bootstrapServers: "kafka:9092"
+  topic: "transactions"
+
+resources: {}

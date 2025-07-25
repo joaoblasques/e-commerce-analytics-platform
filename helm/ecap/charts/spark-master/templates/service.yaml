@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{include "ecap.fullname" .}}
+  labels:
+    {{- include "ecap.labels" . | nindent 4}}
+spec:
+  type: {{.Values.service.type}}
+  ports:
+    - port: {{.Values.service.ports.web.port}}
+      targetPort: {{.Values.service.ports.web.targetPort}}
+      protocol: TCP
+      name: {{.Values.service.ports.web.name}}
+    - port: {{.Values.service.ports.spark.port}}
+      targetPort: {{.Values.service.ports.spark.targetPort}}
+      protocol: TCP
+      name: {{.Values.service.ports.spark.name}}
+  selector:
+    {{- include "ecap.selectorLabels" . | nindent 4}}

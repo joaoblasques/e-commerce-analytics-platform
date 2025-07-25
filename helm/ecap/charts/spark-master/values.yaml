@@ -1,0 +1,21 @@
+---
+replicaCount: 1
+
+image:
+  repository: bitnami/spark
+  pullPolicy: IfNotPresent
+  tag: "3.4.1"
+
+service:
+  type: ClusterIP
+  ports:
+    web:
+      port: 8080
+      targetPort: 8080
+      name: web
+    spark:
+      port: 7077
+      targetPort: 7077
+      name: spark
+
+resources: {}

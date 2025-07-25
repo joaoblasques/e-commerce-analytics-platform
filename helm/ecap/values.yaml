@@ -1,0 +1,145 @@
+---
+global:
+  environment: development
+  imagePullPolicy: IfNotPresent
+
+api:
+  replicaCount: 1
+  image:
+    repository: ecap-api
+    tag: latest
+  service:
+    type: ClusterIP
+    port: 8000
+
+streamingConsumer:
+  replicaCount: 1
+  image:
+    repository: ecap-streaming-consumer
+    tag: latest
+  spark:
+    master: "spark://spark-master:7077"
+    driverMemory: "1g"
+    executorMemory: "1g"
+    executorCores: 1
+
+transactionProducer:
+  replicaCount: 1
+  image:
+    repository: ecap-transaction-producer
+    tag: latest
+  kafka:
+    bootstrapServers: "kafka:9092"
+    topic: "transactions"
+
+userBehaviorProducer:
+  replicaCount: 1
+  image:
+    repository: ecap-user-behavior-producer
+    tag: latest
+  kafka:
+    bootstrapServers: "kafka:9092"
+    topic: "user-events"
+
+dashboard:
+  replicaCount: 1
+  image:
+    repository: ecap-dashboard
+    tag: latest
+  service:
+    type: ClusterIP
+    port: 8501
+
+sparkMaster:
+  replicaCount: 1
+  image:
+    repository: bitnami/spark
+    tag: "3.4.1"
+  service:
+    type: ClusterIP
+    ports:
+      web:
+        port: 8080
+        targetPort: 8080
+      spark:
+        port: 7077
+        targetPort: 7077
+
+sparkWorker:
+  replicaCount: 1
+  image:
+    repository: bitnami/spark
+    tag: "3.4.1"
+  spark:
+    masterUrl: "spark://spark-master:7077"
+    workerMemory: "2G"
+    workerCores: 2
+
+postgresql:
+  image:
+    repository: postgres
+    tag: "15-alpine"
+  environment:
+    POSTGRES_DB: ecommerce_analytics
+    POSTGRES_USER: analytics_user
+    POSTGRES_PASSWORD: dev_password
+  service:
+    type: ClusterIP
+    port: 5432
+  persistence:
+    enabled: true
+    size: 1Gi
+
+redis:
+  image:
+    repository: redis
+    tag: "7-alpine"
+  service:
+    type: ClusterIP
+    port: 6379
+  persistence:
+    enabled: true
+    size: 1Gi
+
+minio:
+  image:
+    repository: minio/minio
+    tag: "latest"
+  environment:
+    MINIO_ROOT_USER: minioadmin
+    MINIO_ROOT_PASSWORD: minioadmin
+  service:
+    type: ClusterIP
+    port: 9000
+    consolePort: 9001
+  persistence:
+    enabled: true
+    size: 10Gi
+
+kafka:
+  image:
+    repository: confluentinc/cp-kafka
+    tag: "7.4.0"
+  kafka:
+    brokerId: 1
+    advertisedListeners: "PLAINTEXT://kafka:9092"
+    offsetsTopicReplicationFactor: 1
+    groupInitialRebalanceDelayMs: 0
+    jmxPort: 9997
+  service:
+    type: ClusterIP
+    port: 9092
+  persistence:
+    enabled: true
+    size: 10Gi
+
+zookeeper:
+  image:
+    repository: confluentinc/cp-zookeeper
+    tag: "7.4.0"
+  clientPort: 2181
+  tickTime: 2000
+  persistence:
+    enabled: true
+    dataSize: 1Gi
+    logSize: 1Gi

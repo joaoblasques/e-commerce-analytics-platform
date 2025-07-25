@@ -1,0 +1,14 @@
+---
+replicaCount: 1
+
+image:
+  repository: bitnami/spark
+  pullPolicy: IfNotPresent
+  tag: "3.4.1"
+
+spark:
+  masterUrl: "spark://spark-master:7077"
+  workerMemory: "2G"
+  workerCores: 2
+
+resources: {}

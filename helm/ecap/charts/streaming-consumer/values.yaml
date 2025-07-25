@@ -1,0 +1,15 @@
+---
+replicaCount: 1
+
+image:
+  repository: ecap-streaming-consumer
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+spark:
+  master: "spark://spark-master:7077"
+  driverMemory: "1g"
+  executorMemory: "1g"
+  executorCores: 1
+
+resources: {}

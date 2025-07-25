@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{include "ecap.fullname" .}}-zookeeper
+  labels:
+    {{- include "ecap.labels" . | nindent 4}}
+    app.kubernetes.io/component: zookeeper
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "ecap.selectorLabels" . | nindent 6}}
+      app.kubernetes.io/component: zookeeper
+  template:
+    metadata:
+      labels:
+        {{- include "ecap.selectorLabels" . | nindent 8}}
+        app.kubernetes.io/component: zookeeper
+    spec:
+      containers:
+        - name: zookeeper
+          image: "{{.Values.zookeeper.image.repository}}:{{.Values.zookeeper.image.tag}}"
+          imagePullPolicy: {{.Values.zookeeper.image.pullPolicy}}
+          env:
+            - name: ZOOKEEPER_CLIENT_PORT
+              value: {{.Values.zookeeper.clientPort | quote}}
+            - name: ZOOKEEPER_TICK_TIME
+              value: {{.Values.zookeeper.tickTime | quote}}
+          ports:
+            - name: client
+              containerPort: {{.Values.zookeeper.clientPort}}
+              protocol: TCP
+          volumeMounts:
+            - name: zookeeper-data
+              mountPath: /var/lib/zookeeper/data
+            - name: zookeeper-logs
+              mountPath: /var/lib/zookeeper/log
+          resources:
+            {{- toYaml .Values.resources | nindent 12}}
+      volumes:
+        - name: zookeeper-data
+          persistentVolumeClaim:
+            claimName: {{include "ecap.fullname" .}}-zookeeper-data
+        - name: zookeeper-logs
+          persistentVolumeClaim:
+            claimName: {{include "ecap.fullname" .}}-zookeeper-logs

@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{include "ecap.fullname" .}}
+  labels:
+    {{- include "ecap.labels" . | nindent 4}}
+spec:
+  replicas: {{.Values.replicaCount}}
+  selector:
+    matchLabels:
+      {{- include "ecap.selectorLabels" . | nindent 6}}
+  template:
+    metadata:
+      labels:
+        {{- include "ecap.selectorLabels" . | nindent 8}}
+    spec:
+      containers:
+        - name: {{.Chart.Name}}
+          image: "{{.Values.image.repository}}:{{.Values.image.tag | default .Chart.AppVersion}}"
+          imagePullPolicy: {{.Values.image.pullPolicy}}
+          env:
+            - name: SPARK_MASTER
+              value: {{.Values.spark.master}}
+            - name: SPARK_DRIVER_MEMORY
+              value: {{.Values.spark.driverMemory}}
+            - name: SPARK_EXECUTOR_MEMORY
+              value: {{.Values.spark.executorMemory}}
+            - name: SPARK_EXECUTOR_CORES
+              value: {{.Values.spark.executorCores | quote}}
+          resources:
+            {{- toYaml .Values.resources | nindent 12}}

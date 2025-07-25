@@ -1,0 +1,7 @@
+---
+apiVersion: v2
+name: spark-master
+description: A Helm chart for the Spark Master service
+type: application
+version: 0.1.0
+appVersion: "3.4.1"
