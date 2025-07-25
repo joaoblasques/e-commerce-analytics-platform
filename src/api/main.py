@@ -19,6 +19,7 @@ from .config import get_settings
 from .dependencies import get_database_session, get_redis_client
 from .exceptions import ECAPException
 from .middleware.compression import get_compression_middleware
+from .middleware.correlation_middleware import CorrelationIdMiddleware
 from .v1 import api_router as v1_router
 
 # Configure logging
