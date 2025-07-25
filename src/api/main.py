@@ -16,7 +16,6 @@ from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from .config import get_settings
-from .dependencies import get_database_session, get_redis_client
 from .exceptions import ECAPException
 from .middleware.compression import get_compression_middleware
 from .middleware.correlation_middleware import CorrelationIdMiddleware
