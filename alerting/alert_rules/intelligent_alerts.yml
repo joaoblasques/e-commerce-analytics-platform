@@ -1,0 +1,330 @@
+groups:
+  - name: ecap_intelligent_business_alerts
+    rules:
+      # Fraud Detection System Health
+      - alert: FraudDetectionSystemDown
+        expr: up{job="fraud-detection"} == 0
+        for: 30s
+        labels:
+          severity: critical
+          service: fraud-detection
+          tier: business-critical
+          escalation_level: 1
+        annotations:
+          summary: "Fraud detection system is down"
+          description: "Fraud detection service has been down for more than 30 seconds - immediate business impact"
+          runbook_url: "https://runbooks.ecap.local/fraud-detection-down"
+          business_impact: "critical"
+          mttr_target: "5m"
+
+      # Abnormal Fraud Alert Volume
+      - alert: AbnormalFraudAlertVolume
+        expr: rate(fraud_alerts_total[5m]) > 50
+        for: 2m
+        labels:
+          severity: warning
+          service: fraud-detection
+          tier: business-critical
+          escalation_level: 2
+        annotations:
+          summary: "Unusually high fraud alert volume"
+          description: "Fraud alerts at {{ $value }} per minute - potential system issue or attack"
+          runbook_url: "https://runbooks.ecap.local/high-fraud-alerts"
+          business_impact: "medium"
+
+      # Zero Fraud Alerts (Potential System Issue)
+      - alert: NoFraudAlertsGenerated
+        expr: rate(fraud_alerts_total[30m]) == 0 and rate(transactions_total[30m]) > 0
+        for: 15m
+        labels:
+          severity: critical
+          service: fraud-detection
+          tier: business-critical
+          escalation_level: 1
+        annotations:
+          summary: "No fraud alerts generated despite transaction activity"
+          description: "Fraud detection system may be failing - no alerts in 30 minutes with active transactions"
+          runbook_url: "https://runbooks.ecap.local/fraud-system-not-alerting"
+          business_impact: "critical"
+
+      # Customer Registration System Issues
+      - alert: CustomerRegistrationDown
+        expr: rate(user_registrations_total[5m]) == 0 and rate(http_requests_total{endpoint="/register"}[5m]) > 0
+        for: 5m
+        labels:
+          severity: critical
+          service: registration
+          tier: business-critical
+          escalation_level: 1
+        annotations:
+          summary: "Customer registration system appears to be failing"
+          description: "Registration requests are coming in but no successful registrations in 5 minutes"
+          runbook_url: "https://runbooks.ecap.local/registration-failure"
+          business_impact: "critical"
+
+      # Payment Processing Issues
+      - alert: PaymentProcessingFailure
+        expr: (rate(transactions_total{status="failed"}[5m]) / rate(transactions_total[5m])) * 100 > 10
+        for: 2m
+        labels:
+          severity: critical
+          service: payments
+          tier: business-critical
+          escalation_level: 1
+        annotations:
+          summary: "High payment processing failure rate"
+          description: "Payment failure rate is {{ $value }}% - immediate revenue impact"
+          runbook_url: "https://runbooks.ecap.local/payment-failures"
+          business_impact: "critical"
+          revenue_impact: "high"
+
+  - name: ecap_intelligent_performance_alerts
+    rules:
+      # Cascade Failure Detection
+      - alert: CascadingPerformanceDegradation
+        expr: |
+          (
+            histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 3 and
+            rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m]) > 0.02 and
+            postgresql_connections > 80
+          )
+        for: 3m
+        labels:
+          severity: critical
+          service: platform
+          tier: system-wide
+          escalation_level: 1
+          alert_type: cascade_failure
+        annotations:
+          summary: "Cascading system failure detected"
+          description: "Multiple symptoms: high latency, errors, and database pressure - potential cascade failure"
+          runbook_url: "https://runbooks.ecap.local/cascade-failure"
+          business_impact: "critical"
+          immediate_action: "scale_up"
+
+      # Predictive Capacity Alert
+      - alert: PredictiveCapacityExhaustion
+        expr: |
+          predict_linear(http_requests_total[1h], 3600) > 10000 and
+          histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 1
+        for: 10m
+        labels:
+          severity: warning
+          service: api
+          tier: capacity-planning
+          escalation_level: 3
+          alert_type: predictive
+        annotations:
+          summary: "Predicted capacity exhaustion in next hour"
+          description: "Current trend indicates capacity limits will be reached within 1 hour"
+          runbook_url: "https://runbooks.ecap.local/capacity-scaling"
+          recommended_action: "prepare_scaling"
+
+      # Machine Learning Model Performance Degradation
+      - alert: MLModelPerformanceDegradation
+        expr: ml_model_accuracy < 0.85
+        for: 10m
+        labels:
+          severity: warning
+          service: ml-models
+          tier: business-logic
+          escalation_level: 2
+          model_type: "fraud_detection"
+        annotations:
+          summary: "Machine learning model accuracy degraded"
+          description: "Model accuracy dropped to {{ $value }} - may need retraining"
+          runbook_url: "https://runbooks.ecap.local/ml-model-degradation"
+          business_impact: "medium"
+
+  - name: ecap_intelligent_data_pipeline_alerts
+    rules:
+      # Data Pipeline Backlog
+      - alert: DataPipelineBacklog
+        expr: kafka_consumer_lag_sum > 5000
+        for: 5m
+        labels:
+          severity: warning
+          service: data-pipeline
+          tier: data-processing
+          escalation_level: 2
+        annotations:
+          summary: "Significant data pipeline backlog"
+          description: "Consumer lag is {{ $value }} messages across all topics"
+          runbook_url: "https://runbooks.ecap.local/pipeline-backlog"
+          impact: "data_freshness"
+
+      # Data Quality Issues
+      - alert: DataQualityDegradation
+        expr: data_quality_score < 0.95
+        for: 5m
+        labels:
+          severity: warning
+          service: data-quality
+          tier: data-processing
+          escalation_level: 2
+        annotations:
+          summary: "Data quality degradation detected"
+          description: "Data quality score dropped to {{ $value }}"
+          runbook_url: "https://runbooks.ecap.local/data-quality-issues"
+          business_impact: "medium"
+
+      # Streaming Job Failure
+      - alert: StreamingJobFailure
+        expr: streaming_job_status{status="failed"} > 0
+        for: 1m
+        labels:
+          severity: critical
+          service: streaming
+          tier: data-processing
+          escalation_level: 1
+        annotations:
+          summary: "Critical streaming job failure"
+          description: "Streaming job {{ $labels.job_name }} has failed"
+          runbook_url: "https://runbooks.ecap.local/streaming-job-failure"
+          business_impact: "high"
+
+  - name: ecap_intelligent_security_alerts
+    rules:
+      # Suspicious Authentication Activity
+      - alert: SuspiciousAuthenticationPattern
+        expr: rate(authentication_failures_total[5m]) > 100
+        for: 2m
+        labels:
+          severity: critical
+          service: security
+          tier: security
+          escalation_level: 1
+          alert_type: security_incident
+        annotations:
+          summary: "Suspicious authentication activity detected"
+          description: "High rate of authentication failures: {{ $value }} per minute"
+          runbook_url: "https://runbooks.ecap.local/suspicious-auth"
+          security_incident: "true"
+          immediate_action: "block_ips"
+
+      # Anomalous API Usage Pattern
+      - alert: AnomalousAPIUsagePattern
+        expr: |
+          (
+            rate(http_requests_total[5m]) > 1000 and
+            rate(http_requests_total{endpoint=~"/api/sensitive/.*"}[5m]) > 100
+          )
+        for: 3m
+        labels:
+          severity: warning
+          service: api
+          tier: security
+          escalation_level: 2
+          alert_type: security_monitoring
+        annotations:
+          summary: "Anomalous API usage pattern detected"
+          description: "Unusual access pattern to sensitive endpoints"
+          runbook_url: "https://runbooks.ecap.local/anomalous-api-usage"
+          security_review: "required"
+
+      # Data Exfiltration Warning
+      - alert: PotentialDataExfiltration
+        expr: rate(data_export_requests_total[5m]) > 10
+        for: 1m
+        labels:
+          severity: critical
+          service: data-access
+          tier: security
+          escalation_level: 1
+          alert_type: security_incident
+        annotations:
+          summary: "Potential data exfiltration detected"
+          description: "High rate of data export requests: {{ $value }} per minute"
+          runbook_url: "https://runbooks.ecap.local/data-exfiltration"
+          security_incident: "true"
+          immediate_action: "audit_access"
+
+  - name: ecap_intelligent_business_sla_alerts
+    rules:
+      # Customer Experience SLA
+      - alert: CustomerExperienceSLABreach
+        expr: |
+          (
+            histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{endpoint=~"/api/customer/.*"}[5m])) > 2 or
+            (rate(http_requests_total{endpoint=~"/api/customer/.*",status=~"5.."}[5m]) / rate(http_requests_total{endpoint=~"/api/customer/.*"}[5m])) > 0.01
+          )
+        for: 3m
+        labels:
+          severity: critical
+          service: customer-api
+          tier: business-critical
+          sla: customer_experience
+          escalation_level: 1
+        annotations:
+          summary: "Customer experience SLA breach"
+          description: "Customer-facing APIs are not meeting performance SLAs"
+          runbook_url: "https://runbooks.ecap.local/customer-sla-breach"
+          business_impact: "critical"
+          customer_impact: "high"
+
+      # Revenue Processing SLA
+      - alert: RevenueProcessingSLABreach
+        expr: |
+          (
+            rate(transactions_total{status="completed"}[5m]) / rate(transactions_total[5m]) < 0.99 or
+            histogram_quantile(0.99, rate(transaction_processing_duration_seconds_bucket[5m])) > 10
+          )
+        for: 2m
+        labels:
+          severity: critical
+          service: payments
+          tier: business-critical
+          sla: revenue_processing
+          escalation_level: 1
+        annotations:
+          summary: "Revenue processing SLA breach"
+          description: "Payment processing not meeting SLA requirements"
+          runbook_url: "https://runbooks.ecap.local/revenue-sla-breach"
+          business_impact: "critical"
+          revenue_impact: "direct"
+
+  - name: ecap_intelligent_composite_alerts
+    rules:
+      # Platform Health Score
+      - alert: PlatformHealthScoreLow
+        expr: |
+          (
+            (up{job="ecap-api"} * 0.3) +
+            (up{job="fraud-detection"} * 0.2) +
+            (up{job="payment-processor"} * 0.2) +
+            ((rate(http_requests_total{status!~"5.."}[5m]) / rate(http_requests_total[5m])) * 0.15) +
+            ((1 - (rate(fraud_detection_failures_total[5m]) / rate(fraud_detection_attempts_total[5m]))) * 0.15)
+          ) < 0.8
+        for: 5m
+        labels:
+          severity: warning
+          service: platform
+          tier: health-score
+          escalation_level: 2
+          alert_type: composite
+        annotations:
+          summary: "Overall platform health score below threshold"
+          description: "Composite health score is {{ $value }} (threshold: 0.8)"
+          runbook_url: "https://runbooks.ecap.local/platform-health"
+          dashboard_url: "http://grafana:3000/d/platform-overview"
+
+      # Service Dependency Failure
+      - alert: ServiceDependencyFailure
+        expr: |
+          (
+            up{job="postgres"} == 0 or
+            up{job="redis"} == 0 or
+            up{job="kafka"} == 0
+          ) and up{job="ecap-api"} == 1
+        for: 1m
+        labels:
+          severity: critical
+          service: infrastructure
+          tier: dependencies
+          escalation_level: 1
+          alert_type: dependency_failure
+        annotations:
+          summary: "Critical service dependency failure"
+          description: "Core infrastructure component is down while application is running"
+          runbook_url: "https://runbooks.ecap.local/dependency-failure"
+          immediate_action: "investigate_dependencies"
