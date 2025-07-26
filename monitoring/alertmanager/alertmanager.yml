@@ -1,0 +1,121 @@
+global:
+  smtp_smarthost: 'localhost:587'
+  smtp_from: 'alerts@ecap.local'
+  slack_api_url: 'YOUR_SLACK_WEBHOOK_URL'  # Replace with actual Slack webhook
+
+route:
+  group_by: ['alertname']
+  group_wait: 10s
+  group_interval: 10s
+  repeat_interval: 1h
+  receiver: 'web.hook'
+  routes:
+    # Critical alerts go to multiple channels
+    - match:
+        severity: critical
+      receiver: 'critical-alerts'
+      group_wait: 5s
+      repeat_interval: 30m
+
+    # Warning alerts go to development channel
+    - match:
+        severity: warning
+      receiver: 'warning-alerts'
+      group_wait: 30s
+      repeat_interval: 2h
+
+    # SLA breach alerts
+    - match:
+        sla: availability
+      receiver: 'sla-alerts'
+      group_wait: 5s
+      repeat_interval: 15m
+
+    - match:
+        sla: response_time
+      receiver: 'sla-alerts'
+      group_wait: 10s
+      repeat_interval: 1h
+
+receivers:
+  - name: 'web.hook'
+    webhook_configs:
+      - url: 'http://localhost:5001/webhook'
+        send_resolved: true
+
+  - name: 'critical-alerts'
+    email_configs:
+      - to: 'oncall@ecap.local'
+        subject: '🚨 CRITICAL: {{ .GroupLabels.alertname }}'
+        body: |
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          Severity: {{ .Labels.severity }}
+          Service: {{ .Labels.service }}
+          Instance: {{ .Labels.instance }}
+          {{ end }}
+    slack_configs:
+      - channel: '#alerts-critical'
+        title: '🚨 Critical Alert: {{ .GroupLabels.alertname }}'
+        text: |
+          {{ range .Alerts }}
+          *Alert:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          *Severity:* {{ .Labels.severity }}
+          *Service:* {{ .Labels.service }}
+          {{ end }}
+        send_resolved: true
+
+  - name: 'warning-alerts'
+    slack_configs:
+      - channel: '#alerts-warning'
+        title: '⚠️ Warning: {{ .GroupLabels.alertname }}'
+        text: |
+          {{ range .Alerts }}
+          *Alert:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          *Service:* {{ .Labels.service }}
+          {{ end }}
+        send_resolved: true
+
+  - name: 'sla-alerts'
+    email_configs:
+      - to: 'sla-team@ecap.local'
+        subject: '📊 SLA Breach: {{ .GroupLabels.alertname }}'
+        body: |
+          SLA BREACH DETECTED
+
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          SLA Type: {{ .Labels.sla }}
+          Service: {{ .Labels.service }}
+          Threshold Breached: {{ .Annotations.description }}
+          {{ end }}
+    slack_configs:
+      - channel: '#sla-monitoring'
+        title: '📊 SLA Breach: {{ .GroupLabels.alertname }}'
+        text: |
+          {{ range .Alerts }}
+          *SLA Breach:* {{ .Annotations.summary }}
+          *Type:* {{ .Labels.sla }}
+          *Service:* {{ .Labels.service }}
+          *Details:* {{ .Annotations.description }}
+          {{ end }}
+        send_resolved: true
+
+inhibit_rules:
+  # Inhibit warning alerts if critical alerts are firing
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname', 'service', 'instance']
+
+  # Inhibit API alerts if service is down
+  - source_match:
+      alertname: 'APIServiceDown'
+    target_match_re:
+      alertname: '(HighAPIResponseTime|HighErrorRate)'
+    equal: ['service']
