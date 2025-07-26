@@ -926,7 +926,8 @@ This progressive approach ensures we maintain development velocity while systema
   - **Estimated Time**: 8 hours
   - **Actual Time**: 5 hours 30 minutes (ahead of schedule ✅)
   - **Branch**: `feature/task-5.3.1-production-spark-cluster`
-  - **Commit**: [ba601af](https://github.com/joaoblasques/e-commerce-analytics-platform/commit/ba601af)
+  - **Pull Request**: [#70](https://github.com/joaoblasques/e-commerce-analytics-platform/pull/70) (Merged)
+  - **Commit**: [dce4deb](https://github.com/joaoblasques/e-commerce-analytics-platform/commit/dce4deb)
   - **Key Deliverables**:
     - Comprehensive EMR Terraform module (552 lines of infrastructure code)
     - Apache Airflow Kubernetes deployment with CeleryExecutor
