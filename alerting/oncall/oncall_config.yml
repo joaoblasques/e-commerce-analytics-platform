@@ -1,0 +1,443 @@
+# On-Call Rotation Configuration for ECAP
+# This file defines engineers, notification settings, and escalation procedures
+
+engineers:
+  alice@ecap.local:
+    name: "Alice Smith"
+    phone: "+1-555-0001"
+    backup_phone: "+1-555-0011"
+    slack_user_id: "U123456"
+    timezone: "America/Los_Angeles"
+    seniority_level: "senior"
+    skills: ["api", "database", "security", "incident_response"]
+    escalation_preference:
+      - "phone_call"
+      - "sms"
+      - "slack_dm"
+    availability_hours:
+      monday: "09:00-17:00"
+      tuesday: "09:00-17:00"
+      wednesday: "09:00-17:00"
+      thursday: "09:00-17:00"
+      friday: "09:00-17:00"
+      saturday: "10:00-14:00"
+      sunday: "unavailable"
+
+  bob@ecap.local:
+    name: "Bob Johnson"
+    phone: "+1-555-0002"
+    backup_phone: "+1-555-0012"
+    slack_user_id: "U234567"
+    timezone: "America/Los_Angeles"
+    seniority_level: "senior"
+    skills: ["frontend", "infrastructure", "kubernetes", "monitoring"]
+    escalation_preference:
+      - "sms"
+      - "phone_call"
+      - "slack_dm"
+    availability_hours:
+      monday: "08:00-18:00"
+      tuesday: "08:00-18:00"
+      wednesday: "08:00-18:00"
+      thursday: "08:00-18:00"
+      friday: "08:00-16:00"
+      saturday: "00:00-23:59"
+      sunday: "00:00-23:59"
+
+  charlie@ecap.local:
+    name: "Charlie Brown"
+    phone: "+1-555-0003"
+    backup_phone: "+1-555-0013"
+    slack_user_id: "U345678"
+    timezone: "America/New_York"
+    seniority_level: "principal"
+    skills: ["data", "analytics", "ml", "spark", "kafka"]
+    escalation_preference:
+      - "slack_dm"
+      - "phone_call"
+      - "email"
+    availability_hours:
+      monday: "09:00-17:00"
+      tuesday: "09:00-17:00"
+      wednesday: "09:00-17:00"
+      thursday: "09:00-17:00"
+      friday: "09:00-17:00"
+      saturday: "12:00-16:00"
+      sunday: "unavailable"
+
+  diana@ecap.local:
+    name: "Diana Prince"
+    phone: "+1-555-0004"
+    backup_phone: "+1-555-0014"
+    slack_user_id: "U456789"
+    timezone: "America/New_York"
+    seniority_level: "senior"
+    skills: ["devops", "aws", "terraform", "security"]
+    escalation_preference:
+      - "phone_call"
+      - "pagerduty"
+      - "sms"
+    availability_hours:
+      monday: "08:00-18:00"
+      tuesday: "08:00-18:00"
+      wednesday: "08:00-18:00"
+      thursday: "08:00-18:00"
+      friday: "08:00-18:00"
+      saturday: "09:00-13:00"
+      sunday: "unavailable"
+
+  eve@ecap.local:
+    name: "Eve Wilson"
+    phone: "+1-555-0005"
+    backup_phone: "+1-555-0015"
+    slack_user_id: "U567890"
+    timezone: "Europe/London"
+    seniority_level: "senior"
+    skills: ["api", "microservices", "performance", "troubleshooting"]
+    escalation_preference:
+      - "slack_dm"
+      - "sms"
+      - "phone_call"
+    availability_hours:
+      monday: "09:00-17:00"
+      tuesday: "09:00-17:00"
+      wednesday: "09:00-17:00"
+      thursday: "09:00-17:00"
+      friday: "09:00-17:00"
+      saturday: "10:00-14:00"
+      sunday: "unavailable"
+
+# Escalation team (managers and senior leaders)
+escalation_engineers:
+  - "sre_lead@ecap.local"
+  - "engineering_manager@ecap.local"
+  - "cto@ecap.local"
+
+sre_lead@ecap.local:
+  name: "Sarah Connor"
+  phone: "+1-555-1001"
+  slack_user_id: "U111111"
+  timezone: "America/Los_Angeles"
+  seniority_level: "lead"
+  role: "SRE Lead"
+
+engineering_manager@ecap.local:
+  name: "John Doe"
+  phone: "+1-555-1002"
+  slack_user_id: "U222222"
+  timezone: "America/Los_Angeles"
+  seniority_level: "manager"
+  role: "Engineering Manager"
+
+cto@ecap.local:
+  name: "Jane Smith"
+  phone: "+1-555-1003"
+  slack_user_id: "U333333"
+  timezone: "America/Los_Angeles"
+  seniority_level: "executive"
+  role: "CTO"
+
+# Notification service configuration
+notification_config:
+  phone:
+    enabled: true
+    provider: "twilio"  # or "aws_connect"
+    api_key: "${TWILIO_API_KEY}"
+    api_secret: "${TWILIO_API_SECRET}"
+    from_number: "+1-555-ONCALL"
+    voice_url: "https://api.ecap.local/oncall/voice"
+    timeout_seconds: 30
+    retry_attempts: 2
+
+  sms:
+    enabled: true
+    provider: "twilio"  # or "aws_sns"
+    api_key: "${TWILIO_API_KEY}"
+    api_secret: "${TWILIO_API_SECRET}"
+    from_number: "+1-555-ONCALL"
+    template: "🚨 ECAP Alert L{level}: {alert_name} - {service}. Ack immediately!"
+
+  email:
+    enabled: true
+    provider: "aws_ses"  # or "sendgrid", "smtp"
+    region: "us-west-2"
+    from_address: "oncall@ecap.local"
+    reply_to: "noreply@ecap.local"
+    smtp_server: "email-smtp.us-west-2.amazonaws.com"
+    smtp_port: 587
+    use_tls: true
+    username: "${AWS_SES_USERNAME}"
+    password: "${AWS_SES_PASSWORD}"
+
+  slack:
+    enabled: true
+    webhook_url: "${SLACK_WEBHOOK_URL}"
+    bot_token: "${SLACK_BOT_TOKEN}"
+    channels:
+      critical: "#oncall-critical"
+      warning: "#oncall-warning"
+      info: "#oncall-info"
+    dm_enabled: true
+    mention_groups:
+      - "@oncall"
+      - "@sre-team"
+
+  push:
+    enabled: true
+    provider: "firebase"  # or "aws_sns_mobile"
+    server_key: "${FIREBASE_SERVER_KEY}"
+    android_package: "com.ecap.oncall"
+    ios_bundle_id: "com.ecap.oncall"
+
+  pagerduty:
+    enabled: true
+    integration_key: "${PAGERDUTY_INTEGRATION_KEY}"
+    service_id: "${PAGERDUTY_SERVICE_ID}"
+    api_token: "${PAGERDUTY_API_TOKEN}"
+    escalation_policy_id: "${PAGERDUTY_ESCALATION_POLICY_ID}"
+
+# Escalation configuration
+escalation_config:
+  response_timeout_minutes: 5
+  max_escalation_levels: 4
+  escalation_delays:
+    level_1: 300    # 5 minutes
+    level_2: 600    # 10 minutes
+    level_3: 900    # 15 minutes
+    level_4: 1800   # 30 minutes
+
+  severity_rules:
+    critical:
+      initial_timeout: 300      # 5 minutes
+      escalation_timeout: 300   # 5 minutes
+      max_levels: 4
+      notification_types:
+        - "phone_call"
+        - "sms"
+        - "pagerduty"
+        - "slack_dm"
+
+    warning:
+      initial_timeout: 900      # 15 minutes
+      escalation_timeout: 600   # 10 minutes
+      max_levels: 3
+      notification_types:
+        - "slack_dm"
+        - "sms"
+        - "email"
+
+    info:
+      initial_timeout: 3600     # 1 hour
+      escalation_timeout: 1800  # 30 minutes
+      max_levels: 2
+      notification_types:
+        - "slack_dm"
+        - "email"
+
+  business_hours:
+    timezone: "America/Los_Angeles"
+    weekdays:
+      start: "09:00"
+      end: "17:00"
+    saturday:
+      start: "10:00"
+      end: "14:00"
+    sunday: "unavailable"
+
+  after_hours_escalation:
+    faster_escalation: true
+    skip_levels: []
+    emergency_contact: "sre_lead@ecap.local"
+
+# Rotation configuration
+rotation_config:
+  default_rotation_type: "weekly"  # weekly, daily, custom
+  shift_duration_hours: 168  # 1 week
+  handoff_window_minutes: 15
+  minimum_gap_hours: 48  # Minimum time between shifts for same engineer
+
+  schedule_advance_weeks: 12  # Generate schedule 12 weeks in advance
+
+  primary_rotation:
+    engineers:
+      - "alice@ecap.local"
+      - "bob@ecap.local"
+      - "charlie@ecap.local"
+      - "diana@ecap.local"
+      - "eve@ecap.local"
+    rotation_order: "round_robin"
+
+  secondary_rotation:
+    engineers:
+      - "bob@ecap.local"
+      - "charlie@ecap.local"
+      - "diana@ecap.local"
+      - "eve@ecap.local"
+      - "alice@ecap.local"
+    rotation_order: "round_robin"
+    offset_shifts: 1  # Start one shift after primary
+
+  weekend_rotation:
+    enabled: true
+    engineers:
+      - "alice@ecap.local"
+      - "bob@ecap.local"
+      - "diana@ecap.local"
+    compensation: "time_off"
+
+  holiday_rotation:
+    enabled: true
+    special_pay: true
+    volunteer_first: true
+    fallback_to_regular: true
+
+# Holiday calendar
+holidays:
+  2025:
+    - name: "New Year's Day"
+      date: "2025-01-01"
+      type: "federal"
+    - name: "Martin Luther King Jr. Day"
+      date: "2025-01-20"
+      type: "federal"
+    - name: "Presidents' Day"
+      date: "2025-02-17"
+      type: "federal"
+    - name: "Memorial Day"
+      date: "2025-05-26"
+      type: "federal"
+    - name: "Independence Day"
+      date: "2025-07-04"
+      type: "federal"
+    - name: "Labor Day"
+      date: "2025-09-01"
+      type: "federal"
+    - name: "Columbus Day"
+      date: "2025-10-13"
+      type: "federal"
+    - name: "Veterans Day"
+      date: "2025-11-11"
+      type: "federal"
+    - name: "Thanksgiving Day"
+      date: "2025-11-27"
+      type: "federal"
+    - name: "Christmas Day"
+      date: "2025-12-25"
+      type: "federal"
+
+# Override management
+override_config:
+  advance_notice_hours: 24
+  approval_required: false
+  automatic_backup_assignment: true
+  notification_channels:
+    - "slack"
+    - "email"
+
+  valid_reasons:
+    - "personal_emergency"
+    - "illness"
+    - "vacation"
+    - "conference"
+    - "training"
+    - "other"
+
+# Metrics and reporting
+metrics_config:
+  collection_enabled: true
+  retention_days: 90
+
+  kpis:
+    mean_time_to_acknowledge:
+      target_seconds: 300  # 5 minutes
+      alert_threshold: 600  # 10 minutes
+
+    mean_time_to_resolve:
+      target_seconds: 1800  # 30 minutes
+      alert_threshold: 3600  # 1 hour
+
+    escalation_rate:
+      target_percentage: 10
+      alert_threshold: 20
+
+    false_positive_rate:
+      target_percentage: 5
+      alert_threshold: 15
+
+  reports:
+    daily_summary:
+      enabled: true
+      recipients:
+        - "sre_lead@ecap.local"
+      include_metrics: true
+
+    weekly_detailed:
+      enabled: true
+      recipients:
+        - "engineering_manager@ecap.local"
+        - "sre_lead@ecap.local"
+      include_trends: true
+
+    monthly_executive:
+      enabled: true
+      recipients:
+        - "cto@ecap.local"
+        - "engineering_manager@ecap.local"
+      include_recommendations: true
+
+# Integration settings
+integrations:
+  monitoring:
+    prometheus_url: "http://prometheus:9090"
+    alertmanager_url: "http://alertmanager:9093"
+    grafana_url: "http://grafana:3000"
+
+  incident_management:
+    pagerduty:
+      enabled: true
+      auto_create_incidents: true
+      severity_mapping:
+        critical: "P1"
+        warning: "P2"
+        info: "P3"
+
+  communication:
+    status_page:
+      enabled: true
+      url: "https://status.ecap.local"
+      auto_update: true
+
+    slack_workspace:
+      team_id: "${SLACK_TEAM_ID}"
+      channels:
+        incidents: "#incidents"
+        general: "#general"
+        engineering: "#engineering"
+
+# Security settings
+security:
+  webhook_secret: "${ONCALL_WEBHOOK_SECRET}"
+  api_authentication: "bearer_token"
+  token_expiry_hours: 24
+  rate_limiting:
+    enabled: true
+    requests_per_minute: 60
+    burst_limit: 10
+
+  audit_logging:
+    enabled: true
+    log_level: "info"
+    include_sensitive_data: false
+    retention_days: 365
+
+# Development and testing
+development:
+  test_mode: false
+  mock_notifications: false
+  dry_run_escalations: false
+
+  test_engineer:
+    email: "test@ecap.local"
+    name: "Test Engineer"
+    phone: "+1-555-TEST"
+    slack_user_id: "UTEST123"
