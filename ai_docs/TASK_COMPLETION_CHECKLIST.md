@@ -77,11 +77,11 @@ This checklist must be followed for **EVERY** task start and completion to ensur
      - [ ] Completion date added
    - [ ] **ECAP_execution_summary.md** updated with:
      - [ ] Task status marked as ✅ Completed
-     - [ ] Comprehensive summary added
-     - [ ] Key features documented
-     - [ ] Repository status updated
-     - [ ] Statistics updated (total tasks count)
-     - [ ] Next task updated
+     - [ ] **MANDATORY: Comprehensive summary section added in chronological order**
+     - [ ] Key features documented with technical details
+     - [ ] Repository status updated with file counts and metrics
+     - [ ] Statistics updated (total tasks count percentage)
+     - [ ] **CRITICAL: "Next up" section updated to reflect next actual task**
 
 7. **✅ Final Verification**
    - [ ] CI/CD pipeline is green (or technical debt documented)
