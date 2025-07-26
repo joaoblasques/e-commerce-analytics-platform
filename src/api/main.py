@@ -15,10 +15,16 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+from src.monitoring import initialize_tracing, instrument_all
+
 from .config import get_settings
 from .exceptions import ECAPException
 from .middleware.compression import get_compression_middleware
 from .middleware.correlation_middleware import CorrelationIdMiddleware
+from .middleware.metrics_middleware import (
+    PrometheusMetricsMiddleware,
+    get_metrics_response,
+)
 from .v1 import api_router as v1_router
 
 # Configure logging
@@ -36,6 +42,17 @@ async def lifespan(app: FastAPI):
     logger.info("Starting E-Commerce Analytics Platform API")
     settings = get_settings()
     logger.info(f"Running in {settings.environment} mode")
+
+    # Initialize distributed tracing
+    try:
+        initialize_tracing(
+            service_name="ecap-api",
+            service_version="1.0.0",
+            environment=settings.environment,
+        )
+        logger.info("Distributed tracing initialized successfully")
+    except Exception as e:
+        logger.warning(f"Failed to initialize tracing: {e}")
 
     # Validate database connection
     try:
@@ -86,6 +103,9 @@ def create_application() -> FastAPI:
     compression_middleware = get_compression_middleware(app)
     app.add_middleware(type(compression_middleware), app=app)
 
+    # Add metrics middleware (before correlation to track all requests)
+    app.add_middleware(PrometheusMetricsMiddleware)
+
     # Add correlation ID middleware
     app.add_middleware(CorrelationIdMiddleware)
 
@@ -103,6 +123,13 @@ def create_application() -> FastAPI:
 
     # Add exception handlers
     add_exception_handlers(app)
+
+    # Initialize tracing instrumentation
+    try:
+        instrument_all(app, enable_database=True, enable_redis=True, enable_kafka=True)
+        logger.info("Application instrumentation completed")
+    except Exception as e:
+        logger.warning(f"Failed to instrument application: {e}")
 
     return app
 
@@ -201,6 +228,18 @@ async def health_check() -> Dict[str, Any]:
         "environment": get_settings().environment,
         "timestamp": "2025-01-23T00:00:00Z",  # This would be actual timestamp in production
     }
+
+
+# Metrics endpoint for Prometheus
+@app.get("/metrics", tags=["monitoring"])
+async def metrics():
+    """
+    Prometheus metrics endpoint.
+
+    Returns:
+        Prometheus-formatted metrics for application monitoring
+    """
+    return get_metrics_response()
 
 
 # Root endpoint
