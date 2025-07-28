@@ -120,6 +120,8 @@ sphinx-rtd-theme = "^1.2.2"
 locust = "^2.15.1"
 safety = "^2.3.0"
 bandit = "^1.7.5"
+# Integration Testing with Docker
+testcontainers = "^3.7.1"
 
 [build-system]
 requires = ["poetry-core"]
