@@ -20,7 +20,10 @@ from pyspark.sql.types import (
 )
 
 from src.data_lake.delta import DeltaLakeManager
-from src.data_lake.delta_config import DeltaTableConfig, DeltaTableSchemas
+from src.data_lake.delta_config import (
+    DeltaTableConfigurations,
+    DeltaTableSchemas,
+)
 from src.data_lake.delta_maintenance import DeltaMaintenanceScheduler
 from src.data_lake.delta_streaming import DeltaStreamingManager
 
@@ -466,12 +469,12 @@ class TestDeltaTableSchemas:
         assert "customer_segment" in field_names
 
 
-class TestDeltaTableConfig:
-    """Test cases for DeltaTableConfig."""
+class TestDeltaTableConfigurations:
+    """Test cases for DeltaTableConfigurations."""
 
     def test_get_table_config_transactions(self):
         """Test getting configuration for transactions table."""
-        config = DeltaTableConfig.get_table_config("transactions")
+        config = DeltaTableConfigurations.get_table_config("transactions")
 
         assert "partition_columns" in config
         assert "properties" in config
@@ -480,7 +483,7 @@ class TestDeltaTableConfig:
 
     def test_get_table_config_user_events(self):
         """Test getting configuration for user_events table."""
-        config = DeltaTableConfig.get_table_config("user_events")
+        config = DeltaTableConfigurations.get_table_config("user_events")
 
         assert "partition_columns" in config
         assert config["partition_columns"] == ["year", "month", "day", "event_type"]
@@ -488,11 +491,11 @@ class TestDeltaTableConfig:
     def test_get_table_config_invalid_table(self):
         """Test getting configuration for invalid table."""
         with pytest.raises(ValueError, match="Unknown table type: invalid_table"):
-            DeltaTableConfig.get_table_config("invalid_table")
+            DeltaTableConfigurations.get_table_config("invalid_table")
 
     def test_get_recommended_properties(self):
         """Test getting recommended table properties."""
-        properties = DeltaTableConfig.get_recommended_properties()
+        properties = DeltaTableConfigurations.get_recommended_properties()
 
         assert "autoOptimize.optimizeWrite" in properties
         assert "autoOptimize.autoCompact" in properties
@@ -501,7 +504,7 @@ class TestDeltaTableConfig:
 
     def test_get_partition_strategy(self):
         """Test getting partition strategy."""
-        strategy = DeltaTableConfig.get_partition_strategy("transactions")
+        strategy = DeltaTableConfigurations.get_partition_strategy("transactions")
 
         assert strategy["type"] == "temporal"
         assert strategy["columns"] == ["year", "month", "day"]
