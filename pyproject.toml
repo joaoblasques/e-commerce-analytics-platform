@@ -85,6 +85,8 @@ opentelemetry-instrumentation-fastapi = "^0.42b0"
 opentelemetry-instrumentation-psycopg2 = "^0.42b0"
 opentelemetry-instrumentation-redis = "^0.42b0"
 opentelemetry-instrumentation-kafka-python = "^0.42b0"
+schedule = "^1.2.2"
+aiohttp = "^3.12.14"
 
 [tool.poetry.group.dev.dependencies]
 # Testing
