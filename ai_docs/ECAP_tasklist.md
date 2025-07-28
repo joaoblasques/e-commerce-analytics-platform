@@ -998,13 +998,32 @@ This progressive approach ensures we maintain development velocity while systema
   - **Acceptance Criteria**: All components have comprehensive unit tests
   - **Estimated Time**: 24 hours
 
-- [ ] **Task 6.1.2**: Add property-based testing
-  - [ ] Implement property-based tests for data transformations
-  - [ ] Add fuzz testing for API endpoints
-  - [ ] Create invariant testing for business rules
-  - [ ] Add edge case discovery automation
-  - **Acceptance Criteria**: System handles unexpected inputs gracefully
+- [x] **Task 6.1.2**: Add property-based testing ✅
+  - [x] Implement property-based tests for data transformations
+  - [x] Add fuzz testing for API endpoints
+  - [x] Create invariant testing for business rules
+  - [x] Add edge case discovery automation
+  - **Acceptance Criteria**: System handles unexpected inputs gracefully ✅
   - **Estimated Time**: 12 hours
+  - **Actual Time**: 8 hours 30 minutes (29% under estimate ✅)
+  - **Completed**: 2025-07-28
+  - **Repository**: https://github.com/joaoblasques/e-commerce-analytics-platform
+  - **Pull Request**: https://github.com/joaoblasques/e-commerce-analytics-platform/pull/74 (Merged)
+  - **Implementation Details**:
+    - Created comprehensive property-based testing framework with Hypothesis library
+    - Implemented 4 test modules covering all acceptance criteria:
+      * `test_property_based_transformations.py` - PySpark data transformation testing (642 lines)
+      * `test_property_based_api.py` - FastAPI fuzz testing and malformed input handling (509 lines)
+      * `test_property_based_business_rules.py` - RFM segmentation and fraud detection invariants (656 lines)
+      * `test_edge_case_discovery.py` - Automated edge case discovery framework (794 lines)
+      * `test_property_validation.py` - Basic property validation without complex dependencies (422 lines)
+    - Added comprehensive documentation guide (docs/6.1.2-property-based-testing-guide.md) with 481 lines
+    - Enhanced pyproject.toml with Hypothesis library and optional dependencies for JSON schema testing
+    - All tests designed to handle unexpected inputs gracefully with comprehensive error handling
+    - Created both Spark-dependent and Spark-independent test suites for flexibility
+    - Implemented stateful testing, boundary value analysis, and invariant checking
+    - Added realistic data generation strategies for e-commerce domain testing
+    - Created edge case discovery automation with comprehensive reporting capabilities
 
 ### 6.2 Integration Testing
 - [ ] **Task 6.2.1**: Create end-to-end pipeline tests
