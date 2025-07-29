@@ -120,6 +120,12 @@ sphinx-rtd-theme = "^1.2.2"
 locust = "^2.15.1"
 safety = "^2.3.0"
 bandit = "^1.7.5"
+# Performance regression testing dependencies
+scipy = "^1.11.0"
+# JWT for API testing
+pyjwt = "^2.8.0"
+# Docker for chaos engineering
+docker = "^6.1.0"
 # Integration Testing with Docker
 testcontainers = "^3.7.1"
 
