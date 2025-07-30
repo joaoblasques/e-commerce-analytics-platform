@@ -126,7 +126,7 @@ class ECommerceDataGenerator:
             )
             
             self.user_devices[user_id] = {
-                'device_id': f"device_{hashlib.md5(user_id.encode()).hexdigest()[:8]}",
+                'device_id': f"device_{hashlib.md5(user_id.encode(), usedforsecurity=False).hexdigest()[:8]}",
                 'device_type': device_type,
                 'os': os,
                 'browser': browser,

@@ -16,6 +16,7 @@ from .delta import DeltaLakeManager
 from .delta_config import DeltaTableConfigurations
 from .delta_maintenance import DeltaMaintenanceManager
 from .delta_streaming import DeltaStreamingManager
+from ..utils.spark_utils import get_secure_temp_dir
 
 logger = setup_logging(__name__)
 
@@ -456,7 +457,7 @@ def streaming(ctx):
 )
 @click.option(
     "--checkpoint-path",
-    default="/tmp/delta_streaming_checkpoints",
+    default=get_secure_temp_dir("delta_streaming_checkpoints"),
     help="Checkpoint base path",
 )
 @click.pass_context
@@ -504,7 +505,7 @@ def start_all(ctx, kafka_servers, checkpoint_path):
 )
 @click.option(
     "--checkpoint-path",
-    default="/tmp/delta_streaming_checkpoints",
+    default=get_secure_temp_dir("delta_streaming_checkpoints"),
     help="Checkpoint base path",
 )
 @click.pass_context

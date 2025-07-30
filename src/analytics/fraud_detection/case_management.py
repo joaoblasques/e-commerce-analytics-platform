@@ -5,6 +5,7 @@ This module provides comprehensive case management capabilities for fraud invest
 including case creation, assignment, status tracking, and investigation workflows.
 """
 
+import ast
 import logging
 import uuid
 from dataclasses import dataclass, field
@@ -842,7 +843,7 @@ class FraudCaseManager:
                     merchant_id=row["merchant_id"],
                     transaction_amount=row["transaction_amount"],
                     fraud_score=row["fraud_score"],
-                    rule_triggers=eval(row["rule_triggers"])
+                    rule_triggers=ast.literal_eval(row["rule_triggers"])
                     if row["rule_triggers"]
                     else [],
                     ml_prediction=row["ml_prediction"],
@@ -850,7 +851,7 @@ class FraudCaseManager:
                     resolution=row["resolution"],
                     resolution_confidence=row["resolution_confidence"],
                     resolution_reason=row["resolution_reason"],
-                    investigation_notes=eval(row["investigation_notes"])
+                    investigation_notes=ast.literal_eval(row["investigation_notes"])
                     if row["investigation_notes"]
                     else [],
                     first_response_time=row["first_response_time"],

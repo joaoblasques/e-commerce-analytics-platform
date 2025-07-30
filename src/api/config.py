@@ -26,7 +26,8 @@ class Settings(BaseSettings):
         default="development", description="Application environment"
     )
     debug: bool = Field(default=False, description="Enable debug mode")
-    host: str = Field(default="0.0.0.0", description="Host to bind the server")
+    # Use localhost for development, 0.0.0.0 for production deployment
+    host: str = Field(default="127.0.0.1", description="Host to bind the server")
     port: int = Field(default=8000, description="Port to bind the server")
     log_level: str = Field(default="INFO", description="Logging level")
 

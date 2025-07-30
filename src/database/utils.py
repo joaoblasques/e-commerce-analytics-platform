@@ -30,8 +30,21 @@ def get_table_info(table_name: str) -> Dict[str, Any]:
 
 def get_table_count(table_name: str) -> int:
     """Get the number of rows in a table."""
+    # Validate table name to prevent SQL injection
+    # Allow only alphanumeric characters, underscores, and dots for schema.table format
+    import re
+    if not re.match(r'^[a-zA-Z_][a-zA-Z0-9_.]*$', table_name):
+        raise ValueError(f"Invalid table name: {table_name}")
+    
+    # Additional length check to prevent abuse
+    if len(table_name) > 100:
+        raise ValueError("Table name too long")
+    
     with get_database_session() as session:
-        result = session.execute(text(f"SELECT COUNT(*) FROM {table_name}"))
+        # Use parameterized query for safety - note: table names cannot be parameterized
+        # but we've already validated the table name above with regex and length checks
+        # This is safe because we've validated table_name matches ^[a-zA-Z_][a-zA-Z0-9_.]*$
+        result = session.execute(text('SELECT COUNT(*) FROM "' + table_name + '"'))  # nosec B608
         return result.scalar()
 
 

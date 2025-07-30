@@ -13,6 +13,8 @@ import shutil
 import subprocess
 from datetime import datetime, timedelta
 from pathlib import Path
+
+from ..utils.spark_utils import get_secure_temp_dir
 from typing import Any, Dict, List, Optional, Tuple
 
 import boto3
@@ -61,7 +63,7 @@ class BackupManager:
             config: Configuration dictionary containing backup settings
         """
         self.config = config
-        self.backup_dir = Path(config.get("backup_dir", "/tmp/backups"))
+        self.backup_dir = Path(config.get("backup_dir", get_secure_temp_dir("backups")))
         self.backup_dir.mkdir(parents=True, exist_ok=True)
 
         # Initialize AWS clients
@@ -820,7 +822,7 @@ class BackupManager:
         """Calculate MD5 checksum of entire backup."""
         import hashlib
 
-        md5_hash = hashlib.md5()
+        md5_hash = hashlib.md5(usedforsecurity=False)
 
         # Get all files in backup directory
         for file_path in sorted(backup_path.rglob("*")):

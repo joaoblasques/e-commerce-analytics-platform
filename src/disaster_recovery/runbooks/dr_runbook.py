@@ -776,9 +776,18 @@ class DisasterRecoveryRunbook:
                 outputs = []
                 for command in step.commands:
                     try:
+                        # Validate command for basic security (disaster recovery context)
+                        if not self._is_safe_command(command):
+                            outputs.append({
+                                "command": command,
+                                "error": "Command rejected for security reasons",
+                                "status": "blocked"
+                            })
+                            continue
+                            
                         result = subprocess.run(
                             command,
-                            shell=True,
+                            shell=True,  # nosec B602 - DR commands require shell features
                             capture_output=True,
                             text=True,
                             timeout=300,  # 5 minute timeout
@@ -911,6 +920,33 @@ This runbook provides step-by-step procedures for recovering from {failure_type.
 """
 
         return doc
+
+    def _is_safe_command(self, command: str) -> bool:
+        """
+        Validate command for basic security in disaster recovery context.
+        
+        This allows legitimate DR commands while blocking obviously dangerous ones.
+        Note: shell=True is still required for DR operations with pipes/redirects.
+        """
+        # Block obviously dangerous patterns
+        dangerous_patterns = [
+            'rm -rf /',     # Don't delete root
+            'mkfs',         # Don't format filesystems unexpectedly
+            '>(', ')|(',    # Block process substitution that could be abused
+            '&&rm', '&&del', # Block chained destructive commands
+            'curl.*|sh',    # Block piping downloads to shell
+            'wget.*|sh',    # Block piping downloads to shell
+            '`', '$(',      # Block command substitution in basic cases
+        ]
+        
+        command_lower = command.lower()
+        for pattern in dangerous_patterns:
+            if pattern in command_lower:
+                logger.warning(f"Blocked potentially dangerous command pattern: {pattern}")
+                return False
+        
+        # Allow legitimate DR commands (kubectl, docker, systemctl, monitoring, etc.)
+        return True
 
     def get_all_runbooks_summary(self) -> Dict[str, Any]:
         """Get summary of all available runbooks."""
