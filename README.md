@@ -104,12 +104,13 @@ This platform demonstrates **advanced data engineering concepts** with productio
     'secondaryColor': '#E8F8F5',
     'tertiaryColor': '#FDF2E9',
     'nodeBorder': '#000000',
-    'clusterBkg': '#ffffff'
+    'clusterBkg': '#ffffff',
+    'fontSize': '20px'
   },
   'flowchart': {
-    'nodeSpacing': 20,
-    'rankSpacing': 30,
-    'fontSize': '18px'
+    'nodeSpacing': 40,
+    'rankSpacing': 60,
+    'fontSize': '20px'
   }
 }}%%
 flowchart LR
@@ -160,13 +161,13 @@ flowchart LR
     Processing -.-> Monitoring
     Storage -.-> Monitoring
 
-    %% Styling
-    classDef sourceStyle fill:#E8F6F3,stroke:#16A085,stroke-width:4px,color:#000,font-size:16px,font-weight:bold
-    classDef ingestionStyle fill:#EBF5FB,stroke:#3498DB,stroke-width:4px,color:#000,font-size:16px,font-weight:bold
-    classDef processStyle fill:#FEF9E7,stroke:#F39C12,stroke-width:4px,color:#000,font-size:16px,font-weight:bold
-    classDef storageStyle fill:#F4ECF7,stroke:#8E44AD,stroke-width:4px,color:#000,font-size:16px,font-weight:bold
-    classDef analyticsStyle fill:#FDEDEC,stroke:#E74C3C,stroke-width:4px,color:#000,font-size:16px,font-weight:bold
-    classDef monitorStyle fill:#F8F9FA,stroke:#34495E,stroke-width:4px,color:#000,font-size:16px,font-weight:bold
+    %% Styling with larger fonts
+    classDef sourceStyle fill:#E8F6F3,stroke:#16A085,stroke-width:4px,color:#000,font-size:22px,font-weight:bold
+    classDef ingestionStyle fill:#EBF5FB,stroke:#3498DB,stroke-width:4px,color:#000,font-size:22px,font-weight:bold
+    classDef processStyle fill:#FEF9E7,stroke:#F39C12,stroke-width:4px,color:#000,font-size:22px,font-weight:bold
+    classDef storageStyle fill:#F4ECF7,stroke:#8E44AD,stroke-width:4px,color:#000,font-size:22px,font-weight:bold
+    classDef analyticsStyle fill:#FDEDEC,stroke:#E74C3C,stroke-width:4px,color:#000,font-size:22px,font-weight:bold
+    classDef monitorStyle fill:#F8F9FA,stroke:#34495E,stroke-width:4px,color:#000,font-size:22px,font-weight:bold
 
     class WEB,TXN,USER sourceStyle
     class KAFKA,PRODUCERS ingestionStyle
