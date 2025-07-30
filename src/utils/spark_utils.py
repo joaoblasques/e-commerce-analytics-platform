@@ -1,6 +1,8 @@
 """
 Spark utilities for the e-commerce analytics platform.
 """
+import os
+import tempfile
 from typing import Optional
 
 try:
@@ -14,6 +16,23 @@ except ImportError:
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
+
+
+def get_secure_temp_dir(prefix: str = "spark") -> str:
+    """
+    Get a secure temporary directory path.
+
+    Args:
+        prefix: Prefix for the temporary directory name
+
+    Returns:
+        str: Secure temporary directory path
+    """
+    # Use system temporary directory instead of hardcoded /tmp
+    # This respects TMPDIR environment variable and system settings
+    temp_dir = tempfile.gettempdir()
+    secure_path = os.path.join(temp_dir, f"{prefix}_{os.getpid()}")
+    return secure_path
 
 
 def create_spark_session(
@@ -49,7 +68,7 @@ def create_spark_session(
             "spark.sql.adaptive.enabled": "true",
             "spark.sql.adaptive.coalescePartitions.enabled": "true",
             "spark.sql.execution.arrow.pyspark.enabled": "true",
-            "spark.sql.warehouse.dir": "/tmp/spark-warehouse",
+            "spark.sql.warehouse.dir": get_secure_temp_dir("spark_warehouse"),
             "spark.serializer": "org.apache.spark.serializer.KryoSerializer",
         }
 

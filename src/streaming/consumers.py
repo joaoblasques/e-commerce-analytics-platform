@@ -5,8 +5,6 @@ This module provides streaming consumer classes for processing e-commerce data
 from Kafka topics using PySpark Structured Streaming.
 """
 
-import json
-import time
 from abc import ABC, abstractmethod
 from typing import Any, Callable, Dict, List, Optional
 
@@ -14,16 +12,13 @@ from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.functions import (
     col,
     current_timestamp,
-    expr,
     from_json,
     isnan,
-    isnull,
     unix_timestamp,
     when,
 )
 from pyspark.sql.streaming import StreamingQuery
 from pyspark.sql.types import (
-    BooleanType,
     DoubleType,
     IntegerType,
     StringType,
@@ -33,6 +28,7 @@ from pyspark.sql.types import (
 )
 
 from src.utils.logger import get_logger
+from src.utils.spark_utils import get_secure_temp_dir
 
 
 class StreamingConsumerError(Exception):
@@ -171,9 +167,9 @@ class DataQualityChecker:
             )
 
             # Count stale records
-            stale_count = (
-                df_with_age.filter(col("age_seconds") > max_age_seconds).count()
-            )
+            stale_count = df_with_age.filter(
+                col("age_seconds") > max_age_seconds
+            ).count()
 
             if stale_count > 0:
                 self.logger.warning(
@@ -246,8 +242,10 @@ class BaseStreamingConsumer(ABC):
             str(self.max_offsets_per_trigger),
         )
 
-        # Set checkpoint configuration
-        self.spark.conf.set("spark.sql.streaming.checkpointLocation", "/tmp/checkpoints")
+        # Set checkpoint configuration with secure temporary directory
+        self.spark.conf.set(
+            "spark.sql.streaming.checkpointLocation", get_secure_temp_dir("checkpoints")
+        )
 
     def set_error_callback(self, callback: Callable[[Exception], None]) -> None:
         """Set error callback function."""
@@ -342,9 +340,12 @@ class BaseStreamingConsumer(ABC):
             raw_stream = self.create_stream()
             transformed_stream = self.transform_stream(raw_stream)
 
-            # Configure checkpoint location
+            # Configure checkpoint location with secure temporary directory
             if not checkpoint_location:
-                checkpoint_location = f"/tmp/checkpoints/{self.topic}_{self.consumer_group}"
+                base_checkpoint_dir = get_secure_temp_dir("checkpoints")
+                checkpoint_location = (
+                    f"{base_checkpoint_dir}/{self.topic}_{self.consumer_group}"
+                )
 
             # Start streaming query
             query = (
@@ -386,7 +387,9 @@ class BaseStreamingConsumer(ABC):
                     "processed_rows_per_second": progress.get(
                         "processedRowsPerSecond", 0
                     ),
-                    "batch_duration": progress.get("durationMs", {}).get("triggerExecution", 0),
+                    "batch_duration": progress.get("durationMs", {}).get(
+                        "triggerExecution", 0
+                    ),
                     "timestamp": progress.get("timestamp"),
                 }
             else:

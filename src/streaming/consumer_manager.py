@@ -1,20 +1,19 @@
 """
-Consumer Manager for Kafka Structured Streaming
+Consumer Manager for Kafka Structured Streaming.
 
 This module provides orchestration and management capabilities for multiple
 streaming consumers with health monitoring, fault tolerance, and coordination.
 """
 
-import logging
 import threading
 import time
 from concurrent.futures import Future, ThreadPoolExecutor
 from typing import Any, Callable, Dict, List, Optional
 
 from pyspark.sql import SparkSession
-from pyspark.sql.streaming import StreamingQuery
 
 from src.utils.logger import get_logger
+from src.utils.spark_utils import get_secure_temp_dir
 
 from .consumers import (
     BaseStreamingConsumer,
@@ -228,7 +227,7 @@ class StreamingConsumerManager:
         self,
         spark: SparkSession,
         kafka_bootstrap_servers: str = "localhost:9092",
-        base_checkpoint_location: str = "/tmp/streaming_checkpoints",
+        base_checkpoint_location: Optional[str] = None,
         max_concurrent_consumers: int = 4,
     ):
         """Initialize consumer manager.
@@ -241,7 +240,10 @@ class StreamingConsumerManager:
         """
         self.spark = spark
         self.kafka_bootstrap_servers = kafka_bootstrap_servers
-        self.base_checkpoint_location = base_checkpoint_location
+        # Use secure temp directory if not provided
+        self.base_checkpoint_location = base_checkpoint_location or get_secure_temp_dir(
+            "streaming_checkpoints"
+        )
         self.max_concurrent_consumers = max_concurrent_consumers
 
         self.logger = get_logger(self.__class__.__name__)
@@ -413,9 +415,11 @@ class StreamingConsumerManager:
             while not self.shutdown_event.is_set() and streaming_query.isActive:
                 try:
                     streaming_query.awaitTermination(timeout=5)
-                except Exception:
-                    # Timeout is expected, continue monitoring
-                    pass
+                except Exception as e:
+                    # Timeout is expected for monitoring, log only unexpected errors
+                    if "timeout" not in str(e).lower():
+                        self.logger.debug(f"Stream monitoring exception: {e}")
+                    continue
 
             # Stop if shutdown requested
             if self.shutdown_event.is_set():
@@ -505,7 +509,6 @@ class StreamingConsumerManager:
 
 def create_default_consumers(manager: StreamingConsumerManager) -> None:
     """Create and register default consumers for the e-commerce platform."""
-
     # Register transaction consumer
     manager.register_consumer(
         name="transaction_consumer",

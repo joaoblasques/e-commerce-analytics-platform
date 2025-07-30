@@ -12,10 +12,9 @@ import time
 from typing import Optional
 
 import click
-from pyspark.sql import SparkSession
 
 from src.utils.logger import get_logger
-from src.utils.spark_utils import create_spark_session
+from src.utils.spark_utils import create_spark_session, get_secure_temp_dir
 
 from .consumer_manager import StreamingConsumerManager, create_default_consumers
 from .consumers import TransactionStreamConsumer, UserBehaviorStreamConsumer
@@ -46,7 +45,7 @@ signal.signal(signal.SIGTERM, signal_handler)
 )
 @click.option(
     "--checkpoint-dir",
-    default="/tmp/streaming_checkpoints",
+    default=None,
     help="Checkpoint directory",
 )
 @click.option("--max-consumers", default=4, help="Maximum concurrent consumers")
@@ -61,6 +60,10 @@ def cli(ctx, kafka_servers, checkpoint_dir, max_consumers, spark_master, log_lev
 
     # Ensure ctx.obj is a dict
     ctx.ensure_object(dict)
+
+    # Use secure temp directory if checkpoint_dir not provided
+    if checkpoint_dir is None:
+        checkpoint_dir = get_secure_temp_dir("streaming_checkpoints")
 
     # Create Spark session
     spark = create_spark_session(
@@ -287,7 +290,7 @@ def status(ctx, name, output_format):
 
             # Health summary
             health = all_status["health_summary"]
-            click.echo(f"\n🏥 Health Summary")
+            click.echo("\n🏥 Health Summary")
             click.echo("-" * 30)
             click.echo(f"Overall Status: {health['overall_status'].upper()}")
             click.echo(
@@ -298,7 +301,7 @@ def status(ctx, name, output_format):
             # Individual consumers
             consumers = all_status["consumers"]
             if consumers:
-                click.echo(f"\n📋 Individual Consumer Status")
+                click.echo("\n📋 Individual Consumer Status")
                 click.echo("-" * 50)
                 for consumer_name, consumer_status in consumers.items():
                     stream_status = consumer_status.get("stream_status", {})
