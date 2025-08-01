@@ -9,13 +9,12 @@ from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
 
 from ..dependencies import get_database_session
 from .models import TokenData, User, UserInDB
 from .security import create_access_token, verify_password, verify_token
-
 
 # HTTP Bearer token scheme
 security = HTTPBearer()
@@ -132,8 +131,9 @@ class AuthService:
             Token data dictionary
         """
         from ..config import get_settings
+
         settings = get_settings()
-        
+
         access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
         access_token = create_access_token(
             data={

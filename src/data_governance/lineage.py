@@ -183,7 +183,7 @@ class DataLineageTracker:
             self.logger.error(f"Error loading edges: {e}")
             return {}
 
-    def _save_events(self):
+    def _save_events(self) -> None:
         """Save events to storage."""
         try:
             # Keep only recent events to prevent file from growing too large
@@ -194,7 +194,7 @@ class DataLineageTracker:
         except Exception as e:
             self.logger.error(f"Error saving events: {e}")
 
-    def _save_nodes(self):
+    def _save_nodes(self) -> None:
         """Save nodes to storage."""
         try:
             data = {name: node.to_dict() for name, node in self.nodes.items()}
@@ -203,7 +203,7 @@ class DataLineageTracker:
         except Exception as e:
             self.logger.error(f"Error saving nodes: {e}")
 
-    def _save_edges(self):
+    def _save_edges(self) -> None:
         """Save edges to storage."""
         try:
             data = {key: edge.to_dict() for key, edge in self.edges.items()}

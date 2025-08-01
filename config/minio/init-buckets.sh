@@ -30,7 +30,7 @@ BUCKETS=(
 for bucket in "${BUCKETS[@]}"; do
     echo "Creating bucket: $bucket"
     mc mb "$MINIO_ALIAS/$bucket" --ignore-existing
-    
+
     # Set bucket policy to allow read/write access
     mc anonymous set download "$MINIO_ALIAS/$bucket"
     echo "Created bucket: $bucket"

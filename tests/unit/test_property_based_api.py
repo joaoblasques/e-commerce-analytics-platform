@@ -27,8 +27,8 @@ except ImportError:
         )
 
 
+from src.api.auth.security import create_access_token
 from src.api.main import app
-from src.api.v1.endpoints.auth import create_access_token
 
 # JSON Schema for API request validation
 CUSTOMER_ANALYTICS_SCHEMA = {

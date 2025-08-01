@@ -48,6 +48,89 @@ test-coverage: ## Run tests with coverage report
 	@echo "$(BLUE)Running tests with coverage...$(NC)"
 	poetry run pytest --cov=src --cov-report=html --cov-report=term-missing
 
+# Coverage trend tracking commands (Issue #31)
+coverage-collect: ## Collect current coverage metrics and trends
+	@echo "$(BLUE)Collecting coverage metrics...$(NC)"
+	poetry run python scripts/coverage_trend_tracker.py --collect
+
+coverage-report: ## Generate comprehensive coverage trend report
+	@echo "$(BLUE)Generating coverage trend report...$(NC)"
+	poetry run python scripts/coverage_trend_tracker.py --report
+
+coverage-validate: ## Validate quality gates against coverage thresholds
+	@echo "$(BLUE)Validating coverage quality gates...$(NC)"
+	poetry run python scripts/coverage_trend_tracker.py --validate
+
+coverage-diff: ## Calculate coverage diff between commits
+	@echo "$(BLUE)Calculate coverage diff between commits...$(NC)"
+	@echo "Usage: make coverage-diff BASE=<commit-hash> CURRENT=<commit-hash>"
+	@if [ -n "$(BASE)" ] && [ -n "$(CURRENT)" ]; then \
+		poetry run python scripts/coverage_trend_tracker.py --diff $(BASE) $(CURRENT); \
+	else \
+		echo "$(RED)Error: Please provide BASE and CURRENT commit hashes$(NC)"; \
+		echo "Example: make coverage-diff BASE=abc123 CURRENT=def456"; \
+	fi
+
+coverage-analysis: coverage-collect coverage-report coverage-validate ## Complete coverage analysis workflow
+
+# Dependency Management (Issue #26)
+dependency-add: ## Add new dependency with validation and CI monitoring
+	@echo "$(BLUE)Adding dependency with validation...$(NC)"
+	@echo "Usage: make dependency-add NAME=<package> VERSION=<version> JUSTIFICATION='<reason>' [DEV=true]"
+	@if [ -n "$(NAME)" ] && [ -n "$(VERSION)" ] && [ -n "$(JUSTIFICATION)" ]; then \
+		if [ "$(DEV)" = "true" ]; then \
+			python scripts/add_dependency.py --name $(NAME) --version $(VERSION) --justification "$(JUSTIFICATION)" --dev; \
+		else \
+			python scripts/add_dependency.py --name $(NAME) --version $(VERSION) --justification "$(JUSTIFICATION)"; \
+		fi \
+	else \
+		echo "$(RED)Error: Please provide NAME, VERSION, and JUSTIFICATION$(NC)"; \
+		echo "Example: make dependency-add NAME=requests VERSION='^2.31.0' JUSTIFICATION='HTTP client for API integrations'"; \
+	fi
+
+dependency-audit: ## Run comprehensive dependency audit
+	@echo "$(BLUE)Running dependency audit...$(NC)"
+	poetry run python scripts/dependency_audit.py
+
+dependency-impact-analysis: ## Analyze impact of dependency changes
+	@echo "$(BLUE)Analyzing dependency impact...$(NC)"
+	@echo "Checking dependency count..."
+	@poetry show --tree | grep -c '^[a-zA-Z]' || echo "0"
+	@echo "Checking for security vulnerabilities..."
+	@poetry run safety check || true
+	@echo "Checking for outdated dependencies..."
+	@poetry show --outdated || true
+
+dependency-cleanup: ## Remove unused dependencies
+	@echo "$(BLUE)Cleaning up unused dependencies...$(NC)"
+	@echo "$(YELLOW)Manual review required - check unused imports and dependencies$(NC)"
+	@echo "Use: poetry show --tree to review dependency tree"
+	@echo "Use: poetry remove <package> to remove specific dependencies"
+
+dependency-update: ## Update dependencies with safety checks
+	@echo "$(BLUE)Updating dependencies with safety checks...$(NC)"
+	poetry update --dry-run
+	@echo "$(YELLOW)Review the changes above, then run: poetry update$(NC)"
+
+dependency-security-scan: ## Comprehensive dependency security scan
+	@echo "$(BLUE)Running comprehensive dependency security scan...$(NC)"
+	poetry run safety check --json > dependency_security_report.json || echo "Security issues found"
+	poetry run bandit -r src/ -f json -o dependency_bandit_report.json || echo "Bandit scan completed with findings"
+	@echo "$(GREEN)Security scan reports generated:$(NC)"
+	@echo "  - dependency_security_report.json"
+	@echo "  - dependency_bandit_report.json"
+
+dependency-status: ## Show current dependency status and metrics
+	@echo "$(BLUE)Dependency Status Report$(NC)"
+	@echo "$(GREEN)Total Dependencies:$(NC)"
+	@poetry show --tree | grep -c '^[a-zA-Z]' || echo "0"
+	@echo "$(GREEN)Production Dependencies:$(NC)"
+	@poetry show --only=main | wc -l | tr -d ' '
+	@echo "$(GREEN)Development Dependencies:$(NC)"
+	@poetry show --only=dev | wc -l | tr -d ' '
+	@echo "$(GREEN)Security Status:$(NC)"
+	@poetry run safety check --short-report || echo "Security issues found"
+
 # Code Quality
 lint: ## Run linting checks
 	@echo "$(BLUE)Running linting checks...$(NC)"

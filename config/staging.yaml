@@ -20,12 +20,12 @@ logging:
   level: "DEBUG"
   format: "json"
   output: "both"
-  
+
   # File logging
   file_path: "/app/logs/ecap-staging.log"
   max_file_size: "200MB"
   backup_count: 5
-  
+
   # Enable ELK integration in staging
   elasticsearch:
     enabled: true
@@ -33,7 +33,7 @@ logging:
     index: "ecap-logs-staging"
     buffer_size: 50
     flush_interval: 10.0
-  
+
   # Enhanced request logging for testing
   request_logging:
     enabled: true
@@ -42,7 +42,7 @@ logging:
     max_body_size: 2048
     slow_request_threshold: 500.0
     very_slow_threshold: 2000.0
-  
+
   # Detailed logger levels for debugging
   loggers:
     uvicorn: "INFO"
@@ -55,7 +55,7 @@ logging:
 kafka:
   consumer:
     group_id: "ecap-staging-consumer-group"
-    
+
 # MinIO configuration - staging buckets
 minio:
   buckets:
@@ -69,19 +69,19 @@ minio:
 # Performance settings (relaxed for testing)
 performance:
   cache_ttl: 60  # Shorter cache for testing
-  
+
 # Monitoring (enhanced for staging)
 monitoring:
   metrics:
     enabled: true
     interval: 15  # More frequent metrics
     retention_days: 7
-  
+
   health_checks:
     enabled: true
     interval: 15
     timeout: 5
-  
+
   alerts:
     enabled: true
     channels: ["email"]
@@ -90,7 +90,7 @@ monitoring:
 security:
   jwt:
     access_token_expire_minutes: 60  # Longer for testing
-  
+
   rate_limiting:
     requests_per_minute: 200  # Higher for load testing
 

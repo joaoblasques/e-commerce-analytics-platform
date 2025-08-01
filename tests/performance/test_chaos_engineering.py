@@ -19,13 +19,14 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from typing import Any, Callable, Dict, List, Optional
 
-import docker
 import psutil
 import pytest
 import requests
 from testcontainers.compose import DockerCompose
 from testcontainers.kafka import KafkaContainer
 from testcontainers.postgres import PostgresContainer
+
+import docker
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

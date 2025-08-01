@@ -1,21 +1,21 @@
 """
 Real-time data transformations for streaming analytics.
 
-This package provides comprehensive transformation capabilities for streaming data:
+This package provides comprehensive transformation capabilities for streaming:
 - Data enrichment pipelines
 - Real-time aggregations (windowed)
 - Stream-to-stream joins
 - Data deduplication logic
 """
 
-from .enrichment import DataEnrichmentPipeline
 from .aggregations import StreamingAggregator
-from .joins import StreamJoinEngine
 from .deduplication import StreamDeduplicator
+from .enrichment import DataEnrichmentPipeline
+from .joins import StreamJoinEngine
 
 __all__ = [
     "DataEnrichmentPipeline",
-    "StreamingAggregator", 
+    "StreamingAggregator",
     "StreamJoinEngine",
     "StreamDeduplicator",
 ]

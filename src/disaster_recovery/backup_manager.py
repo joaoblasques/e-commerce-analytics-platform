@@ -13,13 +13,13 @@ import shutil
 import subprocess
 from datetime import datetime, timedelta
 from pathlib import Path
-
-from ..utils.spark_utils import get_secure_temp_dir
 from typing import Any, Dict, List, Optional, Tuple
 
 import boto3
 import psycopg2
 from botocore.exceptions import ClientError, NoCredentialsError
+
+from ..utils.spark_utils import get_secure_temp_dir
 
 logger = logging.getLogger(__name__)
 

@@ -15,8 +15,8 @@ import asyncio
 import json
 import time
 from datetime import datetime
-from unittest.mock import Mock, patch
 from typing import Dict, List, Optional
+from unittest.mock import Mock, patch
 
 import pytest
 from kafka import KafkaConsumer, KafkaProducer
@@ -26,7 +26,7 @@ from testcontainers.postgres import PostgresContainer
 from testcontainers.redis import RedisContainer
 
 from src.data_ingestion.producers.base_producer import BaseProducer
-from src.streaming.consumers import StreamingConsumer
+from src.streaming.consumers import BaseStreamingConsumer
 from src.utils.spark_utils import create_spark_session
 
 
@@ -42,27 +42,27 @@ class ErrorRecoveryTestEnvironment:
     def setup_containers(self):
         """Set up test containers for error recovery testing."""
         # PostgreSQL container
-        self.containers['postgres'] = PostgresContainer("postgres:13")
-        self.containers['postgres'].start()
+        self.containers["postgres"] = PostgresContainer("postgres:13")
+        self.containers["postgres"].start()
 
         # Redis container
-        self.containers['redis'] = RedisContainer("redis:7-alpine")
-        self.containers['redis'].start()
+        self.containers["redis"] = RedisContainer("redis:7-alpine")
+        self.containers["redis"].start()
 
         # Kafka container
-        self.containers['kafka'] = KafkaContainer("confluentinc/cp-kafka:7.4.0")
-        self.containers['kafka'].start()
+        self.containers["kafka"] = KafkaContainer("confluentinc/cp-kafka:7.4.0")
+        self.containers["kafka"].start()
 
         # Store connection details
-        self.services['database_url'] = self.containers['postgres'].get_connection_url()
-        
-        redis_host = self.containers['redis'].get_container_host_ip()
-        redis_port = self.containers['redis'].get_exposed_port(6379)
-        self.services['redis_url'] = f"redis://{redis_host}:{redis_port}"
-        
-        kafka_host = self.containers['kafka'].get_container_host_ip()
-        kafka_port = self.containers['kafka'].get_exposed_port(9093)
-        self.services['kafka_bootstrap_servers'] = f"{kafka_host}:{kafka_port}"
+        self.services["database_url"] = self.containers["postgres"].get_connection_url()
+
+        redis_host = self.containers["redis"].get_container_host_ip()
+        redis_port = self.containers["redis"].get_exposed_port(6379)
+        self.services["redis_url"] = f"redis://{redis_host}:{redis_port}"
+
+        kafka_host = self.containers["kafka"].get_container_host_ip()
+        kafka_port = self.containers["kafka"].get_exposed_port(9093)
+        self.services["kafka_bootstrap_servers"] = f"{kafka_host}:{kafka_port}"
 
     def setup_spark(self):
         """Set up Spark session for testing."""
@@ -72,7 +72,7 @@ class ErrorRecoveryTestEnvironment:
                 "spark.sql.adaptive.enabled": "true",
                 "spark.serializer": "org.apache.spark.serializer.KryoSerializer",
                 "spark.sql.execution.arrow.pyspark.enabled": "false",  # Avoid arrow issues
-            }
+            },
         )
 
     def simulate_service_failure(self, service_name: str):
@@ -83,29 +83,36 @@ class ErrorRecoveryTestEnvironment:
 
     def restore_service(self, service_name: str):
         """Restore failed service by restarting container."""
-        if service_name in self.containers and self.failure_scenarios.get(service_name) == "stopped":
+        if (
+            service_name in self.containers
+            and self.failure_scenarios.get(service_name) == "stopped"
+        ):
             # For testcontainers, we need to create a new container
             if service_name == "postgres":
                 self.containers[service_name] = PostgresContainer("postgres:13")
             elif service_name == "redis":
                 self.containers[service_name] = RedisContainer("redis:7-alpine")
             elif service_name == "kafka":
-                self.containers[service_name] = KafkaContainer("confluentinc/cp-kafka:7.4.0")
-            
+                self.containers[service_name] = KafkaContainer(
+                    "confluentinc/cp-kafka:7.4.0"
+                )
+
             self.containers[service_name].start()
             self.failure_scenarios[service_name] = "restored"
-            
+
             # Update service connection details
             if service_name == "postgres":
-                self.services['database_url'] = self.containers['postgres'].get_connection_url()
+                self.services["database_url"] = self.containers[
+                    "postgres"
+                ].get_connection_url()
             elif service_name == "redis":
-                redis_host = self.containers['redis'].get_container_host_ip()
-                redis_port = self.containers['redis'].get_exposed_port(6379)
-                self.services['redis_url'] = f"redis://{redis_host}:{redis_port}"
+                redis_host = self.containers["redis"].get_container_host_ip()
+                redis_port = self.containers["redis"].get_exposed_port(6379)
+                self.services["redis_url"] = f"redis://{redis_host}:{redis_port}"
             elif service_name == "kafka":
-                kafka_host = self.containers['kafka'].get_container_host_ip()
-                kafka_port = self.containers['kafka'].get_exposed_port(9093)
-                self.services['kafka_bootstrap_servers'] = f"{kafka_host}:{kafka_port}"
+                kafka_host = self.containers["kafka"].get_container_host_ip()
+                kafka_port = self.containers["kafka"].get_exposed_port(9093)
+                self.services["kafka_bootstrap_servers"] = f"{kafka_host}:{kafka_port}"
 
     def teardown(self):
         """Clean up test environment."""
@@ -125,9 +132,9 @@ def error_recovery_env():
     env = ErrorRecoveryTestEnvironment()
     env.setup_containers()
     env.setup_spark()
-    
+
     yield env
-    
+
     env.teardown()
 
 
@@ -145,9 +152,12 @@ class TestKafkaFailureRecovery:
         )
 
         # Send initial message to verify connection
-        test_message = {"test": "before_failure", "timestamp": datetime.now().isoformat()}
+        test_message = {
+            "test": "before_failure",
+            "timestamp": datetime.now().isoformat(),
+        }
         future = producer.send("test-topic", test_message)
-        
+
         try:
             record_metadata = future.get(timeout=10)
             assert record_metadata.topic == "test-topic"
@@ -156,23 +166,26 @@ class TestKafkaFailureRecovery:
 
         # Simulate Kafka failure
         error_recovery_env.simulate_service_failure("kafka")
-        
+
         # Wait for failure to take effect
         time.sleep(2)
-        
+
         # Try to send message during failure (should fail)
-        failure_message = {"test": "during_failure", "timestamp": datetime.now().isoformat()}
-        
+        failure_message = {
+            "test": "during_failure",
+            "timestamp": datetime.now().isoformat(),
+        }
+
         with pytest.raises(Exception):
             failure_future = producer.send("test-topic", failure_message)
             failure_future.get(timeout=5)  # Should timeout or raise exception
 
         # Restore Kafka service
         error_recovery_env.restore_service("kafka")
-        
+
         # Wait for service restoration
         time.sleep(5)
-        
+
         # Create new producer for restored service
         recovered_producer = KafkaProducer(
             bootstrap_servers=[error_recovery_env.services["kafka_bootstrap_servers"]],
@@ -182,9 +195,12 @@ class TestKafkaFailureRecovery:
         )
 
         # Send message after recovery (should succeed)
-        recovery_message = {"test": "after_recovery", "timestamp": datetime.now().isoformat()}
+        recovery_message = {
+            "test": "after_recovery",
+            "timestamp": datetime.now().isoformat(),
+        }
         recovery_future = recovered_producer.send("test-topic", recovery_message)
-        
+
         try:
             recovery_metadata = recovery_future.get(timeout=10)
             assert recovery_metadata.topic == "test-topic"
@@ -198,7 +214,9 @@ class TestKafkaFailureRecovery:
         """Test exponential backoff retry mechanism for Kafka connections."""
         # Create producer with specific retry configuration
         retry_config = {
-            "bootstrap_servers": [error_recovery_env.services["kafka_bootstrap_servers"]],
+            "bootstrap_servers": [
+                error_recovery_env.services["kafka_bootstrap_servers"]
+            ],
             "retries": 5,
             "retry_backoff_ms": 100,  # Start with 100ms
             "value_serializer": lambda v: json.dumps(v).encode("utf-8"),
@@ -208,17 +226,20 @@ class TestKafkaFailureRecovery:
 
         # Test retry behavior with timing
         start_time = time.time()
-        
+
         try:
             # This should succeed quickly
-            test_message = {"test": "retry_test", "timestamp": datetime.now().isoformat()}
+            test_message = {
+                "test": "retry_test",
+                "timestamp": datetime.now().isoformat(),
+            }
             future = producer.send("test-topic", test_message)
             future.get(timeout=5)
-            
+
             success_time = time.time() - start_time
             # Should be very fast for successful connection
             assert success_time < 1.0
-            
+
         except Exception:
             # If it fails, that's also acceptable for this test
             pass
@@ -229,7 +250,9 @@ class TestKafkaFailureRecovery:
         """Test consumer group rebalancing during failures."""
         # Create multiple consumers in the same group
         consumer_config = {
-            "bootstrap_servers": [error_recovery_env.services["kafka_bootstrap_servers"]],
+            "bootstrap_servers": [
+                error_recovery_env.services["kafka_bootstrap_servers"]
+            ],
             "group_id": "test-rebalance-group",
             "auto_offset_reset": "earliest",
             "value_deserializer": lambda m: json.loads(m.decode("utf-8")),
@@ -246,7 +269,11 @@ class TestKafkaFailureRecovery:
         )
 
         for i in range(10):
-            message = {"id": i, "test": "rebalancing", "timestamp": datetime.now().isoformat()}
+            message = {
+                "id": i,
+                "test": "rebalancing",
+                "timestamp": datetime.now().isoformat(),
+            }
             producer.send("test-topic", message)
 
         producer.flush()
@@ -293,7 +320,7 @@ class TestDatabaseFailureRecovery:
 
         # Test initial connection
         engine = create_engine(error_recovery_env.services["database_url"])
-        
+
         try:
             with engine.connect() as conn:
                 result = conn.execute(text("SELECT 1"))
@@ -303,26 +330,26 @@ class TestDatabaseFailureRecovery:
 
         # Simulate database failure
         error_recovery_env.simulate_service_failure("postgres")
-        
+
         # Wait for failure
         time.sleep(2)
 
         # Try to connect during failure (should fail)
         failed_engine = create_engine(error_recovery_env.services["database_url"])
-        
+
         with pytest.raises(OperationalError):
             with failed_engine.connect() as conn:
                 conn.execute(text("SELECT 1"))
 
         # Restore database
         error_recovery_env.restore_service("postgres")
-        
+
         # Wait for restoration
         time.sleep(5)
 
         # Test reconnection
         restored_engine = create_engine(error_recovery_env.services["database_url"])
-        
+
         try:
             with restored_engine.connect() as conn:
                 result = conn.execute(text("SELECT 1"))
@@ -341,20 +368,24 @@ class TestDatabaseFailureRecovery:
             with engine.connect() as conn:
                 with conn.begin() as trans:
                     # Execute valid statement
-                    conn.execute(text("CREATE TEMP TABLE test_rollback (id INT, name TEXT)"))
+                    conn.execute(
+                        text("CREATE TEMP TABLE test_rollback (id INT, name TEXT)")
+                    )
                     conn.execute(text("INSERT INTO test_rollback VALUES (1, 'test')"))
-                    
+
                     # Execute invalid statement to trigger rollback
                     try:
-                        conn.execute(text("INSERT INTO test_rollback VALUES ('invalid', 123)"))  # Type error
+                        conn.execute(
+                            text("INSERT INTO test_rollback VALUES ('invalid', 123)")
+                        )  # Type error
                     except StatementError:
                         trans.rollback()
-                        
+
                     # Verify rollback occurred
                     result = conn.execute(text("SELECT COUNT(*) FROM test_rollback"))
                     count = result.fetchone()[0]
                     assert count == 0  # Should be 0 due to rollback
-                    
+
         except Exception as e:
             # If temp table operations fail, the test environment might not support them
             pytest.skip(f"Database transaction test failed: {e}")
@@ -374,7 +405,7 @@ class TestDatabaseFailureRecovery:
         )
 
         connections = []
-        
+
         try:
             # Exhaust connection pool
             for i in range(2):
@@ -413,7 +444,7 @@ class TestRedisFailureRecovery:
 
         # Test initial connection
         redis_client = redis.from_url(error_recovery_env.services["redis_url"])
-        
+
         try:
             redis_client.ping()
             redis_client.set("test_key", "test_value")
@@ -423,7 +454,7 @@ class TestRedisFailureRecovery:
 
         # Simulate Redis failure
         error_recovery_env.simulate_service_failure("redis")
-        
+
         # Wait for failure
         time.sleep(2)
 
@@ -433,13 +464,13 @@ class TestRedisFailureRecovery:
 
         # Restore Redis
         error_recovery_env.restore_service("redis")
-        
+
         # Wait for restoration
         time.sleep(5)
 
         # Test reconnection
         restored_client = redis.from_url(error_recovery_env.services["redis_url"])
-        
+
         try:
             restored_client.ping()
             restored_client.set("recovery_test", "success")
@@ -485,14 +516,14 @@ class TestRedisFailureRecovery:
 
         # Simulate Redis failure
         error_recovery_env.simulate_service_failure("redis")
-        
+
         # Wait for failure
         time.sleep(2)
 
         # Test fallback behavior
         cache_service.set("fallback_key", "fallback_value")
         assert cache_service.get("fallback_key") == "fallback_value"
-        
+
         # Should also get previously cached value from fallback
         assert cache_service.get("test_key") == "test_value"
 
@@ -505,11 +536,17 @@ class TestStreamingProcessingErrors:
         # Send mix of valid and invalid messages
         producer = KafkaProducer(
             bootstrap_servers=[error_recovery_env.services["kafka_bootstrap_servers"]],
-            value_serializer=lambda v: v.encode("utf-8") if isinstance(v, str) else json.dumps(v).encode("utf-8"),
+            value_serializer=lambda v: v.encode("utf-8")
+            if isinstance(v, str)
+            else json.dumps(v).encode("utf-8"),
         )
 
         # Send valid message
-        valid_message = {"transaction_id": "valid_001", "amount": 100.0, "timestamp": datetime.now().isoformat()}
+        valid_message = {
+            "transaction_id": "valid_001",
+            "amount": 100.0,
+            "timestamp": datetime.now().isoformat(),
+        }
         producer.send("test-topic", valid_message)
 
         # Send malformed JSON
@@ -520,7 +557,10 @@ class TestStreamingProcessingErrors:
         producer.send("test-topic", incomplete_message)
 
         # Send message with invalid data types
-        invalid_types_message = {"transaction_id": "valid_002", "amount": "not_a_number"}
+        invalid_types_message = {
+            "transaction_id": "valid_002",
+            "amount": "not_a_number",
+        }
         producer.send("test-topic", invalid_types_message)
 
         producer.flush()
@@ -562,17 +602,21 @@ class TestStreamingProcessingErrors:
         from pyspark.sql.types import StringType, StructField, StructType
 
         # Define schema for parsing
-        schema = StructType([
-            StructField("transaction_id", StringType(), True),
-            StructField("amount", StringType(), True),
-        ])
+        schema = StructType(
+            [
+                StructField("transaction_id", StringType(), True),
+                StructField("amount", StringType(), True),
+            ]
+        )
 
         # Create streaming DataFrame
         try:
             streaming_df = (
-                error_recovery_env.spark.readStream
-                .format("kafka")
-                .option("kafka.bootstrap.servers", error_recovery_env.services["kafka_bootstrap_servers"])
+                error_recovery_env.spark.readStream.format("kafka")
+                .option(
+                    "kafka.bootstrap.servers",
+                    error_recovery_env.services["kafka_bootstrap_servers"],
+                )
                 .option("subscribe", "test-topic")
                 .option("startingOffsets", "latest")
                 .load()
@@ -585,8 +629,7 @@ class TestStreamingProcessingErrors:
 
             # Start query with checkpoint
             query = (
-                parsed_df.writeStream
-                .format("memory")
+                parsed_df.writeStream.format("memory")
                 .queryName("error_recovery_test")
                 .outputMode("append")
                 .option("checkpointLocation", "/tmp/checkpoint_error_test")
@@ -610,11 +653,12 @@ class TestStreamingProcessingErrors:
         """Test streaming checkpoint recovery."""
         # This test would verify that streaming queries can recover from checkpoints
         # after failures, but requires more complex setup
-        
+
         checkpoint_location = "/tmp/checkpoint_recovery_test"
-        
+
         # Verify checkpoint directory can be created
         import os
+
         os.makedirs(checkpoint_location, exist_ok=True)
         assert os.path.exists(checkpoint_location)
 
@@ -630,7 +674,7 @@ class TestCircuitBreakerPatterns:
 
     def test_circuit_breaker_open_close_behavior(self, error_recovery_env):
         """Test circuit breaker open/close behavior."""
-        
+
         class CircuitBreaker:
             def __init__(self, failure_threshold=3, timeout=5):
                 self.failure_threshold = failure_threshold
@@ -641,7 +685,7 @@ class TestCircuitBreakerPatterns:
 
             def call(self, func, *args, **kwargs):
                 current_time = time.time()
-                
+
                 if self.state == "OPEN":
                     if current_time - self.last_failure_time > self.timeout:
                         self.state = "HALF_OPEN"
@@ -696,7 +740,7 @@ class TestCircuitBreakerPatterns:
 
     def test_exponential_backoff_retry(self, error_recovery_env):
         """Test exponential backoff retry mechanism."""
-        
+
         class ExponentialBackoffRetry:
             def __init__(self, max_retries=3, base_delay=0.1, max_delay=2.0):
                 self.max_retries = max_retries
@@ -710,13 +754,14 @@ class TestCircuitBreakerPatterns:
                     except Exception as e:
                         if attempt == self.max_retries:
                             raise e
-                        
+
                         # Calculate delay with exponential backoff
-                        delay = min(self.base_delay * (2 ** attempt), self.max_delay)
+                        delay = min(self.base_delay * (2**attempt), self.max_delay)
                         time.sleep(delay)
 
         # Test with eventually successful function
         call_count = 0
+
         def eventually_successful():
             nonlocal call_count
             call_count += 1
@@ -725,20 +770,20 @@ class TestCircuitBreakerPatterns:
             return f"Success on attempt {call_count}"
 
         retry_handler = ExponentialBackoffRetry(max_retries=5, base_delay=0.01)
-        
+
         start_time = time.time()
         result = retry_handler.retry(eventually_successful)
         end_time = time.time()
 
         assert result == "Success on attempt 3"
         assert call_count == 3
-        
+
         # Verify some delay occurred due to backoff
         assert end_time - start_time > 0.01  # At least base delay
 
     def test_bulkhead_pattern(self, error_recovery_env):
         """Test bulkhead pattern for fault isolation."""
-        
+
         class BulkheadService:
             def __init__(self):
                 self.critical_pool = {"available": 3, "in_use": 0}
@@ -747,10 +792,10 @@ class TestCircuitBreakerPatterns:
             def execute_critical(self, func, *args, **kwargs):
                 if self.critical_pool["available"] == 0:
                     raise Exception("Critical pool exhausted")
-                
+
                 self.critical_pool["available"] -= 1
                 self.critical_pool["in_use"] += 1
-                
+
                 try:
                     return func(*args, **kwargs)
                 finally:
@@ -760,10 +805,10 @@ class TestCircuitBreakerPatterns:
             def execute_non_critical(self, func, *args, **kwargs):
                 if self.non_critical_pool["available"] == 0:
                     raise Exception("Non-critical pool exhausted")
-                
+
                 self.non_critical_pool["available"] -= 1
                 self.non_critical_pool["in_use"] += 1
-                
+
                 try:
                     return func(*args, **kwargs)
                 finally:

@@ -1,7 +1,9 @@
+from datetime import datetime
 
 from pyspark.sql import SparkSession
+
 from src.analytics.customer_journey import CustomerJourney
-from datetime import datetime
+
 
 def main():
     """Main function to run the customer journey analytics example."""
@@ -30,8 +32,11 @@ def main():
     funnel_results.show()
 
     print("\n--- Conversion Rate (add_to_cart to purchase) ---")
-    conversion_rate = customer_journey.calculate_conversion_rate(df, "add_to_cart", "purchase")
+    conversion_rate = customer_journey.calculate_conversion_rate(
+        df, "add_to_cart", "purchase"
+    )
     print(f"Conversion rate from add_to_cart to purchase: {conversion_rate:.2f}")
+
 
 if __name__ == "__main__":
     main()

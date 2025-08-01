@@ -362,7 +362,7 @@ services:
       timeout: 10s
       retries: 3
 
-  
+
 
 # Named volumes for data persistence
 volumes:

@@ -1,8 +1,10 @@
-
-from pyspark.sql import SparkSession
-from src.analytics.anomaly_detection import AnomalyDetector
 from datetime import datetime
+
 import pyspark.sql.functions as F
+from pyspark.sql import SparkSession
+
+from src.analytics.anomaly_detection import AnomalyDetector
+
 
 def main():
     """Main function to run the anomaly detection example."""
@@ -15,7 +17,7 @@ def main():
         ("txn3", "user2", 1000.0, 10, datetime(2025, 1, 1, 10, 2, 0)),  # Anomaly
         ("txn4", "user3", 110.0, 1, datetime(2025, 1, 1, 10, 3, 0)),
         ("txn5", "user4", 95.0, 1, datetime(2025, 1, 1, 10, 4, 0)),
-        ("txn6", "user5", 10.0, 1, datetime(2025, 1, 1, 10, 5, 0)),   # Anomaly
+        ("txn6", "user5", 10.0, 1, datetime(2025, 1, 1, 10, 5, 0)),  # Anomaly
     ]
     schema = ["transaction_id", "user_id", "price", "quantity", "timestamp"]
     df = spark.createDataFrame(data, schema)
@@ -26,7 +28,9 @@ def main():
     # and then read from that Delta table in streaming mode.
 
     # Initialize the AnomalyDetector
-    detector = AnomalyDetector(spark, stream_source_path="dummy_path") # Path is not used for static DF
+    detector = AnomalyDetector(
+        spark, stream_source_path="dummy_path"
+    )  # Path is not used for static DF
 
     print("\n--- Detecting Anomalies ---")
     feature_cols = ["price", "quantity"]
@@ -37,6 +41,7 @@ def main():
 
     print("Non-Anomalous Data:")
     anomalies_df.filter(F.col("is_anomaly") == False).show()
+
 
 if __name__ == "__main__":
     main()

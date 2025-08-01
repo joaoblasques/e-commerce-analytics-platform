@@ -13,97 +13,97 @@ rules:
   - pattern: kafka.server<type=(.+), name=(.+)><>Count
     name: kafka_server_$1_$2_total
     type: COUNTER
-  
+
   - pattern: kafka.server<type=(.+), name=(.+)><>Value
     name: kafka_server_$1_$2
     type: GAUGE
-  
+
   # Broker Topic Metrics
   - pattern: kafka.server<type=BrokerTopicMetrics, name=(.+), topic=(.+)><>Count
     name: kafka_server_brokertopicmetrics_$1_total
     labels:
       topic: $2
     type: COUNTER
-  
+
   - pattern: kafka.server<type=BrokerTopicMetrics, name=(.+)><>Count
     name: kafka_server_brokertopicmetrics_$1_total
     type: COUNTER
-  
+
   # Request Handler metrics
   - pattern: kafka.server<type=RequestHandlerAvgIdlePercent><>OneMinuteRate
     name: kafka_server_requesthandleravgidlepercent_oneminute
     type: GAUGE
-  
+
   - pattern: kafka.server<type=RequestHandlerAvgIdlePercent><>MeanRate
     name: kafka_server_requesthandleravgidlepercent_total
     type: GAUGE
-  
+
   # Replica Manager metrics
   - pattern: kafka.server<type=ReplicaManager, name=(.+)><>Value
     name: kafka_server_replicamanager_$1
     type: GAUGE
-  
+
   # Controller metrics
   - pattern: kafka.controller<type=KafkaController, name=(.+)><>Value
     name: kafka_controller_$1
     type: GAUGE
-  
+
   # Network Request metrics
   - pattern: kafka.network<type=RequestMetrics, name=(.+), request=(.+)><>Count
     name: kafka_network_requestmetrics_$1_total
     labels:
       request: $2
     type: COUNTER
-  
+
   - pattern: kafka.network<type=RequestMetrics, name=(.+), request=(.+)><>Mean
     name: kafka_network_requestmetrics_$1_mean
     labels:
       request: $2
     type: GAUGE
-  
+
   # Log metrics
   - pattern: kafka.log<type=LogFlushStats, name=(.+)><>Count
     name: kafka_log_logflushstats_$1_total
     type: COUNTER
-  
+
   - pattern: kafka.log<type=LogFlushStats, name=(.+)><>Mean
     name: kafka_log_logflushstats_$1_mean
     type: GAUGE
-  
+
   # ZooKeeper metrics
   - pattern: kafka.server<type=SessionExpireListener, name=(.+)><>Count
     name: kafka_server_sessionexpirelistener_$1_total
     type: COUNTER
-  
+
   # JVM metrics
   - pattern: java.lang<type=Memory><HeapMemoryUsage>used
     name: jvm_memory_heap_used_bytes
     type: GAUGE
-  
+
   - pattern: java.lang<type=Memory><NonHeapMemoryUsage>used
     name: jvm_memory_nonheap_used_bytes
     type: GAUGE
-  
+
   - pattern: java.lang<type=GarbageCollector, name=(.+)><>CollectionCount
     name: jvm_gc_collection_count_total
     labels:
       gc: $1
     type: COUNTER
-  
+
   - pattern: java.lang<type=GarbageCollector, name=(.+)><>CollectionTime
     name: jvm_gc_collection_time_seconds_total
     labels:
       gc: $1
     type: COUNTER
     valueFactor: 0.001
-  
+
   # Producer metrics
   - pattern: kafka.producer<type=producer-metrics, client-id=(.+)><>(.+)
     name: kafka_producer_$2
     labels:
       client_id: $1
     type: GAUGE
-  
+
   # Consumer metrics
   - pattern: kafka.consumer<type=consumer-fetch-manager-metrics, client-id=(.+)><>(.+)
     name: kafka_consumer_fetch_$2

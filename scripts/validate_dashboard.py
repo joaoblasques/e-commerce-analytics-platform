@@ -18,15 +18,14 @@ def test_imports():
         print("Testing dashboard imports...")
 
         # Test main imports
-        import dashboard.main  # noqa: F401
-        import dashboard.config.settings  # noqa: F401
-
         # Test component imports
         import dashboard.components.alerts  # noqa: F401
         import dashboard.components.charts  # noqa: F401
         import dashboard.components.metrics_cards  # noqa: F401
         import dashboard.components.sidebar  # noqa: F401
         import dashboard.components.tables  # noqa: F401
+        import dashboard.config.settings  # noqa: F401
+        import dashboard.main  # noqa: F401
 
         # Test page imports
         import dashboard.pages.customer_analytics  # noqa: F401
