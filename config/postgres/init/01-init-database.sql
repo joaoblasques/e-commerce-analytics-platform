@@ -15,7 +15,13 @@ CREATE SCHEMA IF NOT EXISTS analytics;
 CREATE SCHEMA IF NOT EXISTS system;
 
 -- Create a service user for the application
-CREATE USER IF NOT EXISTS ecap_app_user WITH PASSWORD 'ecap_app_password';
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'ecap_app_user') THEN
+        CREATE USER ecap_app_user WITH PASSWORD 'ecap_app_password';
+    END IF;
+END
+$$;
 
 -- Grant permissions
 GRANT CONNECT ON DATABASE ecommerce_analytics TO ecap_app_user;

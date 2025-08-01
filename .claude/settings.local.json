@@ -96,7 +96,15 @@
       "Bash(make lint:*)",
       "Bash(poetry run pre-commit run:*)",
       "Bash(poetry run black:*)",
-      "Bash(poetry run isort:*)"
+      "Bash(poetry run isort:*)",
+      "Bash(docker logs:*)",
+      "Bash(docker stop:*)",
+      "Bash(docker rm:*)",
+      "Bash(docker volume:*)",
+      "Bash(docker exec:*)",
+      "Bash(curl:*)",
+      "Bash(docker system:*)",
+      "Bash(sysctl:*)"
     ],
     "deny": []
   }

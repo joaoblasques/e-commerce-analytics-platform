@@ -41,7 +41,7 @@ MONITORING_SERVICES = [
         url="http://localhost",
         port=9090,
         health_path="/-/healthy",
-        expected_content="Prometheus is Healthy",
+        expected_content="Prometheus Server is Healthy.",
     ),
     ServiceConfig(
         name="Grafana",
@@ -55,7 +55,7 @@ MONITORING_SERVICES = [
         url="http://localhost",
         port=9093,
         health_path="/-/healthy",
-        expected_content="Alertmanager is Healthy",
+        expected_content="OK",
     ),
     ServiceConfig(
         name="Node Exporter",
