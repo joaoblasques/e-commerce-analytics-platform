@@ -1,0 +1,17 @@
+---
+name: Test Simple Workflow
+
+on:
+  workflow_dispatch: true
+
+jobs:
+  test:
+    name: Simple Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Test step
+        run: echo "Workflow is working"
