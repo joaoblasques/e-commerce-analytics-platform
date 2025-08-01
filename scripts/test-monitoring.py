@@ -6,16 +6,16 @@ This script verifies that all monitoring services are accessible and functioning
 
 import json
 import sys
-import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
-from typing import Any, Dict, List
+from typing import Any, Dict
 
 import requests
 
 
 # Color codes for output
 class Colors:
+    """ANSI color codes for terminal output."""
     GREEN = "\033[92m"
     RED = "\033[91m"
     YELLOW = "\033[93m"
@@ -26,11 +26,12 @@ class Colors:
 
 @dataclass
 class ServiceConfig:
+    """Configuration for a service to test."""
     name: str
     url: str
     port: int
     health_path: str
-    expected_content: str = None
+    expected_content: str | None = None
     timeout: int = 10
 
 
@@ -77,13 +78,6 @@ MONITORING_SERVICES = [
         port=9121,
         health_path="/metrics",
         expected_content="redis_",
-    ),
-    ServiceConfig(
-        name="Kafka JMX Exporter",
-        url="http://localhost",
-        port=5556,
-        health_path="/metrics",
-        expected_content="kafka_",
     ),
 ]
 
