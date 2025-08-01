@@ -9,33 +9,37 @@ Comprehensive logging infrastructure providing:
 - Performance monitoring
 """
 
-from .structured_logger import get_logger, setup_logging, LogConfig
-from .correlation import CorrelationContext, get_correlation_id, set_correlation_id
+from .correlation import (
+    CorrelationContext,
+    clear_correlation_id,
+    get_correlation_id,
+    set_correlation_id,
+)
+from .formatters import ECSFormatter, JSONFormatter
+from .handlers import AsyncQueueHandler, ElasticsearchHandler, FileRotatingHandler
 from .middleware import LoggingMiddleware
-from .formatters import JSONFormatter, ECSFormatter
-from .handlers import ElasticsearchHandler, FileRotatingHandler
+from .structured_logger import LogConfig, StructuredLogger, get_logger, setup_logging
 
 __all__ = [
     # Core logging
     "get_logger",
-    "setup_logging", 
+    "setup_logging",
     "LogConfig",
-    
+    "StructuredLogger",
     # Correlation and tracing
     "CorrelationContext",
     "get_correlation_id",
     "set_correlation_id",
-    
+    "clear_correlation_id",
     # FastAPI integration
     "LoggingMiddleware",
-    
     # Formatters
     "JSONFormatter",
     "ECSFormatter",
-    
     # Handlers
-    "ElasticsearchHandler", 
+    "ElasticsearchHandler",
     "FileRotatingHandler",
+    "AsyncQueueHandler",
 ]
 
 # Version info

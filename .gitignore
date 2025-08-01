@@ -340,6 +340,27 @@ benchmarks/
 docs/build/
 docs/source/_build/
 
+# Generated reports and audits
+*_report.json
+*_report.md
+dependency_audit_report.json
+dependency_security_report.json
+dependency_bandit_report.json
+bandit-report.json
+bandit-final-report.json
+coverage_report.md
+coverage.json
+coverage.xml
+coverage_trends.db
+integration_quality.db
+security_regression.db
+security_baseline.json
+
+# Test configuration files
+conftest.py
+docker-compose.test.yml
+pyproject.minimal.toml
+
 # Backup files
 *~
 *.orig

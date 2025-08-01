@@ -26,10 +26,10 @@ from testcontainers.kafka import KafkaContainer
 from testcontainers.postgres import PostgresContainer
 from testcontainers.redis import RedisContainer
 
-from src.data_generation.generator import DataGenerator
+from src.data_generation.generator import ECommerceDataGenerator
 from src.data_ingestion.producers.transaction_producer import TransactionProducer
 from src.database.models import Base, Customer, Order, Product
-from src.streaming.consumers import StreamingConsumer
+from src.streaming.consumers import TransactionStreamConsumer
 from src.utils.spark_utils import create_spark_session
 
 
@@ -45,30 +45,30 @@ class E2ETestEnvironment:
     def setup_containers(self):
         """Set up test containers for integration testing."""
         # PostgreSQL container
-        self.containers['postgres'] = PostgresContainer("postgres:13")
-        self.containers['postgres'].start()
+        self.containers["postgres"] = PostgresContainer("postgres:13")
+        self.containers["postgres"].start()
 
         # Redis container
-        self.containers['redis'] = RedisContainer("redis:7-alpine")
-        self.containers['redis'].start()
+        self.containers["redis"] = RedisContainer("redis:7-alpine")
+        self.containers["redis"].start()
 
         # Kafka container
-        self.containers['kafka'] = KafkaContainer("confluentinc/cp-kafka:7.4.0")
-        self.containers['kafka'].start()
+        self.containers["kafka"] = KafkaContainer("confluentinc/cp-kafka:7.4.0")
+        self.containers["kafka"].start()
 
         # Set up database connection
-        postgres_url = self.containers['postgres'].get_connection_url()
-        self.services['database_url'] = postgres_url
+        postgres_url = self.containers["postgres"].get_connection_url()
+        self.services["database_url"] = postgres_url
 
         # Set up Redis connection
-        redis_host = self.containers['redis'].get_container_host_ip()
-        redis_port = self.containers['redis'].get_exposed_port(6379)
-        self.services['redis_url'] = f"redis://{redis_host}:{redis_port}"
+        redis_host = self.containers["redis"].get_container_host_ip()
+        redis_port = self.containers["redis"].get_exposed_port(6379)
+        self.services["redis_url"] = f"redis://{redis_host}:{redis_port}"
 
         # Set up Kafka connection
-        kafka_host = self.containers['kafka'].get_container_host_ip()
-        kafka_port = self.containers['kafka'].get_exposed_port(9093)
-        self.services['kafka_bootstrap_servers'] = f"{kafka_host}:{kafka_port}"
+        kafka_host = self.containers["kafka"].get_container_host_ip()
+        kafka_port = self.containers["kafka"].get_exposed_port(9093)
+        self.services["kafka_bootstrap_servers"] = f"{kafka_host}:{kafka_port}"
 
     def setup_spark(self):
         """Set up Spark session for integration testing."""
@@ -86,7 +86,7 @@ class E2ETestEnvironment:
         from sqlalchemy import create_engine
         from sqlalchemy.orm import sessionmaker
 
-        engine = create_engine(self.services['database_url'])
+        engine = create_engine(self.services["database_url"])
         Base.metadata.create_all(engine)
 
         # Create session for data setup
@@ -124,7 +124,7 @@ class E2ETestEnvironment:
         from kafka.admin import KafkaAdminClient, NewTopic
 
         admin_client = KafkaAdminClient(
-            bootstrap_servers=[self.services['kafka_bootstrap_servers']]
+            bootstrap_servers=[self.services["kafka_bootstrap_servers"]]
         )
 
         topics = [
@@ -141,7 +141,7 @@ class E2ETestEnvironment:
 
     def setup_data_generator(self):
         """Set up data generator for realistic test data."""
-        self.data_generator = DataGenerator(
+        self.data_generator = ECommerceDataGenerator(
             config={
                 "transaction_rate": 10,  # 10 transactions per second for testing
                 "user_behavior_rate": 20,  # 20 events per second
@@ -233,7 +233,7 @@ class TestCompleteDataFlow:
     def test_streaming_processing_flow(self, e2e_environment):
         """Test streaming data processing with Spark Structured Streaming."""
         # Create streaming consumer
-        streaming_consumer = StreamingConsumer(
+        streaming_consumer = TransactionStreamConsumer(
             spark=e2e_environment.spark,
             kafka_servers=e2e_environment.services["kafka_bootstrap_servers"],
         )
@@ -325,8 +325,10 @@ class TestStreamingPipelineIntegration:
         # Set up streaming query
         streaming_df = (
             e2e_environment.spark.readStream.format("kafka")
-            .option("kafka.bootstrap.servers", 
-                   e2e_environment.services["kafka_bootstrap_servers"])
+            .option(
+                "kafka.bootstrap.servers",
+                e2e_environment.services["kafka_bootstrap_servers"],
+            )
             .option("subscribe", "transactions")
             .option("startingOffsets", "latest")
             .load()
@@ -394,12 +396,14 @@ class TestStreamingPipelineIntegration:
         """Test stream-to-stream joins between different topics."""
         # This test would be more complex and might be simplified for the demo
         # due to the complexity of setting up multiple streaming queries
-        
+
         # Create two streams for joining
         transactions_stream = (
             e2e_environment.spark.readStream.format("kafka")
-            .option("kafka.bootstrap.servers", 
-                   e2e_environment.services["kafka_bootstrap_servers"])
+            .option(
+                "kafka.bootstrap.servers",
+                e2e_environment.services["kafka_bootstrap_servers"],
+            )
             .option("subscribe", "transactions")
             .option("startingOffsets", "latest")
             .load()
@@ -407,8 +411,10 @@ class TestStreamingPipelineIntegration:
 
         user_events_stream = (
             e2e_environment.spark.readStream.format("kafka")
-            .option("kafka.bootstrap.servers", 
-                   e2e_environment.services["kafka_bootstrap_servers"])
+            .option(
+                "kafka.bootstrap.servers",
+                e2e_environment.services["kafka_bootstrap_servers"],
+            )
             .option("subscribe", "user-events")
             .option("startingOffsets", "latest")
             .load()
@@ -421,7 +427,9 @@ class TestStreamingPipelineIntegration:
 
     def test_windowed_aggregations(self, e2e_environment):
         """Test windowed aggregations in streaming pipeline."""
-        from pyspark.sql.functions import col, from_json, sum as spark_sum, window
+        from pyspark.sql.functions import col, from_json
+        from pyspark.sql.functions import sum as spark_sum
+        from pyspark.sql.functions import window
         from pyspark.sql.types import (
             DoubleType,
             StringType,
@@ -443,8 +451,10 @@ class TestStreamingPipelineIntegration:
         # Create streaming DataFrame
         streaming_df = (
             e2e_environment.spark.readStream.format("kafka")
-            .option("kafka.bootstrap.servers", 
-                   e2e_environment.services["kafka_bootstrap_servers"])
+            .option(
+                "kafka.bootstrap.servers",
+                e2e_environment.services["kafka_bootstrap_servers"],
+            )
             .option("subscribe", "transactions")
             .option("startingOffsets", "latest")
             .load()
@@ -567,7 +577,10 @@ class TestErrorScenariosAndRecovery:
         producer = KafkaProducer(**producer_config)
 
         # Send message to verify normal operation
-        test_message = {"test": "kafka_recovery", "timestamp": datetime.now().isoformat()}
+        test_message = {
+            "test": "kafka_recovery",
+            "timestamp": datetime.now().isoformat(),
+        }
         future = producer.send("transactions", test_message)
 
         try:
@@ -585,7 +598,9 @@ class TestErrorScenariosAndRecovery:
         from sqlalchemy.exc import OperationalError
 
         # Test with invalid connection string
-        invalid_engine = create_engine("postgresql://invalid:invalid@localhost:5432/invalid")
+        invalid_engine = create_engine(
+            "postgresql://invalid:invalid@localhost:5432/invalid"
+        )
 
         try:
             invalid_engine.connect()
@@ -599,7 +614,9 @@ class TestErrorScenariosAndRecovery:
         # Send malformed data to test error handling
         producer = KafkaProducer(
             bootstrap_servers=[e2e_environment.services["kafka_bootstrap_servers"]],
-            value_serializer=lambda v: v.encode("utf-8") if isinstance(v, str) else json.dumps(v).encode("utf-8"),
+            value_serializer=lambda v: v.encode("utf-8")
+            if isinstance(v, str)
+            else json.dumps(v).encode("utf-8"),
         )
 
         # Send valid and invalid messages
@@ -607,7 +624,9 @@ class TestErrorScenariosAndRecovery:
         invalid_message = "invalid_json_string"
 
         producer.send("transactions", valid_message)
-        producer.send("transactions", invalid_message)  # This should be handled gracefully
+        producer.send(
+            "transactions", invalid_message
+        )  # This should be handled gracefully
 
         producer.flush()
         producer.close()
@@ -624,7 +643,10 @@ class TestErrorScenariosAndRecovery:
 
         # Test with invalid data
         invalid_data = [
-            {"transaction_id": "", "amount": -100.0},  # Invalid: empty ID, negative amount
+            {
+                "transaction_id": "",
+                "amount": -100.0,
+            },  # Invalid: empty ID, negative amount
             {"transaction_id": "valid_001", "amount": 50.0},  # Valid
             {"amount": 75.0},  # Invalid: missing transaction_id
         ]
@@ -643,6 +665,7 @@ class TestErrorScenariosAndRecovery:
 
     def test_circuit_breaker_behavior(self, e2e_environment):
         """Test circuit breaker behavior under failure conditions."""
+
         # Simulate circuit breaker pattern
         class SimpleCircuitBreaker:
             def __init__(self, failure_threshold=5, timeout=60):
@@ -737,8 +760,10 @@ class TestEndToEndPerformance:
         # Create streaming DataFrame
         streaming_df = (
             e2e_environment.spark.readStream.format("kafka")
-            .option("kafka.bootstrap.servers", 
-                   e2e_environment.services["kafka_bootstrap_servers"])
+            .option(
+                "kafka.bootstrap.servers",
+                e2e_environment.services["kafka_bootstrap_servers"],
+            )
             .option("subscribe", "transactions")
             .option("startingOffsets", "latest")
             .load()
@@ -765,8 +790,12 @@ class TestEndToEndPerformance:
         max_response_time = max(response_times)
         avg_response_time = sum(response_times) / len(response_times)
 
-        assert max_response_time < 0.1, f"Max response time {max_response_time:.3f}s exceeds 100ms"
-        assert avg_response_time < 0.05, f"Avg response time {avg_response_time:.3f}s exceeds 50ms"
+        assert (
+            max_response_time < 0.1
+        ), f"Max response time {max_response_time:.3f}s exceeds 100ms"
+        assert (
+            avg_response_time < 0.05
+        ), f"Avg response time {avg_response_time:.3f}s exceeds 50ms"
 
 
 # Integration test configuration
@@ -777,7 +806,7 @@ class TestE2EIntegrationSuite:
     def test_complete_pipeline_integration(self, e2e_environment):
         """Run complete pipeline integration test."""
         # This test orchestrates a complete end-to-end flow
-        
+
         # 1. Generate and send test data
         producer = KafkaProducer(
             bootstrap_servers=[e2e_environment.services["kafka_bootstrap_servers"]],
@@ -813,7 +842,9 @@ class TestE2EIntegrationSuite:
         consumer.close()
 
         # 3. Verify complete pipeline processed the data
-        assert consumed_count >= 20, f"Only consumed {consumed_count} of 20 test messages"
+        assert (
+            consumed_count >= 20
+        ), f"Only consumed {consumed_count} of 20 test messages"
 
         # 4. Verify system health after processing
         # This would include checking database records, cache entries, etc.

@@ -45,7 +45,7 @@ class APIIntegrationTestSetup:
         self.postgres_container = PostgresContainer("postgres:13")
         self.postgres_container.start()
 
-        # Redis container  
+        # Redis container
         self.redis_container = RedisContainer("redis:7-alpine")
         self.redis_container.start()
 
@@ -55,10 +55,12 @@ class APIIntegrationTestSetup:
         redis_port = self.redis_container.get_exposed_port(6379)
 
         # Override app dependencies for testing
-        app.dependency_overrides.update({
-            "database_url": postgres_url,
-            "redis_url": f"redis://{redis_host}:{redis_port}",
-        })
+        app.dependency_overrides.update(
+            {
+                "database_url": postgres_url,
+                "redis_url": f"redis://{redis_host}:{redis_port}",
+            }
+        )
 
         self.test_client = TestClient(app)
 
@@ -136,8 +138,10 @@ class APIIntegrationTestSetup:
         }
 
         # Register test user
-        register_response = self.test_client.post("/api/v1/auth/register", json=test_user_data)
-        
+        register_response = self.test_client.post(
+            "/api/v1/auth/register", json=test_user_data
+        )
+
         if register_response.status_code == 409:
             # User already exists, just login
             pass
@@ -149,7 +153,7 @@ class APIIntegrationTestSetup:
         }
 
         login_response = self.test_client.post("/api/v1/auth/login", data=login_data)
-        
+
         if login_response.status_code == 200:
             self.auth_token = login_response.json()["access_token"]
         else:
@@ -171,9 +175,9 @@ def api_test_setup():
     setup.setup_containers()
     setup.setup_test_database()
     setup.get_auth_token()
-    
+
     yield setup
-    
+
     setup.teardown()
 
 
@@ -182,34 +186,40 @@ class TestCustomerAnalyticsAPI:
 
     def test_get_customer_rfm_segments(self, api_test_setup):
         """Test RFM customer segmentation API endpoint."""
-        headers = {"Authorization": f"Bearer {api_test_setup.auth_token}"} if api_test_setup.auth_token else {}
-        
+        headers = (
+            {"Authorization": f"Bearer {api_test_setup.auth_token}"}
+            if api_test_setup.auth_token
+            else {}
+        )
+
         response = api_test_setup.test_client.get(
-            "/api/v1/analytics/customers/rfm-segments",
-            headers=headers
+            "/api/v1/analytics/customers/rfm-segments", headers=headers
         )
 
         # Should return customer segments even if empty
         assert response.status_code in [200, 404]  # 404 if no data yet
-        
+
         if response.status_code == 200:
             data = response.json()
             assert "segments" in data or isinstance(data, list)
 
     def test_get_customer_lifetime_value(self, api_test_setup):
         """Test customer lifetime value API endpoint."""
-        headers = {"Authorization": f"Bearer {api_test_setup.auth_token}"} if api_test_setup.auth_token else {}
-        
+        headers = (
+            {"Authorization": f"Bearer {api_test_setup.auth_token}"}
+            if api_test_setup.auth_token
+            else {}
+        )
+
         test_customer_id = api_test_setup.test_data["customers"][0]
-        
+
         response = api_test_setup.test_client.get(
-            f"/api/v1/analytics/customers/{test_customer_id}/clv",
-            headers=headers
+            f"/api/v1/analytics/customers/{test_customer_id}/clv", headers=headers
         )
 
         # Should handle request even if customer doesn't have CLV data yet
         assert response.status_code in [200, 404]
-        
+
         if response.status_code == 200:
             data = response.json()
             assert "customer_id" in data
@@ -218,17 +228,21 @@ class TestCustomerAnalyticsAPI:
 
     def test_get_customer_churn_prediction(self, api_test_setup):
         """Test customer churn prediction API endpoint."""
-        headers = {"Authorization": f"Bearer {api_test_setup.auth_token}"} if api_test_setup.auth_token else {}
-        
+        headers = (
+            {"Authorization": f"Bearer {api_test_setup.auth_token}"}
+            if api_test_setup.auth_token
+            else {}
+        )
+
         test_customer_id = api_test_setup.test_data["customers"][0]
-        
+
         response = api_test_setup.test_client.get(
             f"/api/v1/analytics/customers/{test_customer_id}/churn-risk",
-            headers=headers
+            headers=headers,
         )
 
         assert response.status_code in [200, 404]
-        
+
         if response.status_code == 200:
             data = response.json()
             assert "customer_id" in data
@@ -237,17 +251,20 @@ class TestCustomerAnalyticsAPI:
 
     def test_get_customer_journey(self, api_test_setup):
         """Test customer journey analytics API endpoint."""
-        headers = {"Authorization": f"Bearer {api_test_setup.auth_token}"} if api_test_setup.auth_token else {}
-        
+        headers = (
+            {"Authorization": f"Bearer {api_test_setup.auth_token}"}
+            if api_test_setup.auth_token
+            else {}
+        )
+
         test_customer_id = api_test_setup.test_data["customers"][0]
-        
+
         response = api_test_setup.test_client.get(
-            f"/api/v1/analytics/customers/{test_customer_id}/journey",
-            headers=headers
+            f"/api/v1/analytics/customers/{test_customer_id}/journey", headers=headers
         )
 
         assert response.status_code in [200, 404]
-        
+
         if response.status_code == 200:
             data = response.json()
             assert "customer_id" in data
@@ -259,23 +276,30 @@ class TestFraudDetectionAPI:
 
     def test_get_fraud_alerts(self, api_test_setup):
         """Test fraud alerts API endpoint."""
-        headers = {"Authorization": f"Bearer {api_test_setup.auth_token}"} if api_test_setup.auth_token else {}
-        
+        headers = (
+            {"Authorization": f"Bearer {api_test_setup.auth_token}"}
+            if api_test_setup.auth_token
+            else {}
+        )
+
         response = api_test_setup.test_client.get(
-            "/api/v1/fraud/alerts",
-            headers=headers
+            "/api/v1/fraud/alerts", headers=headers
         )
 
         assert response.status_code in [200, 404]
-        
+
         if response.status_code == 200:
             data = response.json()
             assert isinstance(data, list)
 
     def test_submit_transaction_for_fraud_check(self, api_test_setup):
         """Test transaction fraud check API endpoint."""
-        headers = {"Authorization": f"Bearer {api_test_setup.auth_token}"} if api_test_setup.auth_token else {}
-        
+        headers = (
+            {"Authorization": f"Bearer {api_test_setup.auth_token}"}
+            if api_test_setup.auth_token
+            else {}
+        )
+
         test_transaction = {
             "transaction_id": "api_test_fraud_001",
             "customer_id": api_test_setup.test_data["customers"][0],
@@ -285,13 +309,11 @@ class TestFraudDetectionAPI:
         }
 
         response = api_test_setup.test_client.post(
-            "/api/v1/fraud/check",
-            json=test_transaction,
-            headers=headers
+            "/api/v1/fraud/check", json=test_transaction, headers=headers
         )
 
         assert response.status_code in [200, 201, 422]  # 422 for validation errors
-        
+
         if response.status_code in [200, 201]:
             data = response.json()
             assert "transaction_id" in data
@@ -299,18 +321,21 @@ class TestFraudDetectionAPI:
 
     def test_get_fraud_investigation_case(self, api_test_setup):
         """Test fraud investigation case API endpoint."""
-        headers = {"Authorization": f"Bearer {api_test_setup.auth_token}"} if api_test_setup.auth_token else {}
-        
+        headers = (
+            {"Authorization": f"Bearer {api_test_setup.auth_token}"}
+            if api_test_setup.auth_token
+            else {}
+        )
+
         # First create a case or use a test case ID
         test_case_id = "test_case_001"
-        
+
         response = api_test_setup.test_client.get(
-            f"/api/v1/fraud/cases/{test_case_id}",
-            headers=headers
+            f"/api/v1/fraud/cases/{test_case_id}", headers=headers
         )
 
         assert response.status_code in [200, 404]
-        
+
         if response.status_code == 200:
             data = response.json()
             assert "case_id" in data
@@ -322,45 +347,54 @@ class TestBusinessIntelligenceAPI:
 
     def test_get_revenue_analytics(self, api_test_setup):
         """Test revenue analytics API endpoint."""
-        headers = {"Authorization": f"Bearer {api_test_setup.auth_token}"} if api_test_setup.auth_token else {}
-        
+        headers = (
+            {"Authorization": f"Bearer {api_test_setup.auth_token}"}
+            if api_test_setup.auth_token
+            else {}
+        )
+
         response = api_test_setup.test_client.get(
-            "/api/v1/analytics/revenue/summary",
-            headers=headers
+            "/api/v1/analytics/revenue/summary", headers=headers
         )
 
         assert response.status_code in [200, 404]
-        
+
         if response.status_code == 200:
             data = response.json()
             assert "total_revenue" in data or "revenue_metrics" in data
 
     def test_get_product_performance(self, api_test_setup):
         """Test product performance analytics API endpoint."""
-        headers = {"Authorization": f"Bearer {api_test_setup.auth_token}"} if api_test_setup.auth_token else {}
-        
+        headers = (
+            {"Authorization": f"Bearer {api_test_setup.auth_token}"}
+            if api_test_setup.auth_token
+            else {}
+        )
+
         response = api_test_setup.test_client.get(
-            "/api/v1/analytics/products/performance",
-            headers=headers
+            "/api/v1/analytics/products/performance", headers=headers
         )
 
         assert response.status_code in [200, 404]
-        
+
         if response.status_code == 200:
             data = response.json()
             assert isinstance(data, list) or "products" in data
 
     def test_get_geographic_analytics(self, api_test_setup):
         """Test geographic analytics API endpoint."""
-        headers = {"Authorization": f"Bearer {api_test_setup.auth_token}"} if api_test_setup.auth_token else {}
-        
+        headers = (
+            {"Authorization": f"Bearer {api_test_setup.auth_token}"}
+            if api_test_setup.auth_token
+            else {}
+        )
+
         response = api_test_setup.test_client.get(
-            "/api/v1/analytics/geographic/sales-distribution",
-            headers=headers
+            "/api/v1/analytics/geographic/sales-distribution", headers=headers
         )
 
         assert response.status_code in [200, 404]
-        
+
         if response.status_code == 200:
             data = response.json()
             assert isinstance(data, dict) or isinstance(data, list)
@@ -371,15 +405,18 @@ class TestRealtimeAPI:
 
     def test_get_realtime_metrics(self, api_test_setup):
         """Test real-time metrics API endpoint."""
-        headers = {"Authorization": f"Bearer {api_test_setup.auth_token}"} if api_test_setup.auth_token else {}
-        
+        headers = (
+            {"Authorization": f"Bearer {api_test_setup.auth_token}"}
+            if api_test_setup.auth_token
+            else {}
+        )
+
         response = api_test_setup.test_client.get(
-            "/api/v1/realtime/metrics",
-            headers=headers
+            "/api/v1/realtime/metrics", headers=headers
         )
 
         assert response.status_code in [200, 404]
-        
+
         if response.status_code == 200:
             data = response.json()
             assert "timestamp" in data
@@ -388,7 +425,7 @@ class TestRealtimeAPI:
     def test_get_system_health(self, api_test_setup):
         """Test system health API endpoint."""
         response = api_test_setup.test_client.get("/api/v1/health")
-        
+
         assert response.status_code == 200
         data = response.json()
         assert "status" in data
@@ -396,15 +433,18 @@ class TestRealtimeAPI:
 
     def test_get_realtime_dashboard_data(self, api_test_setup):
         """Test real-time dashboard data API endpoint."""
-        headers = {"Authorization": f"Bearer {api_test_setup.auth_token}"} if api_test_setup.auth_token else {}
-        
+        headers = (
+            {"Authorization": f"Bearer {api_test_setup.auth_token}"}
+            if api_test_setup.auth_token
+            else {}
+        )
+
         response = api_test_setup.test_client.get(
-            "/api/v1/realtime/dashboard",
-            headers=headers
+            "/api/v1/realtime/dashboard", headers=headers
         )
 
         assert response.status_code in [200, 404]
-        
+
         if response.status_code == 200:
             data = response.json()
             assert isinstance(data, dict)
@@ -415,8 +455,12 @@ class TestAPIPerformanceAndCaching:
 
     def test_api_response_time_requirements(self, api_test_setup):
         """Test API response time requirements."""
-        headers = {"Authorization": f"Bearer {api_test_setup.auth_token}"} if api_test_setup.auth_token else {}
-        
+        headers = (
+            {"Authorization": f"Bearer {api_test_setup.auth_token}"}
+            if api_test_setup.auth_token
+            else {}
+        )
+
         # Test multiple endpoints for response time
         endpoints = [
             "/api/v1/health",
@@ -426,26 +470,32 @@ class TestAPIPerformanceAndCaching:
         ]
 
         response_times = []
-        
+
         for endpoint in endpoints:
             start_time = time.time()
             response = api_test_setup.test_client.get(endpoint, headers=headers)
             end_time = time.time()
-            
+
             response_time = end_time - start_time
             response_times.append(response_time)
-            
+
             # Each response should be under 200ms for integration testing
             assert response_time < 0.2, f"{endpoint} took {response_time:.3f}s"
 
         # Average response time should be under 100ms
         avg_response_time = sum(response_times) / len(response_times)
-        assert avg_response_time < 0.1, f"Average response time {avg_response_time:.3f}s too high"
+        assert (
+            avg_response_time < 0.1
+        ), f"Average response time {avg_response_time:.3f}s too high"
 
     def test_caching_behavior(self, api_test_setup):
         """Test API caching behavior."""
-        headers = {"Authorization": f"Bearer {api_test_setup.auth_token}"} if api_test_setup.auth_token else {}
-        
+        headers = (
+            {"Authorization": f"Bearer {api_test_setup.auth_token}"}
+            if api_test_setup.auth_token
+            else {}
+        )
+
         # Make first request
         start_time = time.time()
         response1 = api_test_setup.test_client.get(
@@ -469,8 +519,12 @@ class TestAPIPerformanceAndCaching:
 
     def test_api_rate_limiting(self, api_test_setup):
         """Test API rate limiting behavior."""
-        headers = {"Authorization": f"Bearer {api_test_setup.auth_token}"} if api_test_setup.auth_token else {}
-        
+        headers = (
+            {"Authorization": f"Bearer {api_test_setup.auth_token}"}
+            if api_test_setup.auth_token
+            else {}
+        )
+
         # Make many rapid requests to test rate limiting
         responses = []
         for i in range(20):  # 20 rapid requests
@@ -480,10 +534,10 @@ class TestAPIPerformanceAndCaching:
         # Should get mostly 200s, possibly some 429s (rate limited)
         success_count = responses.count(200)
         rate_limited_count = responses.count(429)
-        
+
         # At least some requests should succeed
         assert success_count > 0
-        
+
         # Rate limiting is optional, so we just verify it doesn't break
         assert all(code in [200, 429] for code in responses)
 
@@ -499,19 +553,22 @@ class TestAPIErrorHandling:
     def test_invalid_authentication_handling(self, api_test_setup):
         """Test handling of invalid authentication."""
         headers = {"Authorization": "Bearer invalid_token"}
-        
+
         response = api_test_setup.test_client.get(
-            "/api/v1/analytics/customers/rfm-segments",
-            headers=headers
+            "/api/v1/analytics/customers/rfm-segments", headers=headers
         )
-        
+
         # Should return 401 Unauthorized
         assert response.status_code in [401, 403, 422]
 
     def test_invalid_request_data_handling(self, api_test_setup):
         """Test handling of invalid request data."""
-        headers = {"Authorization": f"Bearer {api_test_setup.auth_token}"} if api_test_setup.auth_token else {}
-        
+        headers = (
+            {"Authorization": f"Bearer {api_test_setup.auth_token}"}
+            if api_test_setup.auth_token
+            else {}
+        )
+
         # Send invalid JSON data
         invalid_transaction = {
             "transaction_id": "",  # Empty ID
@@ -520,9 +577,7 @@ class TestAPIErrorHandling:
         }
 
         response = api_test_setup.test_client.post(
-            "/api/v1/fraud/check",
-            json=invalid_transaction,
-            headers=headers
+            "/api/v1/fraud/check", json=invalid_transaction, headers=headers
         )
 
         # Should return validation error
@@ -532,9 +587,9 @@ class TestAPIErrorHandling:
         """Test API behavior when database is unavailable."""
         # This test would require mocking database failures
         # For now, we'll test that the health endpoint handles it gracefully
-        
+
         response = api_test_setup.test_client.get("/api/v1/health")
-        
+
         # Health endpoint should always respond
         assert response.status_code == 200
         data = response.json()
@@ -544,7 +599,7 @@ class TestAPIErrorHandling:
         """Test API behavior when Redis cache is unavailable."""
         # This would require mocking Redis failures
         # For now, we'll verify that APIs can work without cache
-        
+
         response = api_test_setup.test_client.get("/api/v1/health")
         assert response.status_code == 200
 
@@ -554,10 +609,14 @@ class TestAPIDataConsistency:
 
     def test_customer_data_consistency(self, api_test_setup):
         """Test consistency of customer data across endpoints."""
-        headers = {"Authorization": f"Bearer {api_test_setup.auth_token}"} if api_test_setup.auth_token else {}
-        
+        headers = (
+            {"Authorization": f"Bearer {api_test_setup.auth_token}"}
+            if api_test_setup.auth_token
+            else {}
+        )
+
         test_customer_id = api_test_setup.test_data["customers"][0]
-        
+
         # Get customer data from different endpoints
         endpoints = [
             f"/api/v1/analytics/customers/{test_customer_id}/clv",
@@ -579,8 +638,12 @@ class TestAPIDataConsistency:
 
     def test_transaction_data_integrity(self, api_test_setup):
         """Test transaction data integrity across fraud check process."""
-        headers = {"Authorization": f"Bearer {api_test_setup.auth_token}"} if api_test_setup.auth_token else {}
-        
+        headers = (
+            {"Authorization": f"Bearer {api_test_setup.auth_token}"}
+            if api_test_setup.auth_token
+            else {}
+        )
+
         test_transaction = {
             "transaction_id": "api_integrity_test_001",
             "customer_id": api_test_setup.test_data["customers"][0],
@@ -590,14 +653,12 @@ class TestAPIDataConsistency:
 
         # Submit transaction for fraud check
         response = api_test_setup.test_client.post(
-            "/api/v1/fraud/check",
-            json=test_transaction,
-            headers=headers
+            "/api/v1/fraud/check", json=test_transaction, headers=headers
         )
 
         if response.status_code in [200, 201]:
             data = response.json()
-            
+
             # Verify transaction data integrity
             assert data["transaction_id"] == test_transaction["transaction_id"]
             if "amount" in data:
@@ -605,17 +666,20 @@ class TestAPIDataConsistency:
 
     def test_api_pagination_consistency(self, api_test_setup):
         """Test pagination consistency across list endpoints."""
-        headers = {"Authorization": f"Bearer {api_test_setup.auth_token}"} if api_test_setup.auth_token else {}
-        
+        headers = (
+            {"Authorization": f"Bearer {api_test_setup.auth_token}"}
+            if api_test_setup.auth_token
+            else {}
+        )
+
         # Test pagination on a list endpoint
         response = api_test_setup.test_client.get(
-            "/api/v1/analytics/customers/rfm-segments?page=1&size=5",
-            headers=headers
+            "/api/v1/analytics/customers/rfm-segments?page=1&size=5", headers=headers
         )
 
         if response.status_code == 200:
             data = response.json()
-            
+
             # Check pagination structure
             if isinstance(data, dict) and "items" in data:
                 assert "page" in data or "total" in data or len(data["items"]) <= 5

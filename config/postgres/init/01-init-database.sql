@@ -73,8 +73,8 @@ CREATE OR REPLACE FUNCTION system.update_service_health(
 BEGIN
     INSERT INTO system.service_health (service_name, status, last_check, details)
     VALUES (p_service_name, p_status, CURRENT_TIMESTAMP, p_details)
-    ON CONFLICT (service_name) 
-    DO UPDATE SET 
+    ON CONFLICT (service_name)
+    DO UPDATE SET
         status = EXCLUDED.status,
         last_check = EXCLUDED.last_check,
         details = EXCLUDED.details;
@@ -86,7 +86,7 @@ GRANT EXECUTE ON FUNCTION system.update_service_health TO ecap_app_user;
 
 -- Create a view for service health monitoring
 CREATE OR REPLACE VIEW system.service_health_summary AS
-SELECT 
+SELECT
     service_name,
     status,
     last_check,

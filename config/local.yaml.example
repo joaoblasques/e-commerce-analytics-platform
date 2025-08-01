@@ -75,7 +75,7 @@ monitoring:
   grafana:
     enabled: true
     port: 3000
-    
+
 # Logging configuration
 logging:
   level: "DEBUG"

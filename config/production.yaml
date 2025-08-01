@@ -68,13 +68,13 @@ logging:
   level: "INFO"
   format: "json"
   output: "both"
-  
+
   # File logging with rotation
   file_path: "/app/logs/ecap-production.log"
   max_file_size: "500MB"
   backup_count: 10
   compress_rotated: true
-  
+
   # Full ELK integration
   elasticsearch:
     enabled: true
@@ -82,7 +82,7 @@ logging:
     index: "ecap-logs-production"
     buffer_size: 200
     flush_interval: 2.0
-  
+
   # Minimal request logging for performance
   request_logging:
     enabled: true
@@ -92,7 +92,7 @@ logging:
     max_body_size: 512
     slow_request_threshold: 2000.0
     very_slow_threshold: 5000.0
-  
+
   # Production logger levels
   loggers:
     uvicorn: "WARNING"

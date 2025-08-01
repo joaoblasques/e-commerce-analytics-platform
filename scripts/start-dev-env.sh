@@ -39,17 +39,17 @@ check_docker() {
         print_error "Docker is not installed or not in PATH"
         exit 1
     fi
-    
+
     if ! docker info &> /dev/null; then
         print_error "Docker daemon is not running"
         exit 1
     fi
-    
+
     if ! command -v docker-compose &> /dev/null; then
         print_error "Docker Compose is not installed or not in PATH"
         exit 1
     fi
-    
+
     print_success "Docker is available and running"
 }
 
@@ -57,13 +57,13 @@ check_docker() {
 cleanup_containers() {
     print_status "Cleaning up existing containers..."
     cd "$PROJECT_DIR"
-    
+
     # Stop and remove existing containers
     docker-compose down -v 2>/dev/null || true
-    
+
     # Remove any dangling volumes
     docker volume prune -f 2>/dev/null || true
-    
+
     print_success "Cleanup completed"
 }
 
@@ -71,30 +71,30 @@ cleanup_containers() {
 start_services() {
     print_status "Starting e-commerce analytics platform services..."
     cd "$PROJECT_DIR"
-    
+
     # Build and start all services
     docker-compose up -d --build
-    
+
     print_success "Services started successfully"
 }
 
 # Function to wait for services to be healthy
 wait_for_services() {
     print_status "Waiting for services to be healthy..."
-    
+
     local max_attempts=60
     local attempt=0
-    
+
     while [ $attempt -lt $max_attempts ]; do
         attempt=$((attempt + 1))
-        
+
         # Check service health
         local healthy_services=0
         local total_services=0
-        
+
         # Get service health status
         local services_status=$(docker-compose ps --format json 2>/dev/null | jq -r '.Name + ":" + .Health' 2>/dev/null || echo "")
-        
+
         if [ -n "$services_status" ]; then
             while IFS= read -r line; do
                 if [ -n "$line" ]; then
@@ -105,30 +105,30 @@ wait_for_services() {
                 fi
             done <<< "$services_status"
         fi
-        
+
         # Simple fallback: check if containers are running
         if [ $total_services -eq 0 ]; then
             local running_containers=$(docker-compose ps -q | wc -l)
             local expected_containers=9  # Total number of services
-            
+
             if [ "$running_containers" -eq "$expected_containers" ]; then
                 print_success "All services are running"
                 break
             fi
         else
             print_status "Health check: $healthy_services/$total_services services healthy"
-            
+
             if [ $healthy_services -eq $total_services ] && [ $total_services -gt 0 ]; then
                 print_success "All services are healthy"
                 break
             fi
         fi
-        
+
         if [ $attempt -eq $max_attempts ]; then
             print_warning "Some services may not be fully healthy yet, but continuing..."
             break
         fi
-        
+
         sleep 10
     done
 }
@@ -136,15 +136,15 @@ wait_for_services() {
 # Function to initialize MinIO buckets
 init_minio() {
     print_status "Initializing MinIO buckets..."
-    
+
     # Wait for MinIO to be ready
     local minio_ready=false
     local max_attempts=30
     local attempt=0
-    
+
     while [ $attempt -lt $max_attempts ] && [ "$minio_ready" = false ]; do
         attempt=$((attempt + 1))
-        
+
         if curl -s -f http://localhost:9000/minio/health/live > /dev/null 2>&1; then
             minio_ready=true
             print_success "MinIO is ready"
@@ -153,15 +153,15 @@ init_minio() {
             sleep 5
         fi
     done
-    
+
     if [ "$minio_ready" = false ]; then
         print_warning "MinIO may not be fully ready, but continuing with bucket initialization"
     fi
-    
+
     # Create MinIO client configuration
     docker-compose exec -T minio sh -c "
         mc alias set ecap-minio http://localhost:9000 minioadmin minioadmin123
-        
+
         # Create buckets
         mc mb ecap-minio/raw-data --ignore-existing
         mc mb ecap-minio/processed-data --ignore-existing
@@ -169,12 +169,12 @@ init_minio() {
         mc mb ecap-minio/model-artifacts --ignore-existing
         mc mb ecap-minio/logs --ignore-existing
         mc mb ecap-minio/backups --ignore-existing
-        
+
         # Set bucket policies
         mc anonymous set download ecap-minio/raw-data
         mc anonymous set download ecap-minio/processed-data
         mc anonymous set download ecap-minio/analytics-results
-        
+
         echo 'MinIO buckets initialized successfully!'
     " 2>/dev/null || print_warning "MinIO bucket initialization had some issues, but continuing"
 }
@@ -182,15 +182,15 @@ init_minio() {
 # Function to create Kafka topics
 create_kafka_topics() {
     print_status "Creating Kafka topics..."
-    
+
     # Wait for Kafka to be ready
     local kafka_ready=false
     local max_attempts=30
     local attempt=0
-    
+
     while [ $attempt -lt $max_attempts ] && [ "$kafka_ready" = false ]; do
         attempt=$((attempt + 1))
-        
+
         if docker-compose exec -T kafka kafka-topics --bootstrap-server localhost:9092 --list > /dev/null 2>&1; then
             kafka_ready=true
             print_success "Kafka is ready"
@@ -199,11 +199,11 @@ create_kafka_topics() {
             sleep 5
         fi
     done
-    
+
     if [ "$kafka_ready" = false ]; then
         print_warning "Kafka may not be fully ready, but continuing with topic creation"
     fi
-    
+
     # Create topics
     docker-compose exec -T kafka bash -c "
         kafka-topics --create --topic transactions --bootstrap-server localhost:9092 --partitions 6 --replication-factor 1 --if-not-exists
@@ -211,7 +211,7 @@ create_kafka_topics() {
         kafka-topics --create --topic product-updates --bootstrap-server localhost:9092 --partitions 3 --replication-factor 1 --if-not-exists
         kafka-topics --create --topic fraud-alerts --bootstrap-server localhost:9092 --partitions 3 --replication-factor 1 --if-not-exists
         kafka-topics --create --topic analytics-results --bootstrap-server localhost:9092 --partitions 3 --replication-factor 1 --if-not-exists
-        
+
         echo 'Kafka topics created successfully!'
     " 2>/dev/null || print_warning "Kafka topic creation had some issues, but continuing"
 }
@@ -263,7 +263,7 @@ show_help() {
 main() {
     local clean_first=false
     local skip_init=false
-    
+
     # Parse arguments
     while [[ $# -gt 0 ]]; do
         case $1 in
@@ -286,29 +286,29 @@ main() {
                 ;;
         esac
     done
-    
+
     print_status "Starting E-Commerce Analytics Platform Development Environment"
-    
+
     # Check prerequisites
     check_docker
-    
+
     # Clean up if requested
     if [ "$clean_first" = true ]; then
         cleanup_containers
     fi
-    
+
     # Start services
     start_services
-    
+
     # Wait for services to be healthy
     wait_for_services
-    
+
     # Initialize services if not skipped
     if [ "$skip_init" = false ]; then
         init_minio
         create_kafka_topics
     fi
-    
+
     # Display service information
     display_service_info
 }

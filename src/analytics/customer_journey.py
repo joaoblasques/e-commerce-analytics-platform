@@ -1,14 +1,16 @@
-
-from pyspark.sql import DataFrame, SparkSession
 import pyspark.sql.functions as F
+from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.window import Window
+
 
 class CustomerJourney:
     """
     A class to analyze customer journeys, including touchpoints, funnels, and conversion.
     """
 
-    def __init__(self, spark: SparkSession, user_behavior_path: str = "data/delta/user_behavior"):
+    def __init__(
+        self, spark: SparkSession, user_behavior_path: str = "data/delta/user_behavior"
+    ):
         self.spark = spark
         self.user_behavior_path = user_behavior_path
 
@@ -51,12 +53,19 @@ class CustomerJourney:
 
         results = []
         for i, step in enumerate(funnel_steps):
-            step_count = funnel_df.filter(F.col("event_type") == step).select("session_id").distinct().count()
+            step_count = (
+                funnel_df.filter(F.col("event_type") == step)
+                .select("session_id")
+                .distinct()
+                .count()
+            )
             results.append((step, step_count))
 
         return self.spark.createDataFrame(results, ["funnel_step", "session_count"])
 
-    def calculate_conversion_rate(self, df: DataFrame, start_event: str, end_event: str) -> float:
+    def calculate_conversion_rate(
+        self, df: DataFrame, start_event: str, end_event: str
+    ) -> float:
         """
         Calculates the conversion rate between two events.
 
@@ -69,11 +78,17 @@ class CustomerJourney:
             The conversion rate as a float.
         """
         # Sessions that performed the start event
-        start_sessions = df.filter(F.col("event_type") == start_event).select("session_id").distinct()
+        start_sessions = (
+            df.filter(F.col("event_type") == start_event)
+            .select("session_id")
+            .distinct()
+        )
         start_count = start_sessions.count()
 
         # Sessions that performed both start and end events
-        end_sessions = df.filter(F.col("event_type") == end_event).select("session_id").distinct()
+        end_sessions = (
+            df.filter(F.col("event_type") == end_event).select("session_id").distinct()
+        )
         converted_sessions = start_sessions.join(end_sessions, "session_id").count()
 
         if start_count == 0:
@@ -93,5 +108,9 @@ class CustomerJourney:
         Runs the full conversion rate analysis pipeline.
         """
         user_behavior_df = self._load_user_behavior_data()
-        conversion_rate = self.calculate_conversion_rate(user_behavior_df, start_event, end_event)
-        print(f"Conversion rate from {start_event} to {end_event}: {conversion_rate:.2f}")
+        conversion_rate = self.calculate_conversion_rate(
+            user_behavior_df, start_event, end_event
+        )
+        print(
+            f"Conversion rate from {start_event} to {end_event}: {conversion_rate:.2f}"
+        )

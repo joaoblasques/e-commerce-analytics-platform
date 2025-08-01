@@ -118,7 +118,7 @@ jobs:
             try {
               const safetyReport = JSON.parse(fs.readFileSync('safety-report.json', 'utf8'));
               const banditReport = JSON.parse(fs.readFileSync('bandit-report.json', 'utf8'));
-              
+
               if (safetyReport.vulnerabilities?.length > 0 || banditReport.results?.length > 0) {
                 github.rest.issues.create({
                   owner: context.repo.owner,

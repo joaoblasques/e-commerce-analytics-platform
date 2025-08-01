@@ -7,7 +7,7 @@ This directory contains utility scripts for managing the E-Commerce Analytics Pl
 ### 🚀 Environment Management
 
 #### `start-dev-env.sh`
-**Purpose**: Start the complete development environment with all services  
+**Purpose**: Start the complete development environment with all services
 **Usage**: `./start-dev-env.sh [OPTIONS]`
 
 **Options**:
@@ -32,7 +32,7 @@ This directory contains utility scripts for managing the E-Commerce Analytics Pl
 ```
 
 #### `stop-dev-env.sh`
-**Purpose**: Stop the development environment  
+**Purpose**: Stop the development environment
 **Usage**: `./stop-dev-env.sh [OPTIONS]`
 
 **Options**:
@@ -59,7 +59,7 @@ This directory contains utility scripts for managing the E-Commerce Analytics Pl
 ### 🔍 Health Checks
 
 #### `test-services.py`
-**Purpose**: Test core services connectivity and health  
+**Purpose**: Test core services connectivity and health
 **Usage**: `./test-services.py`
 
 **Tests**:
@@ -72,7 +72,7 @@ This directory contains utility scripts for managing the E-Commerce Analytics Pl
 **Output**: Detailed status report with service-specific information
 
 #### `test-monitoring.py`
-**Purpose**: Test monitoring and observability services  
+**Purpose**: Test monitoring and observability services
 **Usage**: `./test-monitoring.py`
 
 **Tests**:
@@ -84,7 +84,7 @@ This directory contains utility scripts for managing the E-Commerce Analytics Pl
 **Output**: Comprehensive monitoring stack health report
 
 #### `check-health.py`
-**Purpose**: Comprehensive health check for all services and system resources  
+**Purpose**: Comprehensive health check for all services and system resources
 **Usage**: `./check-health.py [OPTIONS]`
 
 **Options**:
@@ -112,7 +112,7 @@ This directory contains utility scripts for managing the E-Commerce Analytics Pl
 ### 🗄️ Data Management
 
 #### `reset-data.sh`
-**Purpose**: Reset data in specific services or all services  
+**Purpose**: Reset data in specific services or all services
 **Usage**: `./reset-data.sh [OPTIONS]`
 
 **Options**:
@@ -142,7 +142,7 @@ This directory contains utility scripts for managing the E-Commerce Analytics Pl
 ```
 
 #### `generate-test-data.py`
-**Purpose**: Generate realistic test data for development  
+**Purpose**: Generate realistic test data for development
 **Usage**: `./generate-test-data.py [OPTIONS]`
 
 **Options**:
@@ -168,7 +168,7 @@ This directory contains utility scripts for managing the E-Commerce Analytics Pl
 ```
 
 #### `manage_kafka.py`
-**Purpose**: Comprehensive Kafka management with CLI interface  
+**Purpose**: Comprehensive Kafka management with CLI interface
 **Usage**: `python manage_kafka.py [COMMAND] [OPTIONS]`
 
 **Commands**:
@@ -189,7 +189,7 @@ This directory contains utility scripts for managing the E-Commerce Analytics Pl
 
 **Topic Configuration**:
 - **transactions**: 6 partitions, 7-day retention, LZ4 compression
-- **user-events**: 12 partitions, 3-day retention, LZ4 compression  
+- **user-events**: 12 partitions, 3-day retention, LZ4 compression
 - **product-updates**: 3 partitions, 30-day retention, GZIP compression
 - **fraud-alerts**: 2 partitions, 90-day retention, GZIP compression
 - **analytics-results**: 4 partitions, 14-day retention, GZIP compression
@@ -207,7 +207,7 @@ python manage_kafka.py describe-topic transactions
 ```
 
 #### `kafka-topics.sh`
-**Purpose**: Shell wrapper for convenient Kafka operations  
+**Purpose**: Shell wrapper for convenient Kafka operations
 **Usage**: `./kafka-topics.sh [COMMAND] [OPTIONS]`
 
 **Commands**:

@@ -1,0 +1,69 @@
+# Dockerfile for PySpark Testing Environment
+# This container provides a complete environment for running PySpark tests
+
+FROM python:3.10-slim
+
+# Install Java (required for PySpark)
+RUN apt-get update && \
+    apt-get install -y openjdk-11-jdk-headless curl wget procps && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Set Java environment
+ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+ENV PATH="$JAVA_HOME/bin:$PATH"
+
+# Install Apache Spark
+ENV SPARK_VERSION=3.4.0
+ENV HADOOP_VERSION=3
+ENV SPARK_HOME=/opt/spark
+
+RUN wget -q "https://archive.apache.org/dist/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz" && \
+    tar xzf "spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz" && \
+    mv "spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}" $SPARK_HOME && \
+    rm "spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz"
+
+ENV PATH="$SPARK_HOME/bin:$PATH"
+ENV PYTHONPATH="$SPARK_HOME/python:$SPARK_HOME/python/lib/py4j-0.10.9.7-src.zip:$PYTHONPATH"
+
+# Install Poetry
+RUN pip install poetry
+
+# Set work directory
+WORKDIR /app
+
+# Copy dependency files
+COPY pyproject.toml poetry.lock ./
+
+# Configure Poetry
+RUN poetry config virtualenvs.create false && \
+    poetry install --with dev --no-interaction --no-ansi
+
+# Copy source code
+COPY . .
+
+# Set Python path
+ENV PYTHONPATH="/app/src:$PYTHONPATH"
+
+# Create test script
+RUN echo '#!/bin/bash\n\
+set -e\n\
+\n\
+echo "Testing PySpark Environment..."\n\
+python -c "from pyspark.sql import SparkSession; spark = SparkSession.builder.appName(\\"test\\").master(\\"local[1]\\").getOrCreate(); print(\\"Spark version:\\", spark.version); spark.stop()"\n\
+\n\
+echo "Running PySpark Tests..."\n\
+pytest tests/test_data_lake_improved.py -v --tb=short -m "not integration"\n\
+\n\
+echo "Running Integration Tests..."\n\
+pytest tests/test_data_lake_improved.py -v --tb=short -m "integration" --runspark\n\
+\n\
+echo "Running All Data Lake Tests..."\n\
+pytest tests/test_data_lake.py tests/test_delta_lake.py -v --tb=short --runspark || true\n\
+\n\
+echo "Running Coverage Report..."\n\
+pytest tests/ --cov=src --cov-report=html --cov-report=term-missing --tb=short\n\
+' > /app/run_tests.sh && chmod +x /app/run_tests.sh
+
+# Default command
+CMD ["/app/run_tests.sh"]

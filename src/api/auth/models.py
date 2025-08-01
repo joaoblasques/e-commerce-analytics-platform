@@ -68,7 +68,9 @@ class UserBase(BaseModel):
     def validate_username(cls, v):
         """Validate username format."""
         if not v.isalnum() and "_" not in v and "-" not in v:
-            raise ValueError("Username can only contain letters, numbers, hyphens, and underscores")
+            raise ValueError(
+                "Username can only contain letters, numbers, hyphens, and underscores"
+            )
         return v.lower()
 
 
@@ -182,9 +184,7 @@ class APIKeyCreate(BaseModel):
     permissions: List[Permission] = Field(
         default_factory=list, description="API key permissions"
     )
-    expires_at: Optional[datetime] = Field(
-        None, description="API key expiration time"
-    )
+    expires_at: Optional[datetime] = Field(None, description="API key expiration time")
 
 
 class LoginRequest(BaseModel):
@@ -278,7 +278,11 @@ def get_role_permissions(role: UserRole) -> List[Permission]:
     return ROLE_PERMISSIONS.get(role, [])
 
 
-def has_permission(user_role: UserRole, user_permissions: List[Permission], required_permission: Permission) -> bool:
+def has_permission(
+    user_role: UserRole,
+    user_permissions: List[Permission],
+    required_permission: Permission,
+) -> bool:
     """
     Check if a user has a specific permission.
 

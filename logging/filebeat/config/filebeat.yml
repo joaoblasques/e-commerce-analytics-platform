@@ -11,12 +11,12 @@ filebeat.inputs:
     enabled: true
     paths:
       - /var/lib/docker/containers/*/*.log
-    
+
     # Container metadata
     processors:
       - add_docker_metadata:
           host: "unix:///var/run/docker.sock"
-      
+
       # Parse JSON logs from our services
       - decode_json_fields:
           fields: ["message"]
@@ -25,14 +25,14 @@ filebeat.inputs:
           when:
             contains:
               message: "{"
-      
+
       # Add ECAP-specific tags
       - add_tags:
           tags: ["ecap-container"]
           when:
             contains:
               container.image.name: "ecap"
-      
+
       # Extract service name from container name
       - script:
           lang: javascript
@@ -52,20 +52,20 @@ filebeat.inputs:
     paths:
       - /app/logs/*.log
       - /app/logs/*/*.log
-    
+
     # Multiline support for stack traces
     multiline.pattern: '^[0-9]{4}-[0-9]{2}-[0-9]{2}'
     multiline.negate: true
     multiline.match: after
     multiline.max_lines: 500
     multiline.timeout: 5s
-    
+
     # Fields and processors
     fields:
       log_type: "application"
       environment: "${ENVIRONMENT:development}"
     fields_under_root: true
-    
+
     processors:
       # Parse JSON logs
       - decode_json_fields:
@@ -75,7 +75,7 @@ filebeat.inputs:
           when:
             contains:
               message: "{"
-      
+
       # Add timestamp
       - timestamp:
           field: timestamp
@@ -90,12 +90,12 @@ filebeat.inputs:
     enabled: true
     paths:
       - /var/log/nginx/*.log
-    
+
     fields:
       log_type: "nginx"
       service.name: "nginx"
     fields_under_root: true
-    
+
     processors:
       # Parse Nginx access logs
       - dissect:
@@ -106,18 +106,18 @@ filebeat.inputs:
 # Output configuration
 output.logstash:
   hosts: ["logstash:5044"]
-  
+
   # Load balancing
   loadbalance: true
   worker: 2
-  
+
   # Compression
   compression_level: 3
-  
+
   # Bulk settings
   bulk_max_size: 2048
   flush_interval: 1s
-  
+
   # Retry settings
   max_retries: 3
   backoff.init: 1s
@@ -156,15 +156,15 @@ processors:
   # Add host information
   - add_host_metadata:
       when.not.contains.tags: "forwarded"
-  
+
   # Add Docker metadata
   - add_docker_metadata: ~
-  
+
   # Clean up fields
   - drop_fields:
       fields: ["agent", "ecs", "host.architecture", "host.os.family"]
       ignore_missing: true
-  
+
   # Rename fields for consistency
   - rename:
       fields:

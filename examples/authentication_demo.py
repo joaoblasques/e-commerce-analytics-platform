@@ -10,9 +10,10 @@ This script demonstrates how to use the authentication system including:
 Run this script with the FastAPI server running on localhost:8000.
 """
 
-import requests
 import json
 from typing import Dict, Optional
+
+import requests
 
 
 class ECAPClient:
@@ -41,10 +42,7 @@ class ECAPClient:
             Login response with token information
         """
         url = f"{self.base_url}/api/v1/auth/login"
-        data = {
-            "username": username,
-            "password": password
-        }
+        data = {"username": username, "password": password}
 
         response = self.session.post(url, json=data)
         response.raise_for_status()
@@ -53,9 +51,7 @@ class ECAPClient:
         self.token = token_data["access_token"]
 
         # Set authorization header for future requests
-        self.session.headers.update({
-            "Authorization": f"Bearer {self.token}"
-        })
+        self.session.headers.update({"Authorization": f"Bearer {self.token}"})
 
         return token_data
 
@@ -95,10 +91,7 @@ class ECAPClient:
             Created API key data
         """
         url = f"{self.base_url}/api/v1/auth/api-keys"
-        data = {
-            "name": name,
-            "permissions": permissions
-        }
+        data = {"name": name, "permissions": permissions}
 
         response = self.session.post(url, json=data)
         response.raise_for_status()
@@ -177,14 +170,13 @@ def demonstrate_jwt_authentication():
         # 5. Create an API key
         print("\n5. Creating an API key...")
         api_key_data = client.create_api_key(
-            name="Demo API Key",
-            permissions=["read:analytics", "read:customers"]
+            name="Demo API Key", permissions=["read:analytics", "read:customers"]
         )
         print(f"✅ API key created: {api_key_data['name']}")
         print(f"   Key: {api_key_data['key'][:20]}...")
         print(f"   Permissions: {api_key_data['permissions']}")
 
-        return api_key_data['key']
+        return api_key_data["key"]
 
     except requests.exceptions.HTTPError as e:
         print(f"❌ HTTP Error: {e}")
@@ -216,7 +208,7 @@ def demonstrate_api_key_authentication(api_key: str):
         print(f"✅ API key is valid!")
         print(f"   Name: {verification['name']}")
         print(f"   Permissions: {verification['permissions']}")
-        if verification['last_used']:
+        if verification["last_used"]:
             print(f"   Last used: {verification['last_used']}")
 
     except requests.exceptions.HTTPError as e:
@@ -304,10 +296,10 @@ def main():
 
     # Run demonstrations
     api_key = demonstrate_jwt_authentication()
-    
+
     if api_key:
         demonstrate_api_key_authentication(api_key)
-    
+
     demonstrate_unauthorized_access()
     demonstrate_invalid_credentials()
 

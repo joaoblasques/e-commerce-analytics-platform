@@ -382,11 +382,9 @@ class FeedbackLoop:
                 if f.timestamp >= datetime.now() - timedelta(days=30)
             ]
 
-            if (
-                len(recent_feedback)
-                >= self.config["retraining_triggers"]["min_feedback_count"]
-                and not self._has_recent_retraining("feedback_threshold")
-            ):
+            if len(recent_feedback) >= self.config["retraining_triggers"][
+                "min_feedback_count"
+            ] and not self._has_recent_retraining("feedback_threshold"):
                 self._trigger_retraining(RetrainingTrigger.FEEDBACK_THRESHOLD)
 
             # Check scheduled retraining
@@ -421,16 +419,19 @@ class FeedbackLoop:
             days=7
         )  # Don't retrain more than once per week
 
-        return any(job.trigger.value == trigger_type and job.triggered_at >= cutoff_time
-                   for job in self.retraining_jobs.values())
+        return any(
+            job.trigger.value == trigger_type and job.triggered_at >= cutoff_time
+            for job in self.retraining_jobs.values()
+        )
 
     def _should_schedule_retraining(self) -> bool:
         """Check if scheduled retraining is due."""
         last_scheduled = None
 
         for job in self.retraining_jobs.values():
-            if (job.trigger == RetrainingTrigger.SCHEDULED and 
-                (last_scheduled is None or job.triggered_at > last_scheduled)):
+            if job.trigger == RetrainingTrigger.SCHEDULED and (
+                last_scheduled is None or job.triggered_at > last_scheduled
+            ):
                 last_scheduled = job.triggered_at
 
         if last_scheduled is None:

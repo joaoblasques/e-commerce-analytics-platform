@@ -53,25 +53,25 @@ show_help() {
 stop_services() {
     local remove_volumes=$1
     local force_remove=$2
-    
+
     print_status "Stopping E-Commerce Analytics Platform services..."
     cd "$PROJECT_DIR"
-    
+
     # Build docker-compose command
     local compose_cmd="docker-compose down"
-    
+
     if [ "$remove_volumes" = true ]; then
         compose_cmd="$compose_cmd -v"
         print_warning "This will remove all data volumes!"
     fi
-    
+
     if [ "$force_remove" = true ]; then
         compose_cmd="$compose_cmd --remove-orphans"
     fi
-    
+
     # Execute the command
     eval "$compose_cmd"
-    
+
     if [ "$remove_volumes" = true ]; then
         print_success "Services stopped and data volumes removed"
     else
@@ -82,16 +82,16 @@ stop_services() {
 # Function to clean up Docker resources
 cleanup_docker() {
     print_status "Cleaning up unused Docker resources..."
-    
+
     # Remove unused networks
     docker network prune -f 2>/dev/null || true
-    
+
     # Remove unused images
     docker image prune -f 2>/dev/null || true
-    
+
     # Remove build cache
     docker builder prune -f 2>/dev/null || true
-    
+
     print_success "Docker cleanup completed"
 }
 
@@ -99,9 +99,9 @@ cleanup_docker() {
 show_status() {
     print_status "Checking current service status..."
     cd "$PROJECT_DIR"
-    
+
     local running_containers=$(docker-compose ps -q 2>/dev/null | wc -l)
-    
+
     if [ "$running_containers" -eq 0 ]; then
         print_success "No services are currently running"
     else
@@ -115,7 +115,7 @@ main() {
     local remove_volumes=false
     local force_remove=false
     local prune_resources=false
-    
+
     # Parse arguments
     while [[ $# -gt 0 ]]; do
         case $1 in
@@ -142,21 +142,21 @@ main() {
                 ;;
         esac
     done
-    
+
     # Check if Docker is available
     if ! command -v docker &> /dev/null; then
         print_error "Docker is not installed or not in PATH"
         exit 1
     fi
-    
+
     if ! command -v docker-compose &> /dev/null; then
         print_error "Docker Compose is not installed or not in PATH"
         exit 1
     fi
-    
+
     # Show current status
     show_status
-    
+
     # Confirm if removing volumes
     if [ "$remove_volumes" = true ]; then
         echo ""
@@ -175,19 +175,19 @@ main() {
             exit 0
         fi
     fi
-    
+
     # Stop services
     stop_services "$remove_volumes" "$force_remove"
-    
+
     # Clean up if requested
     if [ "$prune_resources" = true ]; then
         cleanup_docker
     fi
-    
+
     # Final status
     echo ""
     print_success "E-Commerce Analytics Platform shutdown completed"
-    
+
     if [ "$remove_volumes" = false ]; then
         print_status "Data volumes have been preserved"
         print_status "To start again: ./scripts/start-dev-env.sh"

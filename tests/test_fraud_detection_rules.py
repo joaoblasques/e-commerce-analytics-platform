@@ -1,7 +1,9 @@
-from pyspark.sql import SparkSession
-import pytest
-from src.analytics.fraud_detection_rules import FraudRuleEngine
 import pyspark.sql.functions as F
+import pytest
+from pyspark.sql import SparkSession
+
+from src.analytics.fraud_detection_rules import FraudRuleEngine
+
 
 @pytest.fixture(scope="session")
 def spark():
@@ -13,18 +15,20 @@ def spark():
         .getOrCreate()
     )
 
+
 @pytest.fixture
 def sample_transaction_data(spark):
     """Provides sample transaction data for testing fraud rules."""
     data = [
         ("txn1", "user1", 100.0, 1, "credit_card"),
         ("txn2", "user1", 1500.0, 1, "credit_card"),  # High amount
-        ("txn3", "user2", 50.0, 10, "debit_card"),   # High quantity
+        ("txn3", "user2", 50.0, 10, "debit_card"),  # High quantity
         ("txn4", "user3", 200.0, 1, "paypal"),
-        ("txn5", "user4", 3000.0, 2, "credit_card"), # High amount and quantity
+        ("txn5", "user4", 3000.0, 2, "credit_card"),  # High amount and quantity
     ]
     schema = ["transaction_id", "user_id", "amount", "quantity", "payment_method"]
     return spark.createDataFrame(data, schema)
+
 
 def test_add_rule(spark):
     """Test adding rules to the engine."""
@@ -32,6 +36,7 @@ def test_add_rule(spark):
     engine.add_rule("high_amount", "amount > 1000", "high")
     assert len(engine.rules) == 1
     assert engine.rules[0]["name"] == "high_amount"
+
 
 def test_apply_rules(spark, sample_transaction_data):
     """Test applying rules to data and calculating fraud score."""

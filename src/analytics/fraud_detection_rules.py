@@ -1,6 +1,7 @@
-from pyspark.sql import DataFrame, SparkSession
 import pyspark.sql.functions as F
+from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.types import BooleanType
+
 
 class FraudRuleEngine:
     """
@@ -48,16 +49,22 @@ class FraudRuleEngine:
 
             # Update fraud score based on severity
             if rule_severity == "high":
-                fraud_score_expr = fraud_score_expr + F.when(rule_condition, 1.0).otherwise(0.0)
+                fraud_score_expr = fraud_score_expr + F.when(
+                    rule_condition, 1.0
+                ).otherwise(0.0)
             elif rule_severity == "medium":
-                fraud_score_expr = fraud_score_expr + F.when(rule_condition, 0.5).otherwise(0.0)
+                fraud_score_expr = fraud_score_expr + F.when(
+                    rule_condition, 0.5
+                ).otherwise(0.0)
             elif rule_severity == "low":
-                fraud_score_expr = fraud_score_expr + F.when(rule_condition, 0.1).otherwise(0.0)
+                fraud_score_expr = fraud_score_expr + F.when(
+                    rule_condition, 0.1
+                ).otherwise(0.0)
 
             # Add rule name to fraud_alerts array if triggered
             fraud_alerts_array = F.when(
                 rule_condition,
-                F.array_union(fraud_alerts_array, F.array(F.lit(rule_name)))
+                F.array_union(fraud_alerts_array, F.array(F.lit(rule_name))),
             ).otherwise(fraud_alerts_array)
 
         df_with_alerts = df_with_alerts.withColumn("fraud_score", fraud_score_expr)

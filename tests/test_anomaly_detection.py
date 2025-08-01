@@ -1,9 +1,11 @@
-
-from pyspark.sql import SparkSession
-import pytest
-from src.analytics.anomaly_detection import AnomalyDetector
-import pyspark.sql.functions as F
 from datetime import datetime
+
+import pyspark.sql.functions as F
+import pytest
+from pyspark.sql import SparkSession
+
+from src.analytics.anomaly_detection import AnomalyDetector
+
 
 @pytest.fixture(scope="session")
 def spark():
@@ -15,6 +17,7 @@ def spark():
         .getOrCreate()
     )
 
+
 @pytest.fixture
 def sample_streaming_data(spark):
     """Provides sample streaming data for testing anomaly detection."""
@@ -24,14 +27,17 @@ def sample_streaming_data(spark):
         ("txn3", "user2", 1000.0, 10, datetime(2025, 1, 1, 10, 2, 0)),  # Anomaly
         ("txn4", "user3", 110.0, 1, datetime(2025, 1, 1, 10, 3, 0)),
         ("txn5", "user4", 95.0, 1, datetime(2025, 1, 1, 10, 4, 0)),
-        ("txn6", "user5", 10.0, 1, datetime(2025, 1, 1, 10, 5, 0)),   # Anomaly
+        ("txn6", "user5", 10.0, 1, datetime(2025, 1, 1, 10, 5, 0)),  # Anomaly
     ]
     schema = ["transaction_id", "user_id", "price", "quantity", "timestamp"]
     return spark.createDataFrame(data, schema)
 
+
 def test_detect_anomalies(spark, sample_streaming_data):
     """Test the anomaly detection logic."""
-    detector = AnomalyDetector(spark, stream_source_path="dummy_path") # Path is not used in this test
+    detector = AnomalyDetector(
+        spark, stream_source_path="dummy_path"
+    )  # Path is not used in this test
     feature_cols = ["price", "quantity"]
 
     # For testing, we'll use the static DataFrame as if it were a micro-batch
@@ -50,4 +56,7 @@ def test_detect_anomalies(spark, sample_streaming_data):
     # Check that non-anomalous data is not marked as anomaly
     non_anomalies = anomalies_df.filter(F.col("is_anomaly") == False).collect()
     assert len(non_anomalies) == 4
-    assert all(row["transaction_id"] in ["txn1", "txn2", "txn4", "txn5"] for row in non_anomalies)
+    assert all(
+        row["transaction_id"] in ["txn1", "txn2", "txn4", "txn5"]
+        for row in non_anomalies
+    )

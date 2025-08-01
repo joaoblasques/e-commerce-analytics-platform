@@ -61,11 +61,11 @@ check_python_deps() {
 # Main functions
 create_topics() {
     log_info "Creating Kafka topics for E-Commerce Analytics Platform..."
-    
+
     check_docker
     check_kafka_container
     check_python_deps
-    
+
     # Wait for Kafka to be ready
     log_info "Waiting for Kafka to be ready..."
     timeout=30
@@ -77,11 +77,11 @@ create_topics() {
             exit 1
         fi
     done
-    
+
     # Create topics using Python script
     if python3 "$PYTHON_SCRIPT" create-topics; then
         log_success "All topics created successfully!"
-        
+
         # Show topic summary
         echo ""
         log_info "Topic Summary:"
@@ -95,50 +95,50 @@ create_topics() {
 
 list_topics() {
     log_info "Listing Kafka topics..."
-    
+
     check_docker
     check_kafka_container
     check_python_deps
-    
+
     python3 "$PYTHON_SCRIPT" list-topics
 }
 
 describe_topic() {
     local topic_name="$1"
-    
+
     if [ -z "$topic_name" ]; then
         log_error "Please provide a topic name"
         echo "Usage: $0 describe-topic <topic-name>"
         exit 1
     fi
-    
+
     log_info "Describing topic: $topic_name"
-    
+
     check_docker
     check_kafka_container
     check_python_deps
-    
+
     python3 "$PYTHON_SCRIPT" describe-topic "$topic_name"
 }
 
 delete_topic() {
     local topic_name="$1"
-    
+
     if [ -z "$topic_name" ]; then
         log_error "Please provide a topic name"
         echo "Usage: $0 delete-topic <topic-name>"
         exit 1
     fi
-    
+
     log_warning "This will permanently delete the topic '$topic_name'"
     read -p "Are you sure? (y/N): " -n 1 -r
     echo
-    
+
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         check_docker
         check_kafka_container
         check_python_deps
-        
+
         python3 "$PYTHON_SCRIPT" delete-topic "$topic_name"
     else
         log_info "Topic deletion cancelled"
@@ -147,44 +147,44 @@ delete_topic() {
 
 health_check() {
     log_info "Performing Kafka health check..."
-    
+
     check_docker
     check_kafka_container
     check_python_deps
-    
+
     python3 "$PYTHON_SCRIPT" health-check
 }
 
 consumer_groups() {
     log_info "Listing consumer groups..."
-    
+
     check_docker
     check_kafka_container
     check_python_deps
-    
+
     python3 "$PYTHON_SCRIPT" list-consumer-groups
 }
 
 test_produce() {
     local topic_name="$1"
     local message="$2"
-    
+
     if [ -z "$topic_name" ]; then
         log_error "Please provide a topic name"
         echo "Usage: $0 test-produce <topic-name> [message]"
         exit 1
     fi
-    
+
     if [ -z "$message" ]; then
         message='{"test": "message", "timestamp": "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"}'
     fi
-    
+
     log_info "Sending test message to topic: $topic_name"
-    
+
     check_docker
     check_kafka_container
     check_python_deps
-    
+
     python3 "$PYTHON_SCRIPT" test-produce "$topic_name" --message "$message"
 }
 
@@ -192,10 +192,10 @@ test_produce() {
 kafka_cli() {
     local command="$1"
     shift
-    
+
     check_docker
     check_kafka_container
-    
+
     log_info "Executing Kafka CLI command: $command"
     docker exec -it "$KAFKA_CONTAINER" "$command" --bootstrap-server localhost:9092 "$@"
 }
@@ -207,17 +207,17 @@ reset_topics() {
     echo
     read -p "Are you sure you want to continue? (y/N): " -n 1 -r
     echo
-    
+
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         log_info "Resetting all topics..."
-        
+
         check_docker
         check_kafka_container
         check_python_deps
-        
+
         # Get list of topics to delete (excluding internal topics)
         topics=$(python3 "$PYTHON_SCRIPT" list-topics 2>/dev/null | grep -v "^Found\|^$" | grep -v "__consumer_offsets\|__transaction_state\|_schemas")
-        
+
         if [ -n "$topics" ]; then
             log_info "Deleting existing topics..."
             while IFS= read -r topic; do
@@ -226,15 +226,15 @@ reset_topics() {
                     docker exec "$KAFKA_CONTAINER" kafka-topics --bootstrap-server localhost:9092 --delete --topic "$topic" 2>/dev/null || true
                 fi
             done <<< "$topics"
-            
+
             # Wait a bit for deletion to complete
             sleep 3
         fi
-        
+
         # Recreate topics
         log_info "Creating fresh topics..."
         create_topics
-        
+
         log_success "Topic reset completed!"
     else
         log_info "Topic reset cancelled"

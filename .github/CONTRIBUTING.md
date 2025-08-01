@@ -53,13 +53,13 @@ test/test-improvements        # Test-related changes
    ```bash
    git add .
    git commit -m "feat: implement customer segmentation algorithm
-   
+
    - Add RFM analysis for customer scoring
    - Implement cohort analysis functionality
    - Add unit tests for segmentation logic
-   
+
    🤖 Generated with [Claude Code](https://claude.ai/code)
-   
+
    Co-Authored-By: Claude <noreply@anthropic.com>"
    ```
 
@@ -167,26 +167,26 @@ logger = logging.getLogger(__name__)
 
 class CustomerAnalytics:
     """Class for customer analytics operations."""
-    
+
     def __init__(self, spark_session: SparkSession) -> None:
         """Initialize with Spark session."""
         self.spark = spark_session
-    
+
     def calculate_lifetime_value(
-        self, 
+        self,
         transactions_df: DataFrame,
         time_period: Optional[str] = "1Y"
     ) -> DataFrame:
         """
         Calculate customer lifetime value.
-        
+
         Args:
             transactions_df: DataFrame with transaction data
             time_period: Time period for calculation (default: 1Y)
-            
+
         Returns:
             DataFrame with CLV calculations
-            
+
         Raises:
             ValueError: If time_period is invalid
         """
@@ -225,11 +225,11 @@ class TestCustomerAnalytics:
             .appName("test") \
             .master("local[2]") \
             .getOrCreate()
-    
+
     @pytest.fixture
     def analytics(self, spark):
         return CustomerAnalytics(spark)
-    
+
     def test_calculate_lifetime_value(self, analytics, spark):
         # Test implementation
         test_data = [
@@ -237,9 +237,9 @@ class TestCustomerAnalytics:
             ("user2", "2024-01-02", 200.0)
         ]
         df = spark.createDataFrame(test_data, ["user_id", "date", "amount"])
-        
+
         result = analytics.calculate_lifetime_value(df)
-        
+
         assert result.count() == 2
         assert "clv" in result.columns
 ```

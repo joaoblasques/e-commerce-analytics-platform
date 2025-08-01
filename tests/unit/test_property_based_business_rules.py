@@ -23,9 +23,9 @@ from pyspark.sql.types import (
 )
 
 from src.analytics.business_intelligence.revenue_analytics import RevenueAnalytics
-from src.analytics.fraud_detection.alert_prioritizer import AlertPrioritizer
-from src.analytics.fraud_detection.rules_engine import FraudRulesEngine
-from src.analytics.rfm_segmentation import RFMSegmentation
+from src.analytics.fraud_detection.alert_prioritizer import FraudAlertPrioritizer
+from src.analytics.fraud_detection.rules_engine import ConfigurableRulesEngine
+from src.analytics.rfm_segmentation import RFMSegmentationEngine
 from src.utils.spark_utils import create_spark_session
 
 
@@ -126,7 +126,7 @@ class TestRFMBusinessRuleProperties:
     @pytest.fixture(scope="class")
     def rfm_segmentation(self, spark):
         """Create RFM segmentation instance."""
-        return RFMSegmentation(spark)
+        return RFMSegmentationEngine(spark)
 
     @given(st.lists(customer_transaction_data(), min_size=1, max_size=100))
     @settings(max_examples=30, deadline=None)
@@ -264,12 +264,12 @@ class TestFraudDetectionBusinessRules:
     @pytest.fixture
     def fraud_rules_engine(self):
         """Create fraud rules engine for testing."""
-        return FraudRulesEngine()
+        return ConfigurableRulesEngine()
 
     @pytest.fixture
     def alert_prioritizer(self):
         """Create alert prioritizer for testing."""
-        return AlertPrioritizer()
+        return FraudAlertPrioritizer()
 
     @given(fraud_transaction_data())
     @settings(max_examples=50, deadline=None)

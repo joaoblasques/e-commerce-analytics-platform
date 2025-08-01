@@ -1,4 +1,5 @@
 {
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "permissions": {
     "allow": [
       "Bash(poetry run pytest:*)",
@@ -85,7 +86,17 @@
       "Bash(git commit -m \"docs: update task documentation with Task 6.1.2 completion details\n\n- Mark Task 6.1.2 as completed in ECAP_tasklist.md with comprehensive implementation details\n- Add detailed execution summary to ECAP_execution_summary.md with metrics and outcomes\n- Document 8 hours 30 minutes actual time (29% under estimate)\n- Include comprehensive property-based testing framework implementation highlights\n- Detail 5 test modules with 3,023 lines of advanced testing code\n- Document Hypothesis library integration and edge case discovery automation\n\n🤖 Generated with [Claude Code](https://claude.ai/code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\")",
       "Bash(git add ai_docs/ECAP_execution_summary.md)",
       "Bash(git commit -m \"docs: update task documentation with Task 6.1.2 completion details\n\n- Mark Task 6.1.2 as completed in ECAP_tasklist.md with comprehensive implementation details\n- Add detailed execution summary to ECAP_execution_summary.md with metrics and outcomes\n- Document 8 hours 30 minutes actual time (29% under estimate)\n- Include comprehensive property-based testing framework implementation highlights\n- Detail 5 test modules with 3,023 lines of advanced testing code\n- Document Hypothesis library integration and edge case discovery automation\n\n🤖 Generated with [Claude Code](https://claude.ai/code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\")",
-      "Bash(gh workflow list:*)"
+      "Bash(gh workflow list:*)",
+      "Bash(poetry check:*)",
+      "Bash(poetry run bandit:*)",
+      "Bash(pytest:*)",
+      "Bash(poetry run mypy:*)",
+      "Bash(poetry run flake8:*)",
+      "Bash(poetry remove:*)",
+      "Bash(make lint:*)",
+      "Bash(poetry run pre-commit run:*)",
+      "Bash(poetry run black:*)",
+      "Bash(poetry run isort:*)"
     ],
     "deny": []
   }

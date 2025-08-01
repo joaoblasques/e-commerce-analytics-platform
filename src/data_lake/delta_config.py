@@ -8,8 +8,6 @@ in the e-commerce analytics platform.
 from datetime import datetime
 from typing import Dict, List, Optional
 
-from ..utils.spark_utils import get_secure_temp_dir
-
 from pyspark.sql.types import (
     ArrayType,
     BooleanType,
@@ -24,6 +22,7 @@ from pyspark.sql.types import (
 )
 
 from ..utils.logger import setup_logging
+from ..utils.spark_utils import get_secure_temp_dir
 
 logger = setup_logging(__name__)
 
@@ -412,9 +411,7 @@ class DeltaMaintenanceScheduler:
 
 
 # Utility functions for Delta Lake operations
-def create_checkpoint_location(
-    table_name: str, base_path: str = None
-) -> str:
+def create_checkpoint_location(table_name: str, base_path: str = None) -> str:
     """Create checkpoint location path for streaming operations."""
     if base_path is None:
         base_path = get_secure_temp_dir("delta_checkpoints")

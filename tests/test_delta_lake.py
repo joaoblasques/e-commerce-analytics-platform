@@ -20,10 +20,7 @@ from pyspark.sql.types import (
 )
 
 from src.data_lake.delta import DeltaLakeManager
-from src.data_lake.delta_config import (
-    DeltaTableConfigurations,
-    DeltaTableSchemas,
-)
+from src.data_lake.delta_config import DeltaTableConfigurations, DeltaTableSchemas
 from src.data_lake.delta_maintenance import DeltaMaintenanceScheduler
 from src.data_lake.delta_streaming import DeltaStreamingManager
 

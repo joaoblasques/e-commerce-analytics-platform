@@ -12,11 +12,11 @@ from typing import Optional
 import click
 
 from ..utils.logger import setup_logging
+from ..utils.spark_utils import get_secure_temp_dir
 from .delta import DeltaLakeManager
 from .delta_config import DeltaTableConfigurations
 from .delta_maintenance import DeltaMaintenanceManager
 from .delta_streaming import DeltaStreamingManager
-from ..utils.spark_utils import get_secure_temp_dir
 
 logger = setup_logging(__name__)
 

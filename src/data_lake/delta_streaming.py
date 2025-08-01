@@ -14,9 +14,8 @@ from pyspark.sql.functions import col, current_timestamp, from_json, lit, when
 from pyspark.sql.streaming import StreamingQuery
 from pyspark.sql.types import StructType
 
-from ..utils.spark_utils import get_secure_temp_dir
-
 from ..utils.logger import setup_logging
+from ..utils.spark_utils import get_secure_temp_dir
 from .delta import DeltaLakeManager
 from .delta_config import DeltaTableConfigurations, create_checkpoint_location
 
@@ -46,7 +45,9 @@ class DeltaStreamingManager:
         self.delta_manager = delta_manager
         self.spark = delta_manager.spark
         self.kafka_servers = kafka_bootstrap_servers
-        self.checkpoint_base_path = checkpoint_base_path or get_secure_temp_dir("delta_streaming_checkpoints")
+        self.checkpoint_base_path = checkpoint_base_path or get_secure_temp_dir(
+            "delta_streaming_checkpoints"
+        )
         self.active_streams: Dict[str, StreamingQuery] = {}
 
         logger.info("Delta Streaming Manager initialized")

@@ -9,12 +9,11 @@ import secrets
 from datetime import datetime, timezone
 from typing import List, Optional
 
-from fastapi import Depends, HTTPException, status, Header
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi import Depends, Header, HTTPException, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from .auth import get_current_active_user
 from .models import APIKey, Permission, User, UserRole, has_permission
-
 
 # HTTP Bearer token scheme
 security = HTTPBearer()
@@ -48,7 +47,7 @@ class RoleChecker:
         if current_user.role not in self.allowed_roles:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"Operation requires one of these roles: {[role.value for role in self.allowed_roles]}"
+                detail=f"Operation requires one of these roles: {[role.value for role in self.allowed_roles]}",
             )
         return current_user
 
@@ -83,7 +82,7 @@ class PermissionChecker:
         ):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"Operation requires permission: {self.required_permission.value}"
+                detail=f"Operation requires permission: {self.required_permission.value}",
             )
         return current_user
 
@@ -104,13 +103,14 @@ def require_admin_role(current_user: User = Depends(get_current_active_user)) ->
     """
     if current_user.role != UserRole.ADMIN:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Admin role required"
+            status_code=status.HTTP_403_FORBIDDEN, detail="Admin role required"
         )
     return current_user
 
 
-def require_analyst_or_admin_role(current_user: User = Depends(get_current_active_user)) -> User:
+def require_analyst_or_admin_role(
+    current_user: User = Depends(get_current_active_user),
+) -> User:
     """
     Require analyst or admin role.
 
@@ -126,19 +126,23 @@ def require_analyst_or_admin_role(current_user: User = Depends(get_current_activ
     if current_user.role not in [UserRole.ANALYST, UserRole.ADMIN]:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Analyst or admin role required"
+            detail="Analyst or admin role required",
         )
     return current_user
 
 
 # Permission dependencies
-def require_read_analytics(current_user: User = Depends(get_current_active_user)) -> User:
+def require_read_analytics(
+    current_user: User = Depends(get_current_active_user),
+) -> User:
     """Require read analytics permission."""
     checker = PermissionChecker(Permission.READ_ANALYTICS)
     return checker(current_user)
 
 
-def require_write_analytics(current_user: User = Depends(get_current_active_user)) -> User:
+def require_write_analytics(
+    current_user: User = Depends(get_current_active_user),
+) -> User:
     """Require write analytics permission."""
     checker = PermissionChecker(Permission.WRITE_ANALYTICS)
     return checker(current_user)
@@ -345,7 +349,7 @@ def require_api_key_permission(permission: Permission):
         if permission not in api_key.permissions:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"API key missing required permission: {permission.value}"
+                detail=f"API key missing required permission: {permission.value}",
             )
         return api_key
 

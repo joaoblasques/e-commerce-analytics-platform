@@ -75,9 +75,16 @@ class BaseProducer(ABC):
                 headers.append(("X-Trace-ID", trace_context.trace_id.encode("utf-8")))
                 headers.append(("X-Span-ID", trace_context.span_id.encode("utf-8")))
                 if trace_context.parent_span_id:
-                    headers.append(("X-Parent-Span-ID", trace_context.parent_span_id.encode("utf-8")))
+                    headers.append(
+                        (
+                            "X-Parent-Span-ID",
+                            trace_context.parent_span_id.encode("utf-8"),
+                        )
+                    )
 
-            future = self.producer.send(self.topic, value=message, key=key, headers=headers)
+            future = self.producer.send(
+                self.topic, value=message, key=key, headers=headers
+            )
             record_metadata = future.get(timeout=10)
 
             self.metrics["messages_sent"] += 1
