@@ -506,6 +506,18 @@ open http://localhost:3000  # Grafana dashboards
 open http://localhost:8080  # Spark cluster UI
 ```
 
+### 💾 **Disk Space Management**
+```bash
+# 🧹 Clean up Docker resources when disk space gets low
+docker system prune -f
+
+# 📊 Monitor disk usage
+df -h .
+docker system df
+```
+
+**Note**: If disk space gets critically low (>95%), you might need to run `docker system prune -f` periodically to clean up unused Docker images, containers, and build cache.
+
 ## 📈 **Production Performance Metrics**
 
 ### 🎯 **Real-time Processing Performance**
