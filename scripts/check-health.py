@@ -15,9 +15,26 @@ import subprocess
 
 # Import existing health check modules
 try:
-    from test_services import *
-    from test_monitoring import *
-except ImportError as e:
+    import importlib.util
+    import os
+    
+    # Import test-services.py
+    spec_services = importlib.util.spec_from_file_location(
+        "test_services", 
+        os.path.join(os.path.dirname(__file__), "test-services.py")
+    )
+    test_services = importlib.util.module_from_spec(spec_services)
+    spec_services.loader.exec_module(test_services)
+    
+    # Import test-monitoring.py
+    spec_monitoring = importlib.util.spec_from_file_location(
+        "test_monitoring", 
+        os.path.join(os.path.dirname(__file__), "test-monitoring.py")
+    )
+    test_monitoring = importlib.util.module_from_spec(spec_monitoring)
+    spec_monitoring.loader.exec_module(test_monitoring)
+    
+except Exception as e:
     print(f"❌ Failed to import health check modules: {e}")
     print("Make sure test-services.py and test-monitoring.py are in the same directory")
     sys.exit(1)
@@ -70,11 +87,11 @@ class ComprehensiveHealthChecker:
         try:
             # Use existing test_services functions
             tests = [
-                ('postgres', test_postgres),
-                ('redis', test_redis),
-                ('minio', test_minio),
-                ('spark', test_spark),
-                ('kafka', test_kafka)
+                ('postgres', test_services.test_postgres),
+                ('redis', test_services.test_redis),
+                ('minio', test_services.test_minio),
+                ('spark', test_services.test_spark),
+                ('kafka', test_services.test_kafka)
             ]
             
             results = {}
@@ -100,8 +117,8 @@ class ComprehensiveHealthChecker:
             
             with ThreadPoolExecutor(max_workers=5) as executor:
                 future_to_service = {
-                    executor.submit(test_service, service): service 
-                    for service in MONITORING_SERVICES
+                    executor.submit(test_monitoring.test_service, service): service 
+                    for service in test_monitoring.MONITORING_SERVICES
                 }
                 
                 for future in as_completed(future_to_service):
