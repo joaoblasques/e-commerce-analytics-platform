@@ -25,7 +25,7 @@ from src.api.middleware.metrics_middleware import (
     record_transaction,
     record_user_registration,
 )
-from src.logging.structured_logger import get_logger
+from src.custom_logging.structured_logger import get_logger
 from src.monitoring import add_span_attributes, record_exception, start_span
 
 logger = get_logger(__name__)

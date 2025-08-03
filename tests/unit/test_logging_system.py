@@ -15,7 +15,7 @@ from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 
-from src.logging import (
+from src.custom_logging import (
     AsyncQueueHandler,
     CorrelationContext,
     ECSFormatter,
@@ -515,7 +515,7 @@ class TestLoggerIntegration:
 
     def test_configuration_from_settings(self):
         """Test configuration creation from settings dict."""
-        from src.logging.structured_logger import configure_from_settings
+        from src.custom_logging.structured_logger import configure_from_settings
 
         settings = {
             "app": {"name": "test-app"},
