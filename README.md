@@ -348,8 +348,77 @@ poetry run python scripts/manage_database.py create-tables
 poetry run python scripts/manage_kafka.py create-topics
 
 # 6. Generate sample data and start streaming
-./scripts/generate_stream_data.py --rate 1000 --duration 300 &
+./scripts/generate_stream_data.py stream --scenario peak_traffic --duration 5.0 &
 ```
+
+### 📦 **Data Storage & Management**
+
+#### **Generated Data Storage Locations**
+When you generate data using the platform, it's stored in multiple locations depending on the data type and processing stage:
+
+| **Data Type** | **Storage Location** | **Format** | **Purpose** |
+|---------------|---------------------|------------|-------------|
+| **🔥 Streaming Data** | Kafka Topics | JSON | Real-time event streaming |
+| **📊 Processed Data** | Delta Lake (MinIO/S3) | Parquet + Delta | Analytics-ready data lake |
+| **🗃️ Operational Data** | PostgreSQL | Relational | Customer, product, order data |
+| **💾 Cached Data** | Redis | Key-Value | Session data & real-time metrics |
+| **📈 Historical Data** | Delta Lake Partitions | Parquet | Time-series analytics |
+
+#### **Kafka Topics (Real-time Streaming)**
+```bash
+# View available topics
+./scripts/manage_kafka.py list-topics
+
+# Monitor topic data
+./scripts/manage_kafka.py describe-topic transactions
+./scripts/manage_kafka.py test-produce transactions
+```
+
+#### **Delta Lake Data Storage**
+```bash
+# Data lake structure in MinIO/S3
+data/
+├── bronze/           # Raw ingested data
+│   ├── transactions/
+│   ├── user-events/
+│   └── product-updates/
+├── silver/           # Cleaned & validated data
+│   ├── transactions_clean/
+│   ├── user_sessions/
+│   └── product_catalog/
+└── gold/            # Analytics-ready aggregations
+    ├── customer_segments/
+    ├── daily_metrics/
+    └── fraud_scores/
+```
+
+#### **Access Generated Data**
+```bash
+# Check PostgreSQL database
+poetry run python scripts/manage_database.py show-stats
+
+# View MinIO data lake (Web UI)
+open http://localhost:9000  # admin/minioadmin123
+
+# Query Delta Lake data with Spark
+poetry run python examples/query_delta_data.py
+
+# Monitor streaming data
+poetry run python scripts/monitor_streaming.py
+```
+
+#### **Data Persistence & Cleanup**
+- **🔄 Automatic Retention**: Kafka (7 days), Delta Lake (configurable)
+- **💾 Volume Mounts**: Data persists between container restarts
+- **🧹 Cleanup Commands**:
+  ```bash
+  # Reset all data (clean slate)
+  ./scripts/reset-data.sh
+  
+  # Clean specific components
+  docker-compose down -v  # Remove all volumes
+  poetry run python scripts/manage_database.py drop-tables
+  ```
 
 ### 🔍 **Service Health Check**
 ```bash
@@ -493,7 +562,7 @@ docker stats --format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}"
 ./scripts/start-dev-env.sh
 
 # 📊 Generate test data
-./scripts/generate_stream_data.py --rate 5000 --duration 600
+./scripts/generate_stream_data.py stream --scenario peak_traffic --duration 10.0
 
 # 🔄 Reset all data (clean slate)
 ./scripts/reset-data.sh
