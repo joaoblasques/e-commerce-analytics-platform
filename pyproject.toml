@@ -80,6 +80,7 @@ opentelemetry-instrumentation-kafka-python = "^0.42b0"
 schedule = "^1.2.2"
 aiohttp = "^3.12.14"
 opentelemetry-instrumentation-logging = "0.42b0"
+lz4 = "^4.4.4"
 
 [tool.poetry.group.dev.dependencies]
 # Testing

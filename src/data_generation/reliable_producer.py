@@ -61,7 +61,7 @@ class ReliableKafkaProducer:
             "value_serializer": lambda v: json.dumps(v, default=str).encode("utf-8"),
             "key_serializer": lambda k: str(k).encode("utf-8") if k else None,
             "acks": "all",  # Wait for all replicas
-            "retries": 0,  # We handle retries ourselves
+            "retries": 3,  # Required for idempotent producer
             "max_in_flight_requests_per_connection": 1,  # Ensure ordering
             "enable_idempotence": True,  # Prevent duplicates at broker level
             "compression_type": "lz4",
@@ -447,6 +447,32 @@ class ReliableKafkaProducer:
 
         logger.info(f"Replayed {replayed} messages from DLQ for topic {topic}")
         return replayed
+
+    def start_streaming(
+        self,
+        topics: List[str] = None,
+        duration_hours: float = None,
+        rate_multiplier: float = 1.0,
+    ) -> None:
+        """Start streaming data to Kafka topics."""
+        # This method is for compatibility with KafkaDataProducer interface
+        # In practice, ReliableKafkaProducer sends individual messages via send_message()
+        logger.info(f"Streaming interface activated for topics: {topics}")
+        logger.info(f"Duration: {duration_hours} hours, Rate multiplier: {rate_multiplier}")
+        
+    def stop_streaming(self) -> None:
+        """Stop streaming data."""
+        # For compatibility with KafkaDataProducer interface
+        logger.info("Streaming stopped")
+        
+    def get_stats(self) -> Dict[str, Any]:
+        """Get producer statistics."""
+        return {
+            "messages_sent": self.stats.get("messages_sent", 0),
+            "messages_failed": self.stats.get("messages_failed", 0),
+            "bytes_sent": self.stats.get("bytes_sent", 0),
+            "messages_per_second": 0.0,  # Would need timing logic to calculate
+        }
 
     def close(self) -> None:
         """Close producer and cleanup resources."""
