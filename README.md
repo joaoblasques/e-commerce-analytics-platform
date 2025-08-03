@@ -347,9 +347,90 @@ docker-compose up -d
 poetry run python scripts/manage_database.py create-tables
 poetry run python scripts/manage_kafka.py create-topics
 
-# 6. Generate sample data and start streaming
-./scripts/generate_stream_data.py stream --scenario peak_traffic --duration 5.0 &
+# 6. Generate sample streaming data (quick test data)
+python3 -c "
+from src.data_generation.generator import ECommerceDataGenerator
+from src.data_generation.config import DataGenerationConfig
+from kafka import KafkaProducer
+import json
+
+# Create minimal config and generator
+config = DataGenerationConfig()
+config.num_products = 10
+config.num_users = 10
+generator = ECommerceDataGenerator(config)
+
+# Create producer
+producer = KafkaProducer(
+    bootstrap_servers=['localhost:9092'],
+    value_serializer=lambda v: json.dumps(v, default=str).encode('utf-8'),
+    key_serializer=lambda k: str(k).encode('utf-8') if k else None
+)
+
+# Generate minimal test data
+transactions = generator.generate_transactions(5)
+for tx in transactions:
+    producer.send('transactions', key=tx['user_id'], value=tx)
+
+events = generator.generate_user_events(5)
+for event in events:
+    producer.send('user-events', key=event['session_id'], value=event)
+
+updates = generator.generate_product_updates(3)
+for update in updates:
+    producer.send('product-updates', key=update['product_id'], value=update)
+
+producer.flush()
+producer.close()
+print('✅ Generated 13 test messages across 3 topics')
+"
+
+# 7. Verify data generation was successful
+python3 -c "
+from kafka import KafkaConsumer
+import json
+
+topics = ['transactions', 'user-events', 'product-updates']
+total_messages = 0
+
+for topic in topics:
+    consumer = KafkaConsumer(
+        topic,
+        bootstrap_servers=['localhost:9092'],
+        value_deserializer=lambda m: json.loads(m.decode('utf-8')),
+        consumer_timeout_ms=1000,
+        auto_offset_reset='earliest'
+    )
+
+    count = sum(1 for _ in consumer)
+    consumer.close()
+    total_messages += count
+    print(f'✅ {topic}: {count} messages')
+
+print(f'📊 Total messages available: {total_messages}')
+if total_messages >= 10:
+    print('🚀 Ready to start streaming consumers!')
+else:
+    print('⚠️  Consider generating more data for full demo')
+"
+
+# 8. Start streaming consumers to process the data
+python3 -m src.streaming.consumer_cli run
+
+# Alternative streaming consumer commands:
+# Set up individual consumers
+python3 -m src.streaming.consumer_cli setup-default-consumers
+python3 -m src.streaming.consumer_cli start-consumers
+
+# Monitor streaming in real-time
+python3 -m src.streaming.consumer_cli monitor
 ```
+
+**🌊 What the streaming services do:**
+1. **Consume** data from Kafka topics in real-time
+2. **Process** and transform the data using Spark Structured Streaming
+3. **Write** processed results to Delta Lake and PostgreSQL
+4. **Enable** real-time analytics and monitoring
 
 ### 📦 **Data Storage & Management**
 
@@ -414,7 +495,7 @@ poetry run python scripts/monitor_streaming.py
   ```bash
   # Reset all data (clean slate)
   ./scripts/reset-data.sh
-  
+
   # Clean specific components
   docker-compose down -v  # Remove all volumes
   poetry run python scripts/manage_database.py drop-tables
