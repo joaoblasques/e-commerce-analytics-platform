@@ -6,7 +6,7 @@ from typing import Any, Dict, Optional
 from loguru import logger
 from pydantic import Field
 from pydantic_settings import BaseSettings
-from sqlalchemy import Engine, create_engine, pool
+from sqlalchemy import Engine, create_engine, pool, text
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import QueuePool
 
@@ -78,7 +78,7 @@ class DatabaseManager:
             # Test connection
             try:
                 with self._engine.connect() as conn:
-                    conn.execute("SELECT 1")
+                    conn.execute(text("SELECT 1"))
                 logger.info("Database connection successful")
             except Exception as e:
                 logger.error(f"Database connection failed: {e}")

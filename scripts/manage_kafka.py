@@ -59,8 +59,7 @@ TOPIC_CONFIGS = {
             "cleanup.policy": "delete",
             "compression.type": "lz4",
             "min.insync.replicas": "1",
-            "message.max.bytes": "1048576",  # 1MB
-            "max.message.bytes": "1048576",
+            "max.message.bytes": "1048576",  # 1MB
         },
         "description": "E-commerce transaction events with high throughput requirements",
     },
@@ -73,8 +72,7 @@ TOPIC_CONFIGS = {
             "cleanup.policy": "delete",
             "compression.type": "lz4",
             "min.insync.replicas": "1",
-            "message.max.bytes": "524288",  # 512KB
-            "max.message.bytes": "524288",
+            "max.message.bytes": "524288",  # 512KB
         },
         "description": "User behavior events (page views, clicks, searches) with very high volume",
     },
@@ -87,8 +85,7 @@ TOPIC_CONFIGS = {
             "cleanup.policy": "compact",
             "compression.type": "gzip",
             "min.insync.replicas": "1",
-            "message.max.bytes": "2097152",  # 2MB
-            "max.message.bytes": "2097152",
+            "max.message.bytes": "2097152",  # 2MB
         },
         "description": "Product catalog updates with log compaction for latest state",
     },
@@ -101,8 +98,7 @@ TOPIC_CONFIGS = {
             "cleanup.policy": "delete",
             "compression.type": "gzip",
             "min.insync.replicas": "1",
-            "message.max.bytes": "1048576",  # 1MB
-            "max.message.bytes": "1048576",
+            "max.message.bytes": "1048576",  # 1MB
         },
         "description": "Fraud detection alerts requiring longer retention",
     },
@@ -115,8 +111,7 @@ TOPIC_CONFIGS = {
             "cleanup.policy": "delete",
             "compression.type": "gzip",
             "min.insync.replicas": "1",
-            "message.max.bytes": "10485760",  # 10MB
-            "max.message.bytes": "10485760",
+            "max.message.bytes": "10485760",  # 10MB
         },
         "description": "Processed analytics results from Spark jobs",
     },
@@ -178,14 +173,20 @@ class KafkaManager:
             fs = self.admin_client.create_topics(new_topics, validate_only=False)
 
             # Wait for creation to complete
-            for topic, future in fs.items():
+            for topic in new_topics:
                 try:
-                    future.result()
-                    logger.info(f"✅ Topic '{topic}' created successfully")
+                    if hasattr(fs, "items"):
+                        future = fs[topic.name]
+                    else:
+                        future = fs.get(topic.name, None)
+
+                    if future:
+                        future.result()
+                        logger.info(f"✅ Topic '{topic.name}' created successfully")
                 except TopicAlreadyExistsError:
-                    logger.info(f"ℹ️  Topic '{topic}' already exists")
+                    logger.info(f"ℹ️  Topic '{topic.name}' already exists")
                 except Exception as e:
-                    logger.error(f"❌ Failed to create topic '{topic}': {e}")
+                    logger.error(f"❌ Failed to create topic '{topic.name}': {e}")
                     return False
 
             # Verify topics were created
@@ -209,15 +210,15 @@ class KafkaManager:
 
     def list_topics(self) -> List[str]:
         """List all topics in the Kafka cluster."""
-        if not self.admin_client:
-            if not self.connect():
-                return []
-
         try:
-            metadata = self.admin_client.describe_topics()
-            topics = list(metadata.keys())
-            logger.info(f"Found {len(topics)} topics in cluster")
-            return topics
+            # Use KafkaConsumer to get topic metadata
+            consumer = KafkaConsumer(bootstrap_servers=self.bootstrap_servers)
+            topics = consumer.list_topics()
+            consumer.close()
+
+            topic_names = list(topics.keys()) if topics else []
+            logger.info(f"Found {len(topic_names)} topics in cluster")
+            return topic_names
         except Exception as e:
             logger.error(f"Failed to list topics: {e}")
             return []

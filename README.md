@@ -344,8 +344,8 @@ docker-compose up -d
 ./scripts/check-health.py
 
 # 5. Initialize database and Kafka topics
-poetry run python scripts/manage_database.py --action create
-poetry run python scripts/manage_kafka.py --action create-topics
+poetry run python scripts/manage_database.py create-tables
+poetry run python scripts/manage_kafka.py create-topics
 
 # 6. Generate sample data and start streaming
 ./scripts/generate_stream_data.py --rate 1000 --duration 300 &

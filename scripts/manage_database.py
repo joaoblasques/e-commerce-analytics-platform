@@ -11,6 +11,7 @@ import click
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from loguru import logger
+from sqlalchemy import text
 
 from database.config import get_database_engine, get_database_session
 from database.models import Base
@@ -116,7 +117,7 @@ def test_connection():
         engine = get_database_engine()
 
         with engine.connect() as conn:
-            result = conn.execute("SELECT 1 as test")
+            result = conn.execute(text("SELECT 1 as test"))
             test_value = result.scalar()
 
         if test_value == 1:
