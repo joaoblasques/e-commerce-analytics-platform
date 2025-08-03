@@ -458,19 +458,21 @@ class ReliableKafkaProducer:
         # This method is for compatibility with KafkaDataProducer interface
         # In practice, ReliableKafkaProducer sends individual messages via send_message()
         logger.info(f"Streaming interface activated for topics: {topics}")
-        logger.info(f"Duration: {duration_hours} hours, Rate multiplier: {rate_multiplier}")
-        
+        logger.info(
+            f"Duration: {duration_hours} hours, Rate multiplier: {rate_multiplier}"
+        )
+
     def stop_streaming(self) -> None:
         """Stop streaming data."""
         # For compatibility with KafkaDataProducer interface
         logger.info("Streaming stopped")
-        
-    def get_stats(self) -> Dict[str, Any]:
-        """Get producer statistics."""
+
+    def get_basic_stats(self) -> Dict[str, Any]:
+        """Get basic producer statistics for compatibility."""
         return {
             "messages_sent": self.stats.get("messages_sent", 0),
             "messages_failed": self.stats.get("messages_failed", 0),
-            "bytes_sent": self.stats.get("bytes_sent", 0),
+            "bytes_sent": self.stats.get("total_bytes_sent", 0),
             "messages_per_second": 0.0,  # Would need timing logic to calculate
         }
 
