@@ -3,14 +3,14 @@ from starlette.requests import Request
 from starlette.responses import Response
 from starlette.types import ASGIApp
 
-from src.logging.correlation import (
+from src.custom_logging.correlation import (
     CorrelationContext,
     extract_trace_from_headers,
     generate_correlation_id,
     set_correlation_id,
     set_trace_context,
 )
-from src.logging.structured_logger import get_logger
+from src.custom_logging.structured_logger import get_logger
 
 logger = get_logger(__name__)
 

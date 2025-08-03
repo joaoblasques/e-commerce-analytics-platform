@@ -19,7 +19,7 @@ from prometheus_client import (
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import Response as StarletteResponse
 
-from src.logging.structured_logger import get_logger
+from src.custom_logging.structured_logger import get_logger
 
 logger = get_logger(__name__)
 

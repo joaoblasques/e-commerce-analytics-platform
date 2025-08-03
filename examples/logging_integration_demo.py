@@ -19,7 +19,7 @@ from fastapi.responses import JSONResponse
 from src.config import ECAPConfig
 
 # Import ECAP logging components
-from src.logging import (
+from src.custom_logging import (
     CorrelationContext,
     LoggingMiddleware,
     PerformanceLoggingMiddleware,
