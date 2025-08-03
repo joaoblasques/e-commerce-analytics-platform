@@ -146,13 +146,18 @@ class ECommerceDataGenerator:
         for i in range(self.config.total_products):
             product_id = f"prod_{i+1:06d}"
 
-            # Select category
+            # Select category with normalized weights
+            weights = [
+                self.config.get_category_weight(cat)
+                for cat in self.config.categories
+            ]
+            # Normalize weights to sum to 1.0
+            total_weight = sum(weights)
+            normalized_weights = [w / total_weight for w in weights]
+            
             category = np.random.choice(
                 self.config.categories,
-                p=[
-                    self.config.get_category_weight(cat)
-                    for cat in self.config.categories
-                ],
+                p=normalized_weights,
             )
 
             # Generate product details
