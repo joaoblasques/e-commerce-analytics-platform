@@ -69,8 +69,7 @@ def cli(ctx, kafka_servers, checkpoint_dir, max_consumers, spark_master, log_lev
     spark = create_spark_session(
         app_name="StreamingConsumerCLI",
         master=spark_master,
-        enable_hive_support=False,
-        additional_configs={
+        config={
             "spark.sql.streaming.checkpointLocation": checkpoint_dir,
             "spark.sql.streaming.kafka.consumer.pollTimeoutMs": "512",
             "spark.serializer": "org.apache.spark.serializer.KryoSerializer",
