@@ -432,6 +432,40 @@ python3 -m src.streaming.consumer_cli monitor
 3. **Write** processed results to Delta Lake and PostgreSQL
 4. **Enable** real-time analytics and monitoring
 
+**📊 Where streaming data is stored:**
+
+The streaming data is stored in multiple locations as designed:
+
+#### **📊 Real-time Streaming Data (Primary)**
+- **Location**: Kafka Topics (`localhost:9092`)
+- **Topics Available**:
+  - `transactions` - Transaction events with payment details
+  - `user-events` - User behavior events (page views, searches, cart actions)
+  - `product-updates` - Product catalog changes
+  - `fraud-alerts` - Fraud detection alerts
+  - `analytics-results` - Computed analytics metrics
+- **Format**: JSON messages with intelligent partitioning
+- **Access**: Stream consumers, real-time processing
+
+#### **🗃️ Persistent Storage (Data Lake)**
+- **Location**: Delta Lake (MinIO/S3 compatible storage)
+- **Path Structure**:
+  ```
+  /data/bronze/[topic]/year=[YYYY]/month=[MM]/day=[DD]/
+  /data/silver/processed/[domain]/
+  /data/gold/analytics/[metric_type]/
+  ```
+- **Format**: Parquet with Delta Lake ACID transactions
+
+#### **💾 Operational Database**
+- **Location**: PostgreSQL (`localhost:5432`)
+- **Tables**: customers, products, orders, user_sessions
+- **Purpose**: OLTP operations, customer profiles
+
+#### **⚡ Cache Layer**
+- **Location**: Redis (`localhost:6379`)
+- **Data**: Session data, real-time metrics, computed aggregations
+
 ### 📦 **Data Storage & Management**
 
 #### **Generated Data Storage Locations**
