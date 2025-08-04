@@ -354,10 +354,15 @@ python3 scripts/generate_quick_test_data.py
 python3 scripts/verify_test_data.py
 
 # 8. Start streaming consumers to process the data
-python3 -m src.streaming.consumer_cli run
+# Option A: Setup and start consumers in one command
+python3 -m src.streaming.consumer_cli run --setup-defaults
 
-# Alternative streaming consumer commands:
-# Set up individual consumers
+# Option B: For local Spark development (recommended for debugging)
+python3 -m src.streaming.consumer_cli --spark-master "local[*]" setup-default-consumers
+python3 -m src.streaming.consumer_cli --spark-master "local[*]" start-consumers
+python3 -m src.streaming.consumer_cli --spark-master "local[*]" run --setup-defaults
+
+# Option C: Manual setup (step-by-step)
 python3 -m src.streaming.consumer_cli setup-default-consumers
 python3 -m src.streaming.consumer_cli start-consumers
 
