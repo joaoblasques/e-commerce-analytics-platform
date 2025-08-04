@@ -113,7 +113,7 @@ def setup_default_consumers(ctx):
             click.echo(f"• {name}:")
             click.echo(f"  Topic: {consumer.topic}")
             click.echo(f"  Consumer Group: {consumer.consumer_group}")
-            click.echo(f"  Checkpoint: {consumer.checkpoint_location}")
+            click.echo(f"  Checkpoint: {manager.base_checkpoint_location}/{name}")
             click.echo()
 
     except Exception as e:
